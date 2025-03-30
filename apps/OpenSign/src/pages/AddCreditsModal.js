@@ -12,7 +12,7 @@ const AddCreditsModal = ({ show, handleClose }) => {
   const [gstRate, setGstRate] = useState(0.18); // Default value
   const djangoToken = localStorage.getItem('django')
   const [loadingQRCode, setLoadingQRCode] = useState(true);
-  const djangoUrl = 'http://localhost:8000';
+  const djangoUrl = 'https://api.instasign.ai';
 
 
   useEffect(() => {

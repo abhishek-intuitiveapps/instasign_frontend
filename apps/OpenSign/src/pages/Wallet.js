@@ -19,7 +19,7 @@ const Wallet = () => {
   const [walletDetails, setWalletDetails] = useState(null); // State to store wallet details
   const [isLoading, setIsLoading] = useState(true); // New state for loading
   const [creditsData, setCreditsData] = useState([]); // Make creditsData a state variable
-  const djangoUrl = 'http://localhost:8000';
+  const djangoUrl = 'https://api.instasign.ai';
 
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const savedRowsPerPage = localStorage.getItem("rowsPerPage");

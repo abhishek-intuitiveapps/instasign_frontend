@@ -19,7 +19,7 @@ const Wallet = () => {
   const [walletDetails, setWalletDetails] = useState(null); // State to store wallet details
   const [isLoading, setIsLoading] = useState(true); // New state for loading
   const [creditsData, setCreditsData] = useState([]); // Make creditsData a state variable
-  const djangoUrl = 'http://localhost:8000';
+  const djangoUrl = 'https://api.instasign.ai';
 
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const savedRowsPerPage = localStorage.getItem("rowsPerPage");
@@ -176,7 +176,7 @@ const Wallet = () => {
       {/* <h2 className="text-2xl font-bold text-gray-800 mb-4">Billing - Credits</h2> */}
       <div className="bg-white mt-3 px-5 py-3.5 rounded-md shadow-md overflow-x-auto" style={{ maxHeight: '80vh' }}>
         <div className="flex justify-between mb-2">
-          <h2 className="text-2xl font-bold text-gray-800 ">'http://localhost:8000'</h2>
+          <h2 className="text-2xl font-bold text-gray-800 ">'https://api.instasign.ai'</h2>
           <button 
             onClick={() => setShowModal(true)} 
             className="border border-gray-700 text-gray-700 px-4 py-2 rounded"
