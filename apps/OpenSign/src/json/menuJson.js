@@ -26,41 +26,57 @@ const sidebarList = [
     description: "",
     objectId: "35KBoSgoAK"
   },
+  // {
+  //   icon: "fa-light fa-pen-nib",
+  //   title: "Sign yourself",
+  //   target: "_self",
+  //   pageType: "form",
+  //   description: "",
+  //   objectId: "sHAnZphf69"
+  // },
+  // {
+  //   icon: "fa-light fa-paper-plane",
+  //   title: "Request signatures",
+  //   target: "_self",
+  //   pageType: "form",
+  //   description: "",
+  //   objectId: "8mZzFxbG1z"
+  // },
   {
-    icon: "fa-light fa-pen-nib",
-    title: "Sign yourself",
-    target: "_self",
-    pageType: "form",
-    description: "",
-    objectId: "sHAnZphf69"
-  },
-  {
-    icon: "fa-light fa-paper-plane",
-    title: "Request signatures",
-    target: "_self",
-    pageType: "form",
-    description: "",
-    objectId: "8mZzFxbG1z"
-  },
-  {
-    icon: "fa-light fa-newspaper",
-    title: "Templates",
+    icon: "fa-light fa-pen-fancy",
+    title: "Signature",
     target: "_self",
     pageType: null,
     description: null,
     objectId: null,
     children: [
+      // {
+      //   icon: "fa-light fa-file-signature",
+      //   title: "Create template",
+      //   target: "_self",
+      //   pageType: "form",
+      //   description: "",
+      //   objectId: "template"
+      // },
       {
-        icon: "fa-light fa-file-signature",
-        title: "Create template",
+        icon: "fa-light fa-pen-nib",
+        title: "Sign yourself",
         target: "_self",
         pageType: "form",
         description: "",
-        objectId: "template"
+        objectId: "sHAnZphf69"
+      },
+      {
+        icon: "fa-light fa-paper-plane",
+        title: "Request signatures",
+        target: "_self",
+        pageType: "form",
+        description: "",
+        objectId: "8mZzFxbG1z"
       },
       {
         icon: "fa-light fa-file-contract",
-        title: "Manage templates",
+        title: "Templates",
         target: "_self",
         pageType: "report",
         description: "",
@@ -70,15 +86,15 @@ const sidebarList = [
   },
   {
     icon: "fa-light fa-folder",
-    title: "OpenSign™ Drive",
+    title: "My Drive",
     target: "_self",
     pageType: "",
     description: "",
-    objectId: "drive"
+    objectId: "mydrive"
   },
   {
     icon: "fa-light fa-address-card",
-    title: "Documents",
+    title: "My Documents",
     target: "_self",
     pageType: null,
     description: "",
@@ -134,47 +150,81 @@ const sidebarList = [
       }
     ]
   },
+  // {
+  //   icon: "fa-light fa-address-book",
+  //   title: "Contactbook",
+  //   target: "_self",
+  //   pageType: "report",
+  //   description: "",
+  //   objectId: "contacts"
+  // },
   {
-    icon: "fa-light fa-address-book",
-    title: "Contactbook",
-    target: "_self",
-    pageType: "report",
-    description: "",
-    objectId: "contacts"
-  },
-  {
-    icon: "fa-light fa-cog",
-    title: "Settings",
+    icon: "fa-light fa-money-bills",
+    title: "Billing",
     target: "_self",
     pageType: null,
-    description: "",
+    description: null,
     objectId: null,
     children: [
       {
-        icon: "fa-light fa-pen-fancy",
-        title: "My Signature",
+        icon: "fa-light fa-wallet",
+        title: "Wallet",
         target: "_self",
-        pageType: "",
+        pageType: "wallet",
         description: "",
-        objectId: "managesign"
+        objectId: ""
       },
       {
-        icon: "fa-light fa-key",
-        title: "API Token",
+        icon: "fa-light fa-file-invoice-dollar",
+        title: "Billing",
         target: "_self",
-        pageType: "",
+        pageType: "monthlybills",
         description: "",
-        objectId: "generatetoken"
+        objectId: ""
       },
       {
-        icon: "fa-light fa-globe",
-        title: "Webhook",
+        icon: "fa-light fa-scroll",
+        title: "Transactions",
         target: "_self",
-        pageType: "",
+        pageType: "transaction",
         description: "",
-        objectId: "webhook"
-      }
+        objectId: ""
+      },
     ]
-  }
+  },
+  // {
+  //   icon: "fa-light fa-cog",
+  //   title: "Settings",
+  //   target: "_self",
+  //   pageType: null,
+  //   description: "",
+  //   objectId: null,
+  //   children: [
+  //     {
+  //       icon: "fa-light fa-pen-fancy",
+  //       title: "My Signature",
+  //       target: "_self",
+  //       pageType: "",
+  //       description: "",
+  //       objectId: "managesign"
+  //     },
+  //     {
+  //       icon: "fa-light fa-key",
+  //       title: "API Token",
+  //       target: "_self",
+  //       pageType: "",
+  //       description: "",
+  //       objectId: "generatetoken"
+  //     },
+  //     {
+  //       icon: "fa-light fa-globe",
+  //       title: "Webhook",
+  //       target: "_self",
+  //       pageType: "",
+  //       description: "",
+  //       objectId: "webhook"
+  //     }
+  //   ]
+  // }
 ];
 export default sidebarList;

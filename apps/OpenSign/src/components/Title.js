@@ -2,12 +2,10 @@ import React from "react";
 import { Helmet } from "react-helmet";
 
 function Title({ title, drive }) {
-  const appName =
-    "OpenSign™";
   return (
     <Helmet>
-      <title>{drive ? title : `${title} - ${appName}`}</title>
-      <meta name="description" content={`${title} - ${appName}`} />
+      <title>{drive ? title : `${title} - InstaSign™`}</title>
+      <meta name="description" content={`${title} - InstaSign™`} />
       <link
         rel="icon"
         type="image/png"

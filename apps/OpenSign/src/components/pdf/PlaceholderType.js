@@ -24,13 +24,12 @@ const widgetCls =
 function PlaceholderType(props) {
   const { t } = useTranslation();
   const type = props?.pos?.type;
-  const widgetTypeTranslation = t(`widgets-name.${props?.pos?.type}`);
+  const widgetTypeTraslation = t(`widgets-name.${props?.pos?.type}`);
   const [selectOption, setSelectOption] = useState("");
   const [validatePlaceholder, setValidatePlaceholder] = useState("");
   const inputRef = useRef(null);
   const [textValue, setTextValue] = useState();
   const [selectedCheckbox, setSelectedCheckbox] = useState([]);
-  const [hint, setHint] = useState("");
   const years = range(1950, getYear(new Date()) + 16, 1);
   const fontSize = props.calculateFont(props.pos.options?.fontSize);
   const fontColor = props.pos.options?.fontColor || "black";
@@ -151,11 +150,6 @@ function PlaceholderType(props) {
       if (defaultData) {
         setTextValue(defaultData);
       }
-      if (props.pos?.options?.hint) {
-        setHint(props.pos?.options.hint);
-      } else {
-        setHint(props.pos?.type);
-      }
     } else if ([textInputWidget].includes(props.pos?.type)) {
       const defaultData = props.pos?.options?.defaultValue;
       if (defaultData) {
@@ -164,6 +158,7 @@ function PlaceholderType(props) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.pos?.options?.defaultValue]);
+
   const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
     <div
       style={{
@@ -332,20 +327,13 @@ function PlaceholderType(props) {
         />
       ) : (
         <div className={widgetCls}>
-          {props.pos.type && (
-            <div
-              style={{
-                fontSize: props.pos
-                  ? props.calculateFontsize(props.pos)
-                  : "11px"
-              }}
-              className="font-medium"
-            >
-              {props.isNeedSign
-                ? props.pos?.options?.hint || widgetTypeTranslation
-                : widgetTypeTranslation}
-            </div>
-          )}
+          {props?.handleUserName &&
+            props?.handleUserName(
+              props?.data?.Id,
+              props?.data?.Role,
+              widgetTypeTraslation,
+              props.pos
+            )}
         </div>
       );
     case "stamp":
@@ -358,20 +346,13 @@ function PlaceholderType(props) {
         />
       ) : (
         <div className={widgetCls}>
-          {props.pos.type && (
-            <div
-              style={{
-                fontSize: props.pos
-                  ? props.calculateFontsize(props.pos)
-                  : "11px"
-              }}
-              className="font-medium"
-            >
-              {props.isNeedSign
-                ? props.pos?.options?.hint || widgetTypeTranslation
-                : widgetTypeTranslation}
-            </div>
-          )}
+          {props?.handleUserName &&
+            props?.handleUserName(
+              props?.data?.Id,
+              props?.data?.Role,
+              widgetTypeTraslation,
+              props.pos
+            )}
         </div>
       );
     case "checkbox":
@@ -475,7 +456,7 @@ function PlaceholderType(props) {
         />
       ) : (
         <div style={textWidgetStyle} className="select-none-cls">
-          <span>{textValue || widgetTypeTranslation}</span>
+          <span>{textValue || widgetTypeTraslation}</span>
         </div>
       );
     case "dropdown":
@@ -532,14 +513,10 @@ function PlaceholderType(props) {
           })}
         </select>
       ) : (
-        <div
-          style={textWidgetStyle}
-          className="select-none-cls flex justify-between items-center"
-        >
+        <div style={textWidgetStyle} className="select-none-cls">
           {props.pos?.options?.name
             ? props.pos.options.name
-            : widgetTypeTranslation}
-          <i className="fa-light fa-circle-chevron-down mr-1 "></i>
+            : widgetTypeTraslation}
         </div>
       );
     case "initials":
@@ -552,20 +529,13 @@ function PlaceholderType(props) {
         />
       ) : (
         <div className={widgetCls}>
-          {props.pos.type && (
-            <div
-              style={{
-                fontSize: props.pos
-                  ? props.calculateFontsize(props.pos)
-                  : "11px"
-              }}
-              className="font-medium text-center"
-            >
-              {props.isNeedSign
-                ? props.pos?.options?.hint || widgetTypeTranslation
-                : widgetTypeTranslation}
-            </div>
-          )}
+          {props?.handleUserName &&
+            props?.handleUserName(
+              props?.data?.Id,
+              props?.data?.Role,
+              widgetTypeTraslation,
+              props.pos
+            )}
         </div>
       );
     case "name":
@@ -574,7 +544,7 @@ function PlaceholderType(props) {
         (props.isNeedSign && props.data?.signerObjId === props.signerObjId) ? (
         <textarea
           ref={inputRef}
-          placeholder={hint || widgetTypeTranslation}
+          placeholder={t("widgets-name.name")}
           rows={1}
           onKeyDown={handleEnterPress}
           value={textValue}
@@ -597,7 +567,7 @@ function PlaceholderType(props) {
         />
       ) : (
         <div className="flex h-full select-none-cls" style={textWidgetStyle}>
-          <span>{widgetTypeTranslation}</span>
+          <span>{widgetTypeTraslation}</span>
         </div>
       );
     case "company":
@@ -606,7 +576,7 @@ function PlaceholderType(props) {
         (props.isNeedSign && props.data?.signerObjId === props.signerObjId) ? (
         <textarea
           ref={inputRef}
-          placeholder={hint || widgetTypeTranslation}
+          placeholder={t("widgets-name.company")}
           rows={1}
           onKeyDown={handleEnterPress}
           value={textValue}
@@ -628,7 +598,7 @@ function PlaceholderType(props) {
         />
       ) : (
         <div style={textWidgetStyle} className="select-none-cls">
-          <span>{widgetTypeTranslation}</span>
+          <span>{widgetTypeTraslation}</span>
         </div>
       );
     case "job title":
@@ -637,7 +607,7 @@ function PlaceholderType(props) {
         (props.isNeedSign && props.data?.signerObjId === props.signerObjId) ? (
         <textarea
           ref={inputRef}
-          placeholder={hint || widgetTypeTranslation}
+          placeholder={t("widgets-name.job title")}
           rows={1}
           onKeyDown={handleEnterPress}
           value={textValue}
@@ -659,7 +629,7 @@ function PlaceholderType(props) {
         />
       ) : (
         <div style={textWidgetStyle} className="select-none-cls">
-          <span>{widgetTypeTranslation}</span>
+          <span>{widgetTypeTraslation}</span>
         </div>
       );
     case "date":
@@ -702,7 +672,12 @@ function PlaceholderType(props) {
           onBlur={handleInputBlur}
           closeOnScroll={true}
           className={`${selectWidgetCls} outline-[#007bff]`}
-          selected={props?.startDate}
+          selected={
+            props?.startDate
+              ? props?.startDate
+              : props.pos.options?.response &&
+                new Date(props.pos.options.response)
+          }
           onChange={(date) => handleOnDateChange(date)}
           popperPlacement="top-end"
           customInput={<ExampleCustomInput />}
@@ -738,20 +713,13 @@ function PlaceholderType(props) {
         />
       ) : (
         <div className={widgetCls}>
-          {props.pos.type && (
-            <div
-              style={{
-                fontSize: props.pos
-                  ? props.calculateFontsize(props.pos)
-                  : "11px"
-              }}
-              className="font-medium text-center"
-            >
-              {props.isNeedSign
-                ? props.pos?.options?.hint || widgetTypeTranslation
-                : widgetTypeTranslation}
-            </div>
-          )}
+          {props?.handleUserName &&
+            props?.handleUserName(
+              props?.data?.Id,
+              props?.data?.Role,
+              widgetTypeTraslation,
+              props.pos
+            )}
         </div>
       );
     case "email":
@@ -760,7 +728,7 @@ function PlaceholderType(props) {
         (props.isNeedSign && props.data?.signerObjId === props.signerObjId) ? (
         <textarea
           ref={inputRef}
-          placeholder={hint || widgetTypeTranslation}
+          placeholder={t("widgets-name.email")}
           rows={1}
           onKeyDown={(e) => {
             // Prevent new line on Enter key press
@@ -792,7 +760,7 @@ function PlaceholderType(props) {
         />
       ) : (
         <div style={textWidgetStyle} className="select-none-cls">
-          <span>{widgetTypeTranslation}</span>
+          <span>{widgetTypeTraslation}</span>
         </div>
       );
     case radioButtonWidget:
@@ -881,20 +849,13 @@ function PlaceholderType(props) {
       ) : (
         <div className={widgetCls}>
           {props.pos.isStamp ? <div>stamp</div> : <div>signature</div>}
-          {props.pos.type && (
-            <div
-              style={{
-                fontSize: props.pos
-                  ? props.calculateFontsize(props.pos)
-                  : "11px"
-              }}
-              className="font-medium"
-            >
-              {props.isNeedSign
-                ? props.pos?.options?.hint || widgetTypeTranslation
-                : widgetTypeTranslation}
-            </div>
-          )}
+          {props?.handleUserName &&
+            props?.handleUserName(
+              props?.data?.Id,
+              props?.data?.Role,
+              null,
+              props.pos
+            )}
         </div>
       );
   }

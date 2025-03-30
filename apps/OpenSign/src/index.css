@@ -6,6 +6,36 @@ body {
   background-color: white;
 }
 
+:root {
+  color-scheme: light;
+  background-color: white;
+}
+
+input[type="password"]::-ms-reveal, 
+input[type="password"]::-ms-clear {
+  display: none;
+}
+
+input[type="password"]::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none;
+  pointer-events: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+
+
 /* Custom CSS to hide scrollbar */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
@@ -95,4 +125,26 @@ body {
 *::-webkit-scrollbar-thumb {
   background-color: gray;
   border-radius: 10px;
+}
+
+.custom-modal .modal-dialog {
+    max-width: 1200px; /* Set your desired width */
+    width: 100%; /* Ensure it takes full width */
+}
+
+.custom-modal .modal-content {
+    height: 600px; /* Set your desired height */
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
 }

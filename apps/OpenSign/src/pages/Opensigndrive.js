@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import "../styles/opensigndrive.css";
-import { iconColor } from "../constant/const";
+import {
+  iconColor,
+} from "../constant/const";
 import { getDrive } from "../constant/Utils";
 import { useNavigate } from "react-router";
 import Title from "../components/Title";
@@ -11,7 +13,6 @@ import Tour from "reactour";
 import axios from "axios";
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
-
 const DriveBody = React.lazy(
   () => import("../components/opensigndrive/DriveBody")
 );
@@ -25,8 +26,6 @@ const AppLoader = () => {
   );
 };
 function Opensigndrive() {
-  const appName = "OpenSign™";
-  const drivename = appName === "OpenSign™" ? "OpenSign™" : "";
   const { t } = useTranslation();
   const navigate = useNavigate();
   const scrollRef = useRef(null);
@@ -72,9 +71,12 @@ function Opensigndrive() {
       `Parse/${localStorage.getItem("parseAppId")}/currentUser`
     );
   const jsonCurrentUser = JSON.parse(currentUser);
+  const [selectedStatus, setSelectedStatus] = useState("All");
+  const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
 
   useEffect(() => {
-    getDetails();
+    getPdfDocumentList();
+
     // eslint-disable-next-line
   }, [docId]);
 
@@ -124,9 +126,6 @@ function Opensigndrive() {
       style: { fontSize: "13px" }
     }
   ];
-  const getDetails = async () => {
-    getPdfDocumentList();
-  };
   //function for get all pdf document list
   const getPdfDocumentList = async (disbaleLoading) => {
     setLoading(true);
@@ -139,7 +138,7 @@ function Opensigndrive() {
     try {
       const driveDetails = await getDrive(docId, skip, limit);
       if (driveDetails && driveDetails === "Error: Something went wrong!") {
-        setHandleError(t("something-went-wrong-mssg"));
+        setHandleError("Error: Something went wrong!");
       } else if (driveDetails && driveDetails.length > 0) {
         const addMoreTour = [
           {
@@ -198,9 +197,7 @@ function Opensigndrive() {
         setTourData(tourConfigs);
       }
       if (!docId) {
-        setFolderName([
-          { name: t("OpenSign-drive", { appName: drivename }), objectId: "" }
-        ]);
+        setFolderName([{ name: t("My-drive"), objectId: "" }]);
       }
     } catch (e) {
       setIsAlert({
@@ -338,40 +335,54 @@ function Opensigndrive() {
 
   //function to use sorting document list according to type and order
   const sortedBy = (appInfo, type, order) => {
-    if (type === orderName.Name) {
-      if (order === orderName.Ascending) {
-        return appInfo.sort((a, b) =>
-          a.Name.toLowerCase() < b.Name.toLowerCase() ? -1 : 1
-        );
-      } else if (order === orderName.Descending) {
-        return appInfo.sort((a, b) =>
-          a.Name.toLowerCase() < b.Name.toLowerCase() ? 1 : -1
-        );
+    // Separate folders and files
+    const folders = appInfo.filter(item => item.Type === "Folder");
+    const files = appInfo.filter(item => item.Type !== "Folder");
+
+    // Sort folders
+    folders.sort((a, b) => {
+      if (type === orderName.Name) {
+        return order === orderName.Ascending
+          ? a.Name.toLowerCase().localeCompare(b.Name.toLowerCase())
+          : b.Name.toLowerCase().localeCompare(a.Name.toLowerCase());
+      } else if (type === orderName.Date) {
+        return order === orderName.Ascending
+          ? new Date(a.createdAt) - new Date(b.createdAt)
+          : new Date(b.createdAt) - new Date(a.createdAt);
       }
-    } else if (type === orderName.Date) {
-      if (order === orderName.Ascending) {
-        return appInfo.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1));
-      } else if (order === orderName.Descending) {
-        return appInfo.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+      return 0;
+    });
+
+    // Sort files
+    files.sort((a, b) => {
+      if (type === orderName.Name) {
+        return order === orderName.Ascending
+          ? a.Name.toLowerCase().localeCompare(b.Name.toLowerCase())
+          : b.Name.toLowerCase().localeCompare(a.Name.toLowerCase());
+      } else if (type === orderName.Date) {
+        return order === orderName.Ascending
+          ? new Date(a.createdAt) - new Date(b.createdAt)
+          : new Date(b.createdAt) - new Date(a.createdAt);
       }
-    }
+      return 0;
+    });
+
+    // Concatenate folders and files
+    return [...folders, ...files];
   };
 
   //function to use get sorting type, order and document list to sort
   const sortingData = (type, order, driveDetails, isInitial) => {
-    const selectedSortType = type ? type : selectedSort;
-    const sortOrder = order ? order : sortingOrder;
+    const selectedSortType = type || selectedSort;
+    const sortOrder = order || sortingOrder;
 
-    //check isInitial true it means sort previous 20 and get on scrolling 20 = 40 document list
+    // Check if isInitial is true, it means sort previous data and new data together
     const allPdfData = isInitial ? [...pdfData, ...driveDetails] : driveDetails;
-    //call sortedBy function according to selected Type and order
-    if (selectedSortType === orderName.Name) {
-      sortedBy(allPdfData, orderName.Name, sortOrder);
-    } else if (selectedSortType === orderName.Date) {
-      sortedBy(allPdfData, orderName.Date, sortOrder);
-    }
 
-    setPdfData(allPdfData);
+    // Call sortedBy function according to selected Type and order
+    const sortedData = sortedBy(allPdfData, selectedSortType, sortOrder);
+
+    setPdfData(sortedData);
   };
 
   //function for handle auto scroll on folder path
@@ -425,21 +436,25 @@ function Opensigndrive() {
   //handle to close drop down menu onclick screen
   useEffect(() => {
     const closeMenuOnOutsideClick = (e) => {
-      if (isShowSort && !e.target.closest("#menu-container")) {
-        setIsShowSort(!isShowSort);
-      } else if (isOptions && !e.target.closest("#folder-menu")) {
-        setIsOptions(!isOptions);
-      }
+        if (isShowSort && !e.target.closest("#menu-container")) {
+            setIsShowSort(false);
+        } 
+        if (isOptions && !e.target.closest("#folder-menu")) {
+            setIsOptions(false);
+        }
+        if (isStatusDropdownOpen && !e.target.closest("#status-menu")) {
+            setIsStatusDropdownOpen(false);
+        }
     };
 
     document.addEventListener("click", closeMenuOnOutsideClick);
 
     return () => {
-      // Cleanup the event listener when the component unmounts
-      document.removeEventListener("click", closeMenuOnOutsideClick);
+        // Cleanup the event listener when the component unmounts
+        document.removeEventListener("click", closeMenuOnOutsideClick);
     };
     // eslint-disable-next-line
-  }, [isShowSort, isOptions]);
+}, [isShowSort, isOptions, isStatusDropdownOpen]);
 
   const handleFolderTab = (folderData) => {
     return folderData.map((data, id) => {
@@ -517,9 +532,84 @@ function Opensigndrive() {
       setIsTour(true);
     }
   }
+
+  // Helper functions to determine badge colors
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "In Progress":
+        return "#FFF7CC"; // Gold
+      case "Draft":
+        return "#E8F0FA"; // Light Blue
+      case "Completed":
+        return "#E8F3E1"; // Lime Green
+      case "Declined":
+        return "#F4D6D0"; // Tomato
+      case "Expired":
+        return "#D3D3D3"; // Light Gray
+      default:
+        return "#F0F0F0"; // Default Gray
+    }
+  };
+
+  const getStatusTextColor = (status) => {
+    switch (status) {
+      case "In Progress":
+        return "#8C5E00"; // Black
+      case "Draft":
+        return "#003F92"; // Black
+      case "Completed":
+        return "#355C2A"; // White
+      case "Declined":
+        return "#8A2E00"; // White
+      case "Expired":
+        return "#000000"; // Black
+      default:
+        return "#000000"; // Default Black
+    }
+  };
+
+  // Helper function to determine the status of a file
+  const getFileStatus = (data) => {
+    if (data.Type === "Folder") return null;
+
+    const expireDate = data.ExpiryDate && data.ExpiryDate.iso;
+    const createdDate = data.createdAt && data.createdAt;
+    const isComplete = data.IsCompleted && data.IsCompleted ? true : false;
+    const isDecline = data.IsDeclined && data.IsDeclined;
+    const signerExist = data.Signers && data.Signers;
+    const signedUrl = data.SignedUrl;
+
+    const expireUpdateDate = new Date(expireDate).getTime();
+    const currDate = new Date().getTime();
+    let isExpire = false;
+    if (currDate > expireUpdateDate) {
+      isExpire = true;
+    }
+
+    if (isComplete) {
+      return "Completed";
+    } else if (isDecline) {
+      return "Declined";
+    } else if (!signedUrl) {
+      return "Draft";
+    } else if (isExpire) {
+      return "Expired";
+    } else {
+      return "In Progress";
+    }
+  };
+
+  // Function to filter pdfData based on selectedStatus
+  const getFilteredPdfData = () => {
+    if (selectedStatus === "All") {
+      return pdfData;
+    }
+    return pdfData.filter((file) => getFileStatus(file) === selectedStatus);
+  };
+
   return (
     <div className="bg-base-100 text-base-content rounded-box w-full shadow-md">
-      <Title title={`${drivename} Drive`} drive={true} />
+      <Title title={"My Drive"} drive={true} />
       <ModalUi
         isOpen={isAlert.isShow}
         title={t("alert")}
@@ -627,12 +717,9 @@ function Opensigndrive() {
             >
               {handleFolderTab(folderName)}
             </div>
-            <div className="flex flex-row items-center">
-              <div
+            <div
                 id="folder-menu"
-                className={`${
-                  isOptions ? "dropdown show dropDownStyle" : "dropdown"
-                } hidden md:block`}
+                className={`${isOptions ? "dropdown show dropDownStyle" : "dropdown"} hidden md:block`}
                 onClick={() => setIsOptions(!isOptions)}
               >
                 <div className="sort" data-tut="reactourSecond">
@@ -676,6 +763,68 @@ function Opensigndrive() {
                   </div>
                 </div>
               </div>
+            
+            <div className="flex flex-row items-center" style={{ minWidth: "300px" }}>
+              
+              
+            <div
+                id="status-menu"
+                className={isStatusDropdownOpen ? "dropdown show" : "dropdown"}
+                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
+              >
+                <div className="sort" data-toggle="dropdown">
+                  <span
+                    className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center`}
+                    style={{
+                      cursor: "pointer",
+                      whiteSpace: "nowrap",
+                      backgroundColor: getStatusColor(selectedStatus),
+                      color: getStatusTextColor(selectedStatus),
+                      width: "100px",
+                      display: "inline-block"
+                    }}
+                  >
+                    {selectedStatus}
+                  </span>
+                  <i
+                    className="fa-light fa-angle-down ml-2 text-gray-600 text-bold text-base-content cursor-pointer"></i>
+                </div>
+                <div
+                  className={isStatusDropdownOpen ? "dropdown-menu show" : "dropdown-menu"}
+                  aria-labelledby="dropdownMenuButton"
+                  aria-expanded={isStatusDropdownOpen ? "true" : "false"}
+                  style={{ minWidth: "200px", width: "200px" }}
+                >
+                  {["All", "In Progress", "Draft", "Completed", "Declined", "Expired"].map((status, ind) => (
+                    <span
+                      key={ind}
+                      onClick={() => {
+                        setSelectedStatus(status);
+                        setIsStatusDropdownOpen(false);
+                      }}
+                      className="dropdown-item text-[10px] md:text-[13px]"
+                      style={{
+                        paddingLeft: selectedStatus !== status && "31px",
+                        whiteSpace: "nowrap"
+                      }}
+                    >
+                      {selectedStatus === status && (
+                        <i className="fa-light fa-check" aria-hidden="true"></i>
+                      )}
+                      <span
+                        className={`ml-[5px] text-xs font-semibold px-2.5 py-0.5 rounded text-center`}
+                        style={{
+                          whiteSpace: "nowrap",
+                          backgroundColor: getStatusColor(status),
+                          color: getStatusTextColor(status)
+                        }}
+                      >
+                        {status}
+                      </span>
+                    </span>
+                  ))}
+                </div>
+            </div>
               <div
                 id="menu-container"
                 className={isShowSort ? "dropdown show" : "dropdown"}
@@ -770,9 +919,7 @@ function Opensigndrive() {
               </div>
               <div
                 id="folder-menu"
-                className={`${
-                  isOptions ? "dropdown show dropDownStyle" : "dropdown"
-                } md:hidden`}
+                className={`${isOptions ? "dropdown show dropDownStyle" : "dropdown"} md:hidden`}
                 onClick={() => setIsOptions(!isOptions)}
               >
                 <div
@@ -833,7 +980,7 @@ function Opensigndrive() {
                 <DriveBody
                   dataTutSixth="reactourSixth"
                   dataTutSeventh="reactourSeventh"
-                  pdfData={pdfData}
+                  pdfData={getFilteredPdfData()}
                   setFolderName={setFolderName}
                   setIsLoading={setIsLoading}
                   setDocId={setDocId}

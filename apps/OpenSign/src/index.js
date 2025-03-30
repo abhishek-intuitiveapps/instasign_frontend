@@ -14,6 +14,7 @@ import {
   Preview
 } from "react-dnd-multi-backend";
 import DragElement from "./components/pdf/DragElement";
+import TagManager from "react-gtm-module";
 import Parse from "parse";
 import "./polyfills";
 import { serverUrl_fn } from "./constant/appinfo";
@@ -21,7 +22,7 @@ import "./i18n";
 
 const appId = process.env.REACT_APP_APPID
   ? process.env.REACT_APP_APPID
-  : "opensign";
+  : "InstaSign";
 const serverUrl = serverUrl_fn();
 Parse.initialize(appId);
 Parse.serverURL = serverUrl;
@@ -55,9 +56,16 @@ const generatePreview = (props) => {
   );
 };
 
+if (process.env.REACT_APP_GTM) {
+  const tagManagerArgs = {
+    gtmId: process.env.REACT_APP_GTM
+  };
+  TagManager.initialize(tagManagerArgs);
+}
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <CookiesProvider defaultSetOptions={{ path: "/" }}>
+  <CookiesProvider defaultSetOptions={{ path: "/login" }}>
     <Provider store={store}>
       <DndProvider options={HTML5toTouch}>
         <Preview>{generatePreview}</Preview>

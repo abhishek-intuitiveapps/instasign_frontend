@@ -44,39 +44,39 @@ const dashboardJson = [
           }
         }
       },
-      {
-        colsize: "col-span-12 md:col-span-6 lg:col-span-6",
-        widget: {
-          type: "report",
-          reportId: "5Go51Q7T8r",
-          label: "Recent signature requests",
-          data: {
-            tourSection: "tourreport1"
-          }
-        }
-      },
-      {
-        colsize: "col-span-12 md:col-span-6 lg:col-span-6",
-        widget: {
-          type: "report",
-          reportId: "d9k3UfYHBc",
-          label: "Recently sent for signatures",
-          data: {
-            tourSection: "tourreport2"
-          }
-        }
-      },
-      {
-        colsize: "col-span-12 md:col-span-12 lg:col-span-12",
-        widget: {
-          type: "report",
-          reportId: "kC5mfynCi4",
-          label: "Drafts",
-          data: {
-            tourSection: "tourreport3"
-          }
-        }
-      }
+      // {
+      //   colsize: "col-span-12 md:col-span-6 lg:col-span-6",
+      //   widget: {
+      //     type: "report",
+      //     reportId: "5Go51Q7T8r",
+      //     label: "Recent signature requests",
+      //     data: {
+      //       tourSection: "tourreport1"
+      //     }
+      //   }
+      // },
+      // {
+      //   colsize: "col-span-12 md:col-span-6 lg:col-span-6",
+      //   widget: {
+      //     type: "report",
+      //     reportId: "d9k3UfYHBc",
+      //     label: "Recently sent for signatures",
+      //     data: {
+      //       tourSection: "tourreport2"
+      //     }
+      //   }
+      // },
+      // {
+      //   colsize: "col-span-12 md:col-span-12 lg:col-span-12",
+      //   widget: {
+      //     type: "report",
+      //     reportId: "kC5mfynCi4",
+      //     label: "Drafts",
+      //     data: {
+      //       tourSection: "tourreport3"
+      //     }
+      //   }
+      // }
     ]
   }
 ];

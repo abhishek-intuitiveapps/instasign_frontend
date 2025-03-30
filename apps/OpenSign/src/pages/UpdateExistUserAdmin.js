@@ -7,7 +7,6 @@ import Title from "../components/Title";
 import { useTranslation } from "react-i18next";
 import { emailRegex } from "../constant/const";
 const UpdateExistUserAdmin = () => {
-  const appName = "OpenSign™";
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [formdata, setFormdata] = useState({ email: "", masterkey: "" });
@@ -29,7 +28,7 @@ const UpdateExistUserAdmin = () => {
       }
     } catch (err) {
       console.log("Err in checkadminexist", err);
-      setErrMsg(t("something-went-wrong-mssg"));
+      setErrMsg("Something went wrong.");
     } finally {
       setLoader(false);
     }
@@ -49,7 +48,7 @@ const UpdateExistUserAdmin = () => {
         // console.log("updateUserAsAdmin ", updateUserAsAdmin);
         if (updateUserAsAdmin === "admin_created") {
           setIsAlert({ type: "success", msg: t("admin-created") });
-          navigate("/");
+          navigate("/login");
         }
       } catch (err) {
         console.log("err in updateuserasadmin", err.code);
@@ -94,7 +93,7 @@ const UpdateExistUserAdmin = () => {
                     </div>
                   )}
                   <h2 className="text-[30px] text-center mt-3 font-medium">
-                    {t("opensign-setup", { appName })}
+                    {t("opensign-Setup")}
                   </h2>
                   <NavLink
                     to="https://discord.com/invite/xe9TDuyAyj"

@@ -9,7 +9,6 @@ import {
 import ModalUi from "../primitives/ModalUi";
 import Loader from "../primitives/Loader";
 import DownloadPdfZip from "../primitives/DownloadPdfZip";
-import Title from "../components/Title";
 
 const DocSuccessPage = () => {
   const signed = window.location?.search?.includes("docid");
@@ -53,7 +52,6 @@ const DocSuccessPage = () => {
   };
   return (
     <div className="flex h-screen justify-center items-center text-sm md:text-base">
-      <Title title="Success" />
       {sent ? (
         <div>{t("doc-sent")}</div>
       ) : signed ? (

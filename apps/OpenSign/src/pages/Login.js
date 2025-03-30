@@ -4,10 +4,12 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import Title from "../components/Title";
 import { NavLink, useNavigate, useLocation } from "react-router";
-import login_img from "../assets/images/login_img.svg";
+import login_img from "../assets/images/instasign.jpg";
 import { useWindowSize } from "../hook/useWindowSize";
 import ModalUi from "../primitives/ModalUi";
-import { emailRegex } from "../constant/const";
+import {
+  emailRegex,
+} from "../constant/const";
 import Alert from "../primitives/Alert";
 import { appInfo } from "../constant/appinfo";
 import { fetchAppInfo } from "../redux/reducers/infoReducer";
@@ -21,8 +23,8 @@ import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import SelectLanguage from "../components/pdf/SelectLanguage";
 
+
 function Login() {
-  const appName = "OpenSign™";
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,7 +42,7 @@ function Login() {
     baseUrl: localStorage.getItem("baseUrl"),
     parseAppId: localStorage.getItem("parseAppId"),
     loading: false,
-    thirdpartyLoader: false
+    thirdpartyLoader: false,
   });
   const [userDetails, setUserDetails] = useState({
     Company: "",
@@ -49,6 +51,10 @@ function Login() {
   const [isModal, setIsModal] = useState(false);
   const [image, setImage] = useState();
   const [errMsg, setErrMsg] = useState();
+  const [isChecked, setIsChecked] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  
+
   useEffect(() => {
     checkUserExt();
     // eslint-disable-next-line
@@ -57,8 +63,10 @@ function Login() {
   const checkUserExt = async () => {
     const app = await getAppLogo();
     if (app?.error === "invalid_json") {
-      setErrMsg(t("server-down", { appName: appName }));
-    } else if (app?.user === "not_exist") {
+      setErrMsg(t("server-down"));
+    } else if (
+      app?.user === "not_exist"
+    ) {
       navigate("/addadmin");
     }
     if (app?.logo) {
@@ -89,8 +97,18 @@ function Login() {
       const { email, password } = state;
       if (email && password) {
         try {
-          setState({ ...state, loading: true });
-          localStorage.setItem("appLogo", appInfo.applogo);
+          // Send Axios request to get access and refresh tokens
+          const response = await axios.post("https://api.dev.instasign.ai/base/api/token/", {
+            email: state.email,
+            password: state.password
+          });
+          console.log(response.data);
+          const { access, refresh } = response.data; // Destructure access and refresh tokens
+          
+          // Store tokens in local storage with new names
+          localStorage.setItem("django", access);
+          localStorage.setItem("djangoRefresh", refresh);
+
           // Pass the username and password to logIn function
           const user = await Parse.User.logIn(email, password);
           if (user) {
@@ -104,13 +122,12 @@ function Login() {
             } else {
               localStorage.setItem("profileImg", "");
             }
-            // Check extended class user role and tenentId
+            // Check extended class user role and tenantId
             try {
               const userSettings = appInfo.settings;
               await Parse.Cloud.run("getUserDetails")
                 .then(async (extUser) => {
                   if (extUser) {
-                    // console.log("extUser", extUser, extUser?.get("IsDisabled"));
                     const IsDisabled = extUser?.get("IsDisabled") || false;
                     if (!IsDisabled) {
                       const userRole = extUser?.get("UserRole");
@@ -148,17 +165,18 @@ function Login() {
                         localStorage.setItem("PageLanding", menu.pageId);
                         localStorage.setItem("defaultmenuid", menu.menuId);
                         localStorage.setItem("pageType", menu.pageType);
-                        setState({ ...state, loading: false });
-                        // Redirect to the appropriate URL after successful login
-                        navigate(redirectUrl);
+                        
+                        // Set loading to true before navigating
+                        setState({ ...state, loading: true });
+                        setTimeout(() => {
+                          navigate(redirectUrl); // Navigate after a short delay to show loading
+                        }, 500); // Adjust the delay as needed
                       } else {
-                        setState({ ...state, loading: false });
                         setIsModal(true);
                       }
                     } else {
                       setState({
                         ...state,
-                        loading: false,
                         alertType: "danger",
                         alertMsg:
                           "You don't have access, please contact the admin."
@@ -166,10 +184,8 @@ function Login() {
                       logOutUser();
                     }
                   } else {
-                    setState({ ...state, loading: false });
                     setState({
                       ...state,
-                      loading: false,
                       alertType: "danger",
                       alertMsg: "User not found."
                     });
@@ -179,37 +195,39 @@ function Login() {
                 .catch((error) => {
                   setState({
                     ...state,
-                    loading: false,
                     alertType: "danger",
-                    alertMsg: t("something-went-wrong-mssg")
+                    alertMsg: `Something went wrong.`
                   });
-                  setTimeout(() => setState({ ...state, alertMsg: "" }), 2000);
                   console.error("Error while fetching Follow", error);
                 });
             } catch (error) {
               setState({
                 ...state,
-                loading: false,
                 alertType: "danger",
                 alertMsg: `${error.message}`
               });
               console.log(error);
-              setTimeout(() => setState({ ...state, alertMsg: "" }), 2000);
             }
+
+            // Check if both Django and Parse session tokens are available
+            const parseSessionToken = localStorage.getItem("accesstoken");
+            if (!access || !parseSessionToken) {
+              setState({
+                ...state,
+                alertType: "danger",
+                alertMsg: "You must be logged in to both Django and Parse."
+              });
+              return; // Exit the function if not logged in
+            }
+
           }
         } catch (error) {
           setState({
             ...state,
-            loading: false,
             alertType: "danger",
             alertMsg: "Invalid username/password or region"
           });
           console.error("Error while logging in user", error);
-        } finally {
-          setTimeout(
-            () => setState((prev) => ({ ...prev, alertMsg: "" })),
-            2000
-          );
         }
       }
     }
@@ -241,7 +259,7 @@ function Login() {
       } else {
         localStorage.setItem("profileImg", "");
       }
-      // Check extended class user role and tenentId
+      // Check extended class user role and tenantId
       try {
         const userSettings = appInfo.settings;
         await Parse.Cloud.run("getUserDetails")
@@ -277,11 +295,15 @@ function Login() {
                   localStorage.setItem("PageLanding", menu.pageId);
                   localStorage.setItem("defaultmenuid", menu.menuId);
                   localStorage.setItem("pageType", menu.pageType);
-                  navigate(redirectUrl);
+                  
+                  // Set loading to true before navigating
+                  setState({ ...state, loading: true });
+                  setTimeout(() => {
+                    navigate(redirectUrl); // Navigate after a short delay to show loading
+                  }, 500); // Adjust the delay as needed
                 } else {
                   setState({
                     ...state,
-                    loading: false,
                     alertType: "danger",
                     alertMsg: "Role not found."
                   });
@@ -290,7 +312,6 @@ function Login() {
               } else {
                 setState({
                   ...state,
-                  loading: false,
                   alertType: "danger",
                   alertMsg: "You don't have access, please contact the admin."
                 });
@@ -325,7 +346,6 @@ function Login() {
       } finally {
         setThirdpartyLoader(false);
         setState({ ...state, loading: false });
-        setTimeout(() => setState({ ...state, alertMsg: "" }), 2000);
       }
     }
   };
@@ -375,16 +395,18 @@ function Login() {
               localStorage.setItem("PageLanding", menu.pageId);
               localStorage.setItem("defaultmenuid", menu.menuId);
               localStorage.setItem("pageType", menu.pageType);
-              // Redirect to the appropriate URL after successful login
-              navigate(redirectUrl);
+              
+              // Set loading to true before navigating
+              setState({ ...state, loading: true });
+              setTimeout(() => {
+                navigate(redirectUrl); // Navigate after a short delay to show loading
+              }, 500); // Adjust the delay as needed
             } else {
-              setState({ ...state, loading: false });
               logOutUser();
             }
           } else {
             setState({
               ...state,
-              loading: false,
               alertType: "danger",
               alertMsg: "You don't have access, please contact the admin."
             });
@@ -403,12 +425,11 @@ function Login() {
       setState({
         ...state,
         alertType: "danger",
-        alertMsg: t("something-went-wrong-mssg")
+        alertMsg: "Something went wrong, please try again later."
       });
       console.log("err", error);
     } finally {
       setState({ ...state, loading: false });
-      setTimeout(() => setState({ ...state, alertMsg: "" }), 2000);
     }
   };
 
@@ -420,13 +441,10 @@ function Login() {
     e.preventDefault();
     if (userDetails.Destination && userDetails.Company) {
       setThirdpartyLoader(true);
-      // console.log("handelSubmit", userDetails);
-      // const payload = await Parse.User.logIn(state.email, state.password);
       const payload = { sessionToken: localStorage.getItem("accesstoken") };
       const userInformation = JSON.parse(
         localStorage.getItem("UserInformation")
       );
-      // console.log("payload ", payload);
       if (payload && payload.sessionToken) {
         const params = {
           userDetails: {
@@ -440,7 +458,6 @@ function Login() {
           }
         };
         const userSignUp = await Parse.Cloud.run("usersignup", params);
-        // console.log("userSignUp ", userSignUp);
         if (userSignUp && userSignUp.sessionToken) {
           const LocalUserDetails = {
             name: userInformation.name,
@@ -463,7 +480,6 @@ function Login() {
     } else {
       setState({
         ...state,
-        loading: false,
         alertType: "warning",
         alertMsg: "Please fill required details."
       });
@@ -496,222 +512,134 @@ function Login() {
     localStorage.setItem("parseAppId", appid);
   };
 
-  return errMsg ? (
-    <div className="h-screen flex justify-center text-center items-center p-4 text-gray-500 text-base">
-      {errMsg}
-    </div>
-  ) : (
-    <div>
-      <Title title="Login" />
-      {state.loading && (
-        <div
-          aria-live="assertive"
-          className="fixed w-full h-full flex justify-center items-center bg-black bg-opacity-30 z-50"
-        >
-          <Loader />
-        </div>
-      )}
-      {appInfo && appInfo.appId ? (
-        <>
-          <div
-            aria-labelledby="loginHeading"
-            role="region"
-            className="pb-1 md:pb-4 pt-10 md:px-10 lg:px-16"
-          >
-            <div className="md:p-4 lg:p-10 p-4 bg-base-100 text-base-content op-card">
-              <div className="w-[250px] h-[66px] inline-block overflow-hidden">
-                {image && (
-                  <img
-                    src={image}
-                    className="object-contain h-full"
-                    alt="applogo"
-                  />
-                )}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-2">
-                <div>
-                  <form onSubmit={handleSubmit} aria-label="Login Form">
-                    <h1 className="text-[30px] mt-6">{t("welcome")}</h1>
-                    <fieldset>
-                      <legend className="text-[12px] text-[#878787]">
-                        {t("Login-to-your-account")}
-                      </legend>
-                      <div className="w-full px-6 py-3 my-1 op-card bg-base-100 shadow-md outline outline-1 outline-slate-300/50">
-                        <label className="block text-xs" htmlFor="email">
-                          {t("email")}
-                        </label>
-                        <input
-                          id="email"
-                          type="email"
-                          className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
-                          name="email"
-                          autoComplete="username"
-                          value={state.email}
-                          onChange={handleChange}
-                          required
-                          onInvalid={(e) =>
-                            e.target.setCustomValidity(t("input-required"))
-                          }
-                          onInput={(e) => e.target.setCustomValidity("")}
-                        />
-                        <hr className="my-1 border-none" />
-                        <label className="block text-xs" htmlFor="password">
-                          {t("password")}
-                        </label>
-                        <div className="relative">
-                          <input
-                            id="password"
-                            type={state.passwordVisible ? "text" : "password"}
-                            className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
-                            name="password"
-                            value={state.password}
-                            autoComplete="current-password"
-                            onChange={handleChange}
-                            onInvalid={(e) =>
-                              e.target.setCustomValidity(t("input-required"))
-                            }
-                            onInput={(e) => e.target.setCustomValidity("")}
-                            required
-                          />
-                          <span
-                            className="absolute cursor-pointer top-[50%] right-[10px] -translate-y-[50%] text-base-content"
-                            onClick={togglePasswordVisibility}
-                          >
-                            {state.passwordVisible ? (
-                              <i className="fa-light fa-eye-slash text-xs pb-1" /> // Close eye icon
-                            ) : (
-                              <i className="fa-light fa-eye text-xs pb-1 " /> // Open eye icon
-                            )}
-                          </span>
-                        </div>
+  const handleToggle = () => {
+    setIsChecked(!isChecked);
+  };
 
-                        <div className="relative mt-1">
-                          <NavLink
-                            to="/forgetpassword"
-                            className="text-[13px] op-link op-link-primary underline-offset-1 focus:outline-none ml-1"
-                          >
-                            {t("forgot-password")}
-                          </NavLink>
-                        </div>
-                      </div>
-                    </fieldset>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-center text-xs font-bold mt-2">
-                      <button
-                        type="submit"
-                        className="op-btn op-btn-primary"
-                        disabled={state.loading}
-                      >
-                        {state.loading ? t("loading") : t("login")}
-                      </button>
+  return (
+    <>
+      {
+      state.loading ? (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
+          <Loader /> {/* Your loading component */}
+        </div>
+      ) : errMsg ? (
+        <div className="h-screen flex justify-center text-center items-center p-4 text-gray-500 text-base">
+          {errMsg}
+        </div>
+      ) : (
+        
+        <div className="flex h-screen">
+          <Title title={"Login Page"} />
+          <div className="hidden md:flex flex-none w-2/5 justify-center items-center bg-blue-500 overflow-hidden">
+            <img src={login_img} alt="Login Illustration" className="object-cover w-full h-full" />
+          </div>
+          <div className="flex-1 flex justify-center items-center bg-white">
+            <div className="w-full max-w-md p-8">
+              <h1 className="text-2xl font-bold text-left mb-6">{t("Sign In")}</h1>
+              <form onSubmit={handleSubmit} aria-label="Login Form">
+                <fieldset className="mb-3 relative">
+                  <div className="relative w-full max-w-md">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      <i className="fa fa-envelope"></i>
                     </div>
-                  </form>
-                </div>
-                {width >= 768 && (
-                  <div className="place-self-center">
-                    <div className="mx-auto md:w-[300px] lg:w-[400px] xl:w-[500px]">
-                      <img
-                        src={login_img}
-                        alt="The image illustrates a person from behind, seated at a desk with a four-monitor computer setup, in an environment with a light blue and white color scheme, featuring a potted plant to the right."
-                        width="100%"
-                      />
+                    <input
+                      id="email"
+                      type="email"
+                      placeholder={t("Email")}
+                      className="w-full py-2 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      name="email"
+                      autoComplete="username"
+                      value={state.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </fieldset>
+                <fieldset className="mb-3 relative">
+                  <div className="relative w-full max-w-md">
+                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                      <i className="fa fa-lock"></i>
+                    </div>
+                    <input
+                      id="password"
+                      type={state.passwordVisible ? "text" : "password"}
+                      placeholder={t("Password")}
+                      className="w-full py-2 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={state.password}
+                      name="password"
+                      autoComplete="current-password"
+                      onChange={handleChange}
+                      required
+                    />
+                    <div 
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                      onClick={togglePasswordVisibility}
+                    >
+                      <i className={`fa ${state.passwordVisible ? 'fa-eye' : 'fa-eye-slash'}`}></i>
                     </div>
                   </div>
-                )}
+                </fieldset>
+                <div className="flex items-center justify-between mb-4">
+                  <label className="flex items-center cursor-pointer">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        checked={isChecked}
+                        onChange={handleToggle}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                      />
+                      <div 
+                        className={`w-5 h-5 border transition-colors ${
+                          isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
+                        } ${
+                          isFocused ? 'ring-2 ring-blue-500 ring-opacity-50 rounded-md' : 'rounded-md'
+                        }`}
+                      >
+                        {isChecked && (
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={4}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <span className="ml-2">Keep me logged in</span>
+                  </label>
+                  <NavLink to="/forgetpassword" className="text-blue-500 hover:underline">
+                    {t("Forgot Password")}
+                  </NavLink>
+                </div>
+                <div className="grid grid-cols-1 gap-1 text-center">
+                  <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white font-bold py-3 rounded-md hover:bg-blue-700 transition duration-200"
+                  >
+                    {t("Sign In")}
+                  </button>
+                </div>
+              </form>
+              <div className="text-center mt-2">
+                <span className="text-sm">
+                  {t("Don't have an account?")} <NavLink to="/signup" className="text-blue-500 hover:underline">{t("Sign up")}</NavLink>
+                </span>
               </div>
+              {state.alertMsg && (
+                <Alert type={state.alertType}>{state.alertMsg}</Alert>
+              )}
             </div>
-            <SelectLanguage />
-            {state.alertMsg && (
-              <Alert type={state.alertType}>{state.alertMsg}</Alert>
-            )}
           </div>
-          <ModalUi
-            isOpen={isModal}
-            title={t("additional-info")}
-            showClose={false}
-          >
-            <form className="px-4 py-3 text-base-content">
-              <div className="mb-3">
-                <label
-                  htmlFor="Company"
-                  style={{ display: "flex" }}
-                  className="block text-xs text-gray-700 font-semibold"
-                >
-                  {t("company")}{" "}
-                  <span className="text-[red] text-[13px]">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
-                  id="Company"
-                  value={userDetails.Company}
-                  onChange={(e) =>
-                    setUserDetails({
-                      ...userDetails,
-                      Company: e.target.value
-                    })
-                  }
-                  onInvalid={(e) =>
-                    e.target.setCustomValidity(t("input-required"))
-                  }
-                  onInput={(e) => e.target.setCustomValidity("")}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label
-                  htmlFor="JobTitle"
-                  style={{ display: "flex" }}
-                  className="block text-xs text-gray-700 font-semibold"
-                >
-                  {t("job-title")}
-                  <span className="text-[red] text-[13px]">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
-                  id="JobTitle"
-                  value={userDetails.Destination}
-                  onChange={(e) =>
-                    setUserDetails({
-                      ...userDetails,
-                      Destination: e.target.value
-                    })
-                  }
-                  onInvalid={(e) =>
-                    e.target.setCustomValidity(t("input-required"))
-                  }
-                  onInput={(e) => e.target.setCustomValidity("")}
-                  required
-                />
-              </div>
-              <div className="mt-4 gap-2 flex flex-row">
-                <button
-                  type="button"
-                  className="op-btn op-btn-primary"
-                  onClick={(e) => handleSubmitbtn(e)}
-                >
-                  {t("login")}
-                </button>
-                <button
-                  type="button"
-                  className="op-btn op-btn-ghost"
-                  onClick={logOutUser}
-                >
-                  {t("cancel")}
-                </button>
-              </div>
-            </form>
-          </ModalUi>
-        </>
-      ) : (
-        <div
-          aria-live="assertive"
-          className="fixed w-full h-full flex justify-center items-center z-50"
-        >
-          <Loader />
         </div>
       )}
-    </div>
+    </>
   );
 }
 export default Login;

@@ -5,7 +5,8 @@ FROM node:20
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json first to leverage Docker cache
-COPY ./package*.json ./
+# COPY ./package*.json ./
+COPY ./package*.json .
 
 # Install application dependencies
 RUN npm install
@@ -24,4 +25,4 @@ EXPOSE 8080
 # ENV DATABASE_URL mongodb://db:27017
 
 # Run the application
-ENTRYPOINT npm start
+ENTRYPOINT ["npm", "run", "start"]

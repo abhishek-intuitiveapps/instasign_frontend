@@ -11,6 +11,7 @@ import { useDrop } from "react-dnd";
 import SignPad from "../components/pdf/SignPad";
 import EmailComponent from "../components/pdf/EmailComponent";
 import WidgetComponent from "../components/pdf/WidgetComponent";
+import EmptyWalletImage from "../assets/images/empty_wallet.png";
 import {
   getTenantDetails,
   contractDocument,
@@ -40,10 +41,9 @@ import {
   convertBase64ToFile,
   generatePdfName,
   handleRemoveWidgets,
-  compressedFileSize,
-  addWidgetSelfsignOptions
+  compressedFileSize
 } from "../constant/Utils";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import Tour from "reactour";
 import Signedby from "../components/pdf/Signedby";
 import Header from "../components/pdf/PdfHeader";
@@ -63,14 +63,15 @@ import ModalUi from "../primitives/ModalUi";
 import TourContentWithBtn from "../primitives/TourContentWithBtn";
 import HandleError from "../primitives/HandleError";
 import LoaderWithMsg from "../primitives/LoaderWithMsg";
+
 //For signYourself inProgress section signer can add sign and complete doc sign.
 function SignYourSelf() {
   const { t } = useTranslation();
   const { docId } = useParams();
-  const appName = "OpenSign™";
   const divRef = useRef(null);
   const nodeRef = useRef(null);
   const imageRef = useRef(null);
+  const navigate = useNavigate();
   const pdfRef = useRef();
   const numPages = 1;
   const [pdfDetails, setPdfDetails] = useState([]);
@@ -124,6 +125,7 @@ function SignYourSelf() {
   const [pdfLoad, setPdfLoad] = useState(false);
   const [isAlert, setIsAlert] = useState({ isShow: false, alertMessage: "" });
   const [isDontShow, setIsDontShow] = useState(false);
+  const [extUserId, setExtUserId] = useState("");
   const [isCompleted, setIsCompleted] = useState(false);
   const [isCelebration, setIsCelebration] = useState(false);
   const [pdfArrayBuffer, setPdfArrayBuffer] = useState("");
@@ -141,11 +143,16 @@ function SignYourSelf() {
   const [isDownloadModal, setIsDownloadModal] = useState(false);
   const [isResize, setIsResize] = useState(false);
   const [isUploadPdf, setIsUploadPdf] = useState(false);
+  const [walletStatus, setWalletStatus] = useState(false);
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  const paymentMode = useSelector((state) => state.payment.mode);
+
+  const djangoUrl = 'http://localhost:8000';
+
   const [saveSignCheckbox, setSaveSignCheckbox] = useState({
     isVisible: false,
     signId: ""
   });
-  const [owner, setOwner] = useState({});
   const [, drop] = useDrop({
     accept: "BOX",
     drop: (item, monitor) => addPositionOfSignature(item, monitor),
@@ -175,8 +182,21 @@ function SignYourSelf() {
     if (documentId) {
       getDocumentDetails(true);
     }
+    if (!paymentMode) {
+      fetchStatus();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    console.log("wallet condition", walletStatus);
+    if (walletStatus || paymentMode) {
+      console.log("this condition run");
+      setIsWalletModalOpen(false);
+    } else {
+      setIsWalletModalOpen(true);
+    }
+  }, [walletStatus, paymentMode]);
 
   useEffect(() => {
     const updateSize = () => {
@@ -198,6 +218,26 @@ function SignYourSelf() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [divRef.current, isHeader]);
 
+  const fetchStatus = async () => {
+    try {
+        const response = await axios.get(`${djangoUrl}/base/api/v1/check/activity/access/`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('django')}`
+            }
+        });
+        console.log('Status fetched:', response.data.status);
+        setWalletStatus(response.data.status);
+        // setWalletStatus(true);
+        // Handle the response as needed
+    } catch (error) {
+        console.error('Error fetching status:', error);
+    }
+  };
+
+  const handleAddCredits = () => {
+    navigate("/wallet");
+  };
+
   //function for get document details for perticular signer with signer'object id
   const getDocumentDetails = async (showComplete) => {
     try {
@@ -206,8 +246,8 @@ function SignYourSelf() {
       const documentData = await contractDocument(documentId);
 
       if (documentData && documentData.length > 0) {
-        setOwner(documentData?.[0]?.ExtUserPtr);
         setPdfDetails(documentData);
+        setExtUserId(documentData[0]?.ExtUserPtr?.objectId);
         const placeholders =
           documentData[0]?.Placeholders?.length > 0
             ? documentData[0]?.Placeholders
@@ -252,11 +292,7 @@ function SignYourSelf() {
         documentData === "Error: Something went wrong!" ||
         (documentData.result && documentData.result.error)
       ) {
-        if (documentData?.result?.error?.includes("deleted")) {
-          setHandleError(t("document-deleted"));
-        } else {
-          setHandleError(t("something-went-wrong-mssg"));
-        }
+        setHandleError(t("something-went-wrong-mssg"));
         setIsLoading({ isLoad: false });
       } else {
         setHandleError(t("no-data-avaliable"));
@@ -328,7 +364,7 @@ function SignYourSelf() {
       }
     } catch (err) {
       console.log("Error: error in getDocumentDetails", err);
-      setHandleError(t("something-went-wrong-mssg"));
+      setHandleError("Error: Something went wrong!");
       setIsLoading({ isLoad: false });
     }
   };
@@ -351,6 +387,54 @@ function SignYourSelf() {
     }
   };
 
+  const addWidgetOptions = (type) => {
+    switch (type) {
+      case "signature":
+        return { name: "signature" };
+      case "stamp":
+        return { name: "stamp" };
+      case "checkbox":
+        return { name: "checkbox" };
+      case textWidget:
+        return { name: "text" };
+      case "initials":
+        return { name: "initials" };
+      case "name":
+        return {
+          name: "name",
+          defaultValue: getWidgetValue(type),
+          validation: { type: "text", pattern: "" }
+        };
+      case "company":
+        return {
+          name: "company",
+          defaultValue: getWidgetValue(type),
+          validation: { type: "text", pattern: "" }
+        };
+      case "job title":
+        return {
+          name: "job title",
+          defaultValue: getWidgetValue(type),
+          validation: { type: "text", pattern: "" }
+        };
+      case "date":
+        return {
+          name: "date",
+          response: getDate(),
+          validation: { format: "MM/dd/yyyy", type: "date-format" }
+        };
+      case "image":
+        return { name: "image" };
+      case "email":
+        return {
+          name: "email",
+          defaultValue: getWidgetValue(type),
+          validation: { type: "email", pattern: "" }
+        };
+      default:
+        return {};
+    }
+  };
   //function for setting position after drop signature button over pdf
   const addPositionOfSignature = (item, monitor) => {
     setCurrWidgetsDetails({});
@@ -375,7 +459,7 @@ function SignYourSelf() {
       // `getBoundingClientRect()` is used to get accurate measurement height of the div
       const divHeight = divRef.current.getBoundingClientRect().height;
       const getWidth = widgetTypeExist
-        ? calculateInitialWidthHeight(widgetValue).getWidth
+        ? calculateInitialWidthHeight(dragTypeValue, widgetValue).getWidth
         : defaultWidthHeight(dragTypeValue).width;
       const getHeight = defaultWidthHeight(dragTypeValue).height;
 
@@ -389,7 +473,7 @@ function SignYourSelf() {
         scale: containerScale,
         Width: getWidth,
         Height: getHeight,
-        options: addWidgetSelfsignOptions(dragTypeValue, getWidgetValue, owner)
+        options: addWidgetOptions(dragTypeValue)
       };
       dropData.push(dropObj);
     } else {
@@ -418,7 +502,7 @@ function SignYourSelf() {
         type: dragTypeValue,
         Width: getWidth / (containerScale * scale),
         Height: getHeight / (containerScale * scale),
-        options: addWidgetSelfsignOptions(dragTypeValue, getWidgetValue, owner),
+        options: addWidgetOptions(dragTypeValue),
         scale: containerScale
       };
       dropData.push(dropObj);
@@ -520,7 +604,11 @@ function SignYourSelf() {
     let pdfUrl;
     if (isUploadPdf) {
       const pdfName = generatePdfName(16);
-      pdfUrl = await convertBase64ToFile(pdfName, pdfBase64Url, "");
+      pdfUrl = await convertBase64ToFile(
+        pdfName,
+        pdfBase64Url,
+        "",
+      );
     }
     const widgetsType = ["signature", "stamp", "image", "initials"];
     let updatedXYPosition;
@@ -659,7 +747,7 @@ function SignYourSelf() {
               setIsAlert({
                 header: t("error"),
                 isShow: true,
-                alertMessage: t("pdf-uncompatible", { appName: appName })
+                alertMessage: t("pdf-uncompatible")
               });
             }
           } catch (err) {
@@ -706,7 +794,10 @@ function SignYourSelf() {
     if (tenantDetails && tenantDetails === "user does not exist!") {
       alert(t("user-not-exist"));
     } else {
-      if (tenantDetails?.CompletionBody && tenantDetails?.CompletionSubject) {
+      if (
+        tenantDetails?.CompletionBody &&
+        tenantDetails?.CompletionSubject
+      ) {
         isCustomCompletionMail = true;
       }
     }
@@ -1147,8 +1238,9 @@ function SignYourSelf() {
     setShowRotateAlert({ status: false, degree: 0 });
   };
   return (
+    <>
     <DndProvider backend={HTML5Backend}>
-      <Title title={"Signyourself"} />
+      <Title title={"signyourself"} />
       {isLoading.isLoad ? (
         <LoaderWithMsg isLoading={isLoading} />
       ) : handleError ? (
@@ -1320,10 +1412,13 @@ function SignYourSelf() {
                 {/*render email component to send email after finish signature on document */}
                 <EmailComponent
                   isEmail={isEmail}
+                  pdfUrl={pdfUrl}
                   setIsEmail={setIsEmail}
-                  setSuccessEmail={setSuccessEmail}
                   pdfDetails={pdfDetails}
+                  setSuccessEmail={setSuccessEmail}
+                  sender={jsonSender}
                   setIsAlert={setIsAlert}
+                  extUserId={extUserId}
                   setIsDownloadModal={setIsDownloadModal}
                 />
                 {/* pdf header which contain funish back button */}
@@ -1470,6 +1565,22 @@ function SignYourSelf() {
         currWidgetsDetails={currWidgetsDetails}
       />
     </DndProvider>
+    {isWalletModalOpen && (
+        <ModalUi isOpen={isWalletModalOpen} handleClose={() => {
+          // setIsWalletModalOpen(false);
+          navigate("/dashboard/35KBoSgoAK"); // Redirect to the dashboard
+        }} 
+        showClose={true}>
+          <div className="p-4 flex flex-col items-center">
+            <img src={EmptyWalletImage} alt="Empty Wallet" className="w-32 h-auto mb-4" />
+            <p className="text-xl font-semibold">Your wallet is empty</p>
+            <button onClick={handleAddCredits} className="op-btn op-btn-primary mt-2 text-lg text-white">
+              Add Credits
+            </button>
+          </div>
+        </ModalUi>
+      )}
+      </>
   );
 }
 

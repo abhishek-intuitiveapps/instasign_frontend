@@ -33,9 +33,8 @@ const AddContact = (props) => {
     try {
       const baseURL = localStorage.getItem("baseUrl");
       const url = `${baseURL}functions/isuserincontactbook`;
-      const token = {
-        "X-Parse-Session-Token": localStorage.getItem("accesstoken")
-      };
+      const token =
+            { "X-Parse-Session-Token": localStorage.getItem("accesstoken") };
       const headers = {
         "Content-Type": "application/json",
         "X-Parse-Application-Id": localStorage.getItem("parseAppId"),
@@ -64,15 +63,18 @@ const AddContact = (props) => {
         )
       );
       const userId = user?.objectId || "";
-      const tenantDetails = await getTenantDetails(userId);
+      const tenantDetails = await getTenantDetails(
+        userId,
+      );
       const tenantId = tenantDetails?.objectId || "";
       if (tenantId) {
         try {
           const baseURL = localStorage.getItem("baseUrl");
           const url = `${baseURL}functions/savecontact`;
-          const token = {
-            "X-Parse-Session-Token": localStorage.getItem("accesstoken")
-          };
+          const token =
+                {
+                  "X-Parse-Session-Token": localStorage.getItem("accesstoken")
+                };
           const data = { name, email, phone, tenantId };
           const headers = {
             "Content-Type": "application/json",
@@ -135,9 +137,7 @@ const AddContact = (props) => {
         </div>
       )}
       <div className="w-full mx-auto p-[8px]">
-        {!props?.isDisableTitle && (
-          <div className="text-[14px] font-[700]">{t("add-contact")}</div>
-        )}
+        <div className="text-[14px] font-[700]">{t("add-contact")}</div>
         {isUserExist && (
           <div className="mb-[0.75rem] flex items-center mt-1">
             <input

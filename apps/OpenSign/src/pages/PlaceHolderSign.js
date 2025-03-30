@@ -3,6 +3,9 @@ import axios from "axios";
 import Parse from "parse";
 import "../styles/signature.css";
 import { PDFDocument } from "pdf-lib";
+import {
+  themeColor
+} from "../constant/const";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useDrop } from "react-dnd";
@@ -40,8 +43,7 @@ import {
   signatureTypes,
   handleSignatureType,
   getBase64FromUrl,
-  generatePdfName,
-  mailTemplate
+  generatePdfName
 } from "../constant/Utils";
 import RenderPdf from "../components/pdf/RenderPdf";
 import { useNavigate } from "react-router";
@@ -65,11 +67,10 @@ import LottieWithLoader from "../primitives/DotLottieReact";
 import Alert from "../primitives/Alert";
 import AsyncSelect from "react-select/async";
 import AddContact from "../primitives/AddContact";
+import EmptyWalletImage from "../assets/images/empty_wallet.png"; // Add the import for the image
 
 function PlaceHolderSign() {
   const { t } = useTranslation();
-  const copyUrlRef = useRef(null);
-  const appName = "OpenSign™";
   const editorRef = useRef();
   const { state } = useLocation();
   const navigate = useNavigate();
@@ -142,6 +143,7 @@ function PlaceHolderSign() {
   const [isCurrUser, setIsCurrUser] = useState(false);
   const [pdfArrayBuffer, setPdfArrayBuffer] = useState("");
   const isHeader = useSelector((state) => state.showHeader);
+  const paymentMode = useSelector((state) => state.payment.mode);
   const [showRotateAlert, setShowRotateAlert] = useState({
     status: false,
     degree: 0
@@ -150,6 +152,7 @@ function PlaceHolderSign() {
     status: false,
     message: ""
   });
+  const [extUserId, setExtUserId] = useState("");
   const [isCustomize, setIsCustomize] = useState(false);
   const [zoomPercent, setZoomPercent] = useState(0);
   const [scale, setScale] = useState(1);
@@ -163,20 +166,72 @@ function PlaceHolderSign() {
   const [userList, setUserList] = useState([]);
   const [isAttchSignerModal, setIsAttchSignerModal] = useState(false);
   const [isNewContact, setIsNewContact] = useState({ status: false, id: "" });
-  const [owner, setOwner] = useState({});
   const isMobile = window.innerWidth < 767;
+  const [walletStatus, setWalletStatus] = useState(false);
   const [, drop] = useDrop({
     accept: "BOX",
     drop: (item, monitor) => addPositionOfSignature(item, monitor),
     collect: (monitor) => ({ isOver: !!monitor.isOver() })
   });
+  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false); // Add state for the wallet modal
+
   const documentId = docId;
+  const userEmail = localStorage.getItem('djangoUser')?.email; // Get user email from localStorage
+  const token = localStorage.getItem('django'); 
+
+  const djangoUrl = 'http://localhost:8000';
+
   useEffect(() => {
     if (documentId) {
       getDocumentDetails();
     }
+    if (!paymentMode) {
+      fetchStatus();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // useEffect(() => {
+  //   console.log("wallet condition", walletStatus);
+  //   if (walletStatus) {
+  //     console.log("this condition run");
+  //     setIsWalletModalOpen(false);
+  //   } else {
+  //     setIsWalletModalOpen(true);
+  //   }
+  // }, [walletStatus]);
+
+  useEffect(() => {
+    console.log("wallet condition", walletStatus);
+    if (walletStatus || paymentMode) {
+      console.log("this condition run");
+      setIsWalletModalOpen(false);
+    } else {
+      setIsWalletModalOpen(true);
+    }
+  }, [walletStatus, paymentMode]);
+
+
+
+  const fetchStatus = async () => {
+    try {
+        const response = await axios.get(`${djangoUrl}/base/api/v1/check/activity/access/`, {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('django')}`
+            }
+        });
+        console.log('Status fetched:', response.data.status);
+        setWalletStatus(response.data.status);
+        // setWalletStatus(true);
+        // Handle the response as needed
+    } catch (error) {
+        console.error('Error fetching status:', error);
+    }
+  };
+
+  const handleAddCredits = () => {
+    navigate("/wallet");
+  };
 
   //function to fetch tenant Details
   const fetchTenantDetails = async () => {
@@ -187,7 +242,7 @@ function PlaceHolderSign() {
     );
     if (user) {
       try {
-        const defaultRequestBody = `<p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}}&nbsp;has requested you to review and sign&nbsp;{{document_title}}.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team ${appName}</p><br>`;
+        const defaultRequestBody = `<p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}}&nbsp;has requested you to review and sign&nbsp;{{document_title}}.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team OpenSign™</p><br>`;
         const defaultSubject = `{{sender_name}} has requested you to sign {{document_title}}`;
         setDefaultBody(defaultRequestBody);
         setDefaultSubject(defaultSubject);
@@ -245,15 +300,12 @@ function PlaceHolderSign() {
     if (documentData && documentData.length > 0) {
       if (documentData[0]?.Placeholders?.length > 0) {
         const signerNotExist = documentData[0]?.Placeholders.some(
-          (data) => !data.signerObjId && data.Role !== "prefill"
+          (data) => !data.signerObjId
         );
         //condition to check any role does not attach signer
         if (signerNotExist) {
-          const filterPrefill = documentData[0]?.Placeholders?.filter(
-            (x) => x.Role !== "prefill"
-          );
           let users = [];
-          filterPrefill?.forEach((element) => {
+          documentData[0]?.Placeholders?.forEach((element) => {
             let label = "";
             const signerData = documentData[0]?.Signers.find(
               (x) => element.signerObjId && element.signerObjId === x.objectId
@@ -274,7 +326,6 @@ function PlaceHolderSign() {
           setForms(users);
         }
       }
-
       const url = documentData[0] && documentData[0]?.URL;
       //convert document url in array buffer format to use embed widgets in pdf using pdf-lib
       const arrayBuffer = await convertPdfArrayBuffer(url);
@@ -285,7 +336,7 @@ function PlaceHolderSign() {
         setPdfArrayBuffer(arrayBuffer);
         setPdfBase64Url(base64Pdf);
       }
-      setOwner(documentData?.[0]?.ExtUserPtr);
+      setExtUserId(documentData[0]?.ExtUserPtr?.objectId);
       const alreadyPlaceholder = documentData[0]?.SignedUrl;
       // Check if document is sent for signing
       if (alreadyPlaceholder) {
@@ -456,11 +507,7 @@ function PlaceHolderSign() {
       documentData === "Error: Something went wrong!" ||
       (documentData.result && documentData.result.error)
     ) {
-      if (documentData?.result?.error?.includes("deleted")) {
-        setHandleError(t("document-deleted"));
-      } else {
-        setHandleError(t("something-went-wrong-mssg"));
-      }
+      setHandleError(t("something-went-wrong-mssg"));
       setIsLoading({ isLoad: false });
     } else {
       setHandleError(t("no-data-avaliable"));
@@ -528,7 +575,7 @@ function PlaceHolderSign() {
           scale: containerScale,
           zIndex: posZIndex,
           type: dragTypeValue,
-          options: addWidgetOptions(dragTypeValue, owner),
+          options: addWidgetOptions(dragTypeValue),
           Width: widgetWidth / (containerScale * scale),
           Height: widgetHeight / (containerScale * scale)
         };
@@ -559,7 +606,7 @@ function PlaceHolderSign() {
           scale: containerScale,
           zIndex: posZIndex,
           type: dragTypeValue,
-          options: addWidgetOptions(dragTypeValue, owner),
+          options: addWidgetOptions(dragTypeValue),
           Width: widgetWidth / (containerScale * scale),
           Height: widgetHeight / (containerScale * scale)
         };
@@ -866,7 +913,11 @@ function PlaceHolderSign() {
           scale
         );
         const pdfName = generatePdfName(16);
-        const pdfUrl = await convertBase64ToFile(pdfName, pdfBase64, "");
+        const pdfUrl = await convertBase64ToFile(
+          pdfName,
+          pdfBase64,
+          "",
+        );
         const tenantId = localStorage.getItem("TenantId");
         const buffer = atob(pdfBase64);
         SaveFileSize(buffer.length, pdfUrl, tenantId);
@@ -878,7 +929,11 @@ function PlaceHolderSign() {
     } else if (pdfBase64Url) {
       try {
         const pdfName = generatePdfName(16);
-        const pdfUrl = await convertBase64ToFile(pdfName, pdfBase64Url, "");
+        const pdfUrl = await convertBase64ToFile(
+          pdfName,
+          pdfBase64Url,
+          "",
+        );
         return pdfUrl;
       } catch (err) {
         console.log("error to convertBase64ToFile in placeholder flow", err);
@@ -984,7 +1039,11 @@ function PlaceHolderSign() {
     let pdfUrl;
     if (isUploadPdf) {
       const pdfName = generatePdfName(16);
-      pdfUrl = await convertBase64ToFile(pdfName, pdfBase64Url, "");
+      pdfUrl = await convertBase64ToFile(
+        pdfName,
+        pdfBase64Url,
+        "",
+      );
     }
     try {
       const docCls = new Parse.Object("contracts_Document");
@@ -998,7 +1057,7 @@ function PlaceHolderSign() {
         docCls.set("URL", pdfUrl);
       }
       const res = await docCls.save();
-      if (res && pdfUrl) {
+      if (res) {
         pdfDetails[0] = { ...pdfDetails[0], URL: pdfUrl };
       }
     } catch (e) {
@@ -1053,24 +1112,31 @@ function PlaceHolderSign() {
         if (updateExpiryDate) {
           data["ExpiryDate"] = { iso: updateExpiryDate, __type: "Date" };
         }
-        await axios.put(
-          `${localStorage.getItem(
-            "baseUrl"
-          )}classes/contracts_Document/${documentId}`,
-          data,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "X-Parse-Application-Id": localStorage.getItem("parseAppId"),
-              "X-Parse-Session-Token": localStorage.getItem("accesstoken")
+        await axios
+          .put(
+            `${localStorage.getItem(
+              "baseUrl"
+            )}classes/contracts_Document/${documentId}`,
+            data,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                "X-Parse-Application-Id": localStorage.getItem("parseAppId"),
+                "X-Parse-Session-Token": localStorage.getItem("accesstoken")
+              }
             }
-          }
-        );
-        setIsMailSend(true);
-        setIsLoading({ isLoad: false });
-        setIsUiLoading(false);
-        setSignerPos([]);
-        setIsSendAlert({ mssg: "confirm", alert: true });
+          )
+          .then(() => {
+            setIsMailSend(true);
+            setIsLoading({ isLoad: false });
+            setIsUiLoading(false);
+            setSignerPos([]);
+            setIsSendAlert({ mssg: "confirm", alert: true });
+          })
+          .catch((err) => {
+            console.log("axois err ", err);
+            alert(t("something-went-wrong-mssg"));
+          });
       } catch (e) {
         console.log("error", e);
         alert(t("something-went-wrong-mssg"));
@@ -1082,9 +1148,6 @@ function PlaceHolderSign() {
 
   const copytoclipboard = (text) => {
     copytoData(text);
-    if (copyUrlRef.current) {
-      copyUrlRef.current.textContent = text; // Update text safely
-    }
     setCopied(true);
     setTimeout(() => setCopied(false), 1500); // Reset copied state after 1.5 seconds
   };
@@ -1153,6 +1216,8 @@ function PlaceHolderSign() {
 
     for (let i = 0; i < signerMail.length; i++) {
       try {
+        const imgPng =
+          "https://qikinnovation.ams3.digitaloceanspaces.com/logo.png";
         let url = `${localStorage.getItem("baseUrl")}functions/sendmailv3`;
         const headers = {
           "Content-Type": "application/json",
@@ -1166,14 +1231,20 @@ function PlaceHolderSign() {
           `${pdfDetails?.[0].objectId}/${signerMail[i].Email}/${objectId}`
         );
         let signPdf = `${hostUrl}/login/${encodeBase64}`;
+        const openSignUrl = "https://www.opensignlabs.com/";
         const orgName = pdfDetails[0]?.ExtUserPtr.Company
           ? pdfDetails[0].ExtUserPtr.Company
           : "";
-        const senderName = pdfDetails?.[0].ExtUserPtr.Name;
+        const themeBGcolor = themeColor;
+        const senderName = `${pdfDetails?.[0].ExtUserPtr.Name}`;
         const documentName = `${pdfDetails?.[0].Name}`;
         let replaceVar;
 
-        if (requestBody && requestSubject && isCustomize) {
+        if (
+          requestBody &&
+          requestSubject &&
+          isCustomize
+        ) {
           const replacedRequestBody = requestBody.replace(/"/g, "'");
           htmlReqBody =
             "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>" +
@@ -1182,8 +1253,10 @@ function PlaceHolderSign() {
 
           const variables = {
             document_title: documentName,
-            sender_name: senderName,
-            sender_mail: senderEmail,
+            sender_name:
+              senderName,
+            sender_mail:
+              senderEmail,
             sender_phone: senderPhone || "",
             receiver_name: signerMail[i]?.Name || "",
             receiver_email: signerMail[i].Email,
@@ -1197,7 +1270,10 @@ function PlaceHolderSign() {
             htmlReqBody,
             variables
           );
-        } else if (tenantMailTemplate?.body && tenantMailTemplate?.subject) {
+        } else if (
+          tenantMailTemplate?.body &&
+          tenantMailTemplate?.subject
+        ) {
           const mailBody = tenantMailTemplate?.body;
           const mailSubject = tenantMailTemplate?.subject;
           const replacedRequestBody = mailBody.replace(/"/g, "'");
@@ -1207,8 +1283,10 @@ function PlaceHolderSign() {
             "</body> </html>";
           const variables = {
             document_title: documentName,
-            sender_name: senderName,
-            sender_mail: senderEmail,
+            sender_name:
+              senderName,
+            sender_mail:
+              senderEmail,
             sender_phone: senderPhone || "",
             receiver_name: signerMail[i]?.Name || "",
             receiver_email: signerMail[i].Email,
@@ -1219,25 +1297,40 @@ function PlaceHolderSign() {
           };
           replaceVar = replaceMailVaribles(mailSubject, htmlReqBody, variables);
         }
-        const mailparam = {
-          senderName: senderName,
-          senderMail: senderEmail,
-          title: documentName,
-          organization: orgName,
-          localExpireDate: localExpireDate,
-          sigingUrl: signPdf
-        };
         let params = {
-          extUserId: owner?.objectId,
+          extUserId: extUserId,
           recipient: signerMail[i].Email,
           subject: replaceVar?.subject
             ? replaceVar?.subject
-            : mailTemplate(mailparam).subject,
-          replyto: senderEmail,
-          from: senderEmail,
+            : `${senderName} has requested you to sign "${documentName}"`,
+          replyto:
+            senderEmail ||
+            "",
+          from:
+            senderEmail,
           html: replaceVar?.body
             ? replaceVar?.body
-            : mailTemplate(mailparam).body
+            : "<html><head><meta http-equiv='Content-Type' content='text/html;charset=UTF-8' /></head><body><div style='background-color:#f5f5f5; padding:20px;'><div style='box-shadow:rgba(0, 0, 0, 0.1) 0px 4px 12px;background:white;padding-bottom:20px;'><div style='padding:10px 10px 0 10px'><img src=" +
+              imgPng +
+              " height='50' style='padding:20px,width:170px,height:40px' /></div><div style='padding:2px;font-family:system-ui;background-color:" +
+              themeBGcolor +
+              ";'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px;' > Digital Signature Request</p></div><div><p style='padding:20px;font-family:system-ui;font-size:14px;margin-bottom:10px;'> " +
+              pdfDetails?.[0].ExtUserPtr.Name +
+              " has requested you to review and sign <strong> " +
+              pdfDetails?.[0].Name +
+              "</strong>.</p><div style='padding: 5px 0px 5px 25px;display:flex;flex-direction:row;justify-content:space-around;'><table><tr><td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Sender</td><td></td><td style='color:#626363;font-weight:bold;'>" +
+              senderEmail +
+              "</td></tr><tr><td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Organization</td><td></td><td style='color:#626363;font-weight:bold'> " +
+              orgName +
+              "</td></tr><tr><td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Expire on</td><td></td><td style='color:#626363;font-weight:bold'>" +
+              localExpireDate +
+              "</td></tr><tr><td></td><td></td></tr></table></div> <div style='margin-left:70px'><a target=_blank href=" +
+              signPdf +
+              "><button style='padding: 12px 12px 12px 12px;background-color:#d46b0f;color:white;border:0px;box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;font-weight:bold;margin-top:30px'>Sign here</button></a></div><div style='display: flex; justify-content: center;margin-top: 10px;'></div></div></div><div><p> This is an automated email from OpenSign™. For any queries regarding this email, please contact the sender " +
+              senderEmail +
+              " directly.If you think this email is inappropriate or spam, you may file a complaint with OpenSign™ <a href= " +
+              openSignUrl +
+              " target=_blank>here</a>.</p></div></div></body></html>"
         };
 
         sendMail = await axios.post(url, params, { headers: headers });
@@ -1249,13 +1342,20 @@ function PlaceHolderSign() {
       setMailStatus("success");
       try {
         let data;
-        if (requestBody && requestSubject && isCustomize) {
+        if (
+          requestBody &&
+          requestSubject &&
+          isCustomize
+        ) {
           data = {
             RequestBody: htmlReqBody,
             RequestSubject: requestSubject,
             SendMail: true
           };
-        } else if (tenantMailTemplate?.body && tenantMailTemplate?.subject) {
+        } else if (
+          tenantMailTemplate?.body &&
+          tenantMailTemplate?.subject
+        ) {
           data = {
             RequestBody: tenantMailTemplate?.body,
             RequestSubject: tenantMailTemplate?.subject,
@@ -1534,7 +1634,8 @@ function PlaceHolderSign() {
                   status: defaultdata?.status || "required",
                   hint: defaultdata?.hint || "",
                   defaultValue: defaultdata?.defaultValue || "",
-                  validation: {},
+                  validation:
+                        {},
                   fontSize:
                     fontSize || currWidgetsDetails?.options?.fontSize || 12,
                   fontColor:
@@ -1542,15 +1643,6 @@ function PlaceHolderSign() {
                     currWidgetsDetails?.options?.fontColor ||
                     "black",
                   isReadOnly: defaultdata?.isReadOnly || false
-                }
-              };
-            } else if (["signature"].includes(position.type)) {
-              return {
-                ...position,
-                options: {
-                  ...position.options,
-                  name: defaultdata.name,
-                  hint: defaultdata?.hint || ""
                 }
               };
             } else {
@@ -1561,7 +1653,6 @@ function PlaceHolderSign() {
                   name: defaultdata.name,
                   status: defaultdata.status,
                   defaultValue: defaultdata.defaultValue,
-                  hint: defaultdata?.hint || "",
                   fontSize:
                     fontSize || currWidgetsDetails?.options?.fontSize || 12,
                   fontColor:
@@ -1841,9 +1932,27 @@ function PlaceHolderSign() {
     setPdfBase64Url(urlDetails.base64);
   };
   const handleSendDoc = () => {
+    postSignedDocument();
     setIsAttchSignerModal(false);
     setCheckTourStatus(true);
     alertSendEmail();
+  };
+
+  const postSignedDocument = async () => {// Get token from localStorage
+
+    try {
+      const response = await axios.post(`${djangoUrl}/base/api/v1/signed/document/`, {
+        user: userEmail // Body of the request
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}` // Authorization header
+        }
+      });
+      console.log('Document signed response:', response.data);
+      // Handle the response as needed
+    } catch (error) {
+      console.error('Error posting signed document:', error);
+    }
   };
 
   //show modal to create new contact
@@ -1897,14 +2006,15 @@ function PlaceHolderSign() {
     }
   };
   const handleDisable = () => {
-    const isAllSigner = signerPos.some(
-      (x) => !x.signerObjId && x.Role !== "prefill"
-    );
+    const isAllSigner = signerPos.some((x) => !x.signerObjId);
     return isAllSigner;
   };
   const handleCloseAttachSigner = () => {
     setIsAttchSignerModal(false);
   };
+
+  
+
   return (
     <>
       <Title title={state?.title ? state.title : "New Document"} />
@@ -2009,26 +2119,30 @@ function PlaceHolderSign() {
                           {!isCustomize && (
                             <span>{t("placeholder-alert-3")}</span>
                           )}
-                          {isCustomize && (
-                            <>
-                              <EmailBody
-                                editorRef={editorRef}
-                                requestBody={requestBody}
-                                requestSubject={requestSubject}
-                                handleOnchangeRequest={handleOnchangeRequest}
-                                setRequestSubject={setRequestSubject}
-                              />
-                              <div
-                                className="flex justify-end items-center gap-1 mt-2 op-link op-link-primary"
-                                onClick={() => {
-                                  setRequestBody(defaultBody);
-                                  setRequestSubject(defaultSubject);
-                                }}
-                              >
-                                <span>{t("reset-to-default")}</span>
-                              </div>
-                            </>
-                          )}
+                          {
+                              isCustomize && (
+                                <>
+                                  <EmailBody
+                                    editorRef={editorRef}
+                                    requestBody={requestBody}
+                                    requestSubject={requestSubject}
+                                    handleOnchangeRequest={
+                                      handleOnchangeRequest
+                                    }
+                                    setRequestSubject={setRequestSubject}
+                                  />
+                                  <div
+                                    className="flex justify-end items-center gap-1 mt-2 op-link op-link-primary"
+                                    onClick={() => {
+                                      setRequestBody(defaultBody);
+                                      setRequestSubject(defaultSubject);
+                                    }}
+                                  >
+                                    <span>{t("reset-to-default")}</span>
+                                  </div>
+                                </>
+                              )
+                          }
                           <div className="flex flex-row items-center gap-2 md:gap-6 mt-2">
                             <div className="flex flex-row gap-2">
                               <button
@@ -2046,14 +2160,16 @@ function PlaceHolderSign() {
                                 </button>
                               )}
                             </div>
-                            {!isCustomize && (
-                              <span
-                                className="op-link op-link-accent text-sm"
-                                onClick={() => setIsCustomize(!isCustomize)}
-                              >
-                                {t("cutomize-email")}
-                              </span>
-                            )}
+                            {
+                                !isCustomize && (
+                                  <span
+                                    className="op-link op-link-accent text-sm"
+                                    onClick={() => setIsCustomize(!isCustomize)}
+                                  >
+                                    {t("cutomize-email")}
+                                  </span>
+                                )
+                            }
                           </div>
                         </>
                       )}
@@ -2065,11 +2181,6 @@ function PlaceHolderSign() {
                             <span className="h-[1px] w-[20%] bg-[#ccc]"></span>
                           </div>
                           <div className="my-3">{handleShareList()}</div>
-                          <p
-                            id="copyUrl"
-                            ref={copyUrlRef}
-                            className="hidden"
-                          ></p>
                         </>
                       )}
                     </div>
@@ -2096,11 +2207,9 @@ function PlaceHolderSign() {
                           <LottieWithLoader />
                           {pdfDetails[0].SendinOrder ? (
                             <p>
-                              {isCurrUser
-                                ? t("placeholder-mail-alert-you")
-                                : t("placeholder-mail-alert", {
-                                    name: signersdata[0]?.Name
-                                  })}
+                              {t("placeholder-mail-alert", {
+                                name: pdfDetails[0]?.Signers[0]?.Name
+                              })}
                             </p>
                           ) : (
                             <p>{t("placeholder-alert-4")}</p>
@@ -2113,11 +2222,7 @@ function PlaceHolderSign() {
                         </div>
                       ) : (
                         <div className="mb-[10px]">
-                          {mailStatus === "dailyquotareached" ? (
-                            <p>{t("daily-quota-reached")}</p>
-                          ) : (
-                            <p>{t("placeholder-alert-6")}</p>
-                          )}
+                          <p>{t("placeholder-alert-6")}</p>
                           {isCurrUser && (
                             <p className="mt-1">{t("placeholder-alert-5")}</p>
                           )}
@@ -2187,7 +2292,7 @@ function PlaceHolderSign() {
                         <>
                           {/* grid grid-cols-1 md:grid-cols-2 */}
                           <div className="min-h-max max-h-[250px] overflow-y-auto">
-                            <div className="py-3 px-[10px] op-card border-[1px] border-gray-400 mt-3 md:mx-3  mb-4 bg-base-200 text-base-content flex flex-col gap-2 relative">
+                            <div className="p-3 op-card border-[1px] border-gray-400 mt-3 mx-4 mb-4 bg-base-200 text-base-content flex flex-col gap-2 relative">
                               {forms?.map((field, id) => {
                                 return (
                                   <div
@@ -2195,7 +2300,7 @@ function PlaceHolderSign() {
                                     key={field?.value}
                                   >
                                     <label>{field?.role}</label>
-                                    <div className="flex justify-between items-center gap-1">
+                                    <div className="flex justify-between items-center gap-2">
                                       <div className="flex-1">
                                         <AsyncSelect
                                           cacheOptions
@@ -2549,6 +2654,21 @@ function PlaceHolderSign() {
           handleRemoveWidgets={handleRemovePlaceholder}
         />
       </DndProvider>
+      {isWalletModalOpen && (
+        <ModalUi isOpen={isWalletModalOpen} handleClose={() => {
+          // setIsWalletModalOpen(false);
+          navigate("/dashboard/35KBoSgoAK"); // Redirect to the dashboard
+        }} 
+        showClose={true}>
+          <div className="p-4 flex flex-col items-center">
+            <img src={EmptyWalletImage} alt="Empty Wallet" className="w-32 h-auto mb-4" />
+            <p className="text-xl font-semibold">Your wallet is empty</p>
+            <button onClick={handleAddCredits} className="op-btn op-btn-primary mt-2 text-lg text-white">
+              Add Credits
+            </button>
+          </div>
+        </ModalUi>
+      )}
     </>
   );
 }

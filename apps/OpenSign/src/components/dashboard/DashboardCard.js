@@ -346,6 +346,7 @@ const DashboardCard = (props) => {
           id={props.Label}
           iconColor={"white"}
           message={t(`tour-mssg.${props.Label}`)}
+          // {props?.Data?.tourMessage}
         />
       </div>
     </div>

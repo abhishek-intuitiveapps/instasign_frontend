@@ -1,10 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import pad from "../assets/images/pad.svg";
 import { useLocation, useNavigate } from "react-router";
 import axios from "axios";
 import ModalUi from "./ModalUi";
 import AddSigner from "../components/AddSigner";
-import { emailRegex } from "../constant/const";
+import {
+  emailRegex,
+} from "../constant/const";
 import Alert from "./Alert";
 import Tooltip from "./Tooltip";
 import { RWebShare } from "react-web-share";
@@ -14,7 +16,7 @@ import {
   copytoData,
   fetchUrl,
   formatDate,
-  formatDateTime,
+  formatTimeInTimezone,
   getSignedUrl,
   getTenantDetails,
   handleSignatureType,
@@ -36,9 +38,6 @@ import * as XLSX from "xlsx";
 import EditContactForm from "../components/EditContactForm";
 
 const ReportTable = (props) => {
-  const copyUrlRef = useRef(null);
-  const appName = "OpenSign™";
-  const drivename = appName === "OpenSign™" ? "OpenSign™" : "";
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -154,14 +153,14 @@ const ReportTable = (props) => {
           const teamtRes = await Parse.Cloud.run("getteams", { active: true });
           if (teamtRes.length > 0) {
             const _teamRes = JSON.parse(JSON.stringify(teamtRes));
-            const selected = _teamRes.map(
-              (x) =>
-                x.Name === "All Users" && {
-                  label: x.Name,
-                  value: x.objectId
-                }
-            );
-            setSelectedTeam(selected);
+              const selected = _teamRes.map(
+                (x) =>
+                  x.Name === "All Users" && {
+                    label: x.Name,
+                    value: x.objectId
+                  }
+              );
+              setSelectedTeam(selected);
           }
         }
       } catch (err) {
@@ -222,7 +221,7 @@ const ReportTable = (props) => {
   const handleURL = async (item, act) => {
     if (props.ReportName === "Templates") {
       if (act.hoverLabel === "Edit") {
-        navigate(`/${act.redirectUrl}/${item.objectId}`);
+          navigate(`/${act.redirectUrl}/${item.objectId}`);
       } else {
         setActLoader({ [`${item.objectId}_${act.btnId}`]: true });
         try {
@@ -313,7 +312,6 @@ const ReportTable = (props) => {
                 AutomaticReminders: Doc?.AutomaticReminders || false,
                 RemindOnceInEvery: Doc?.RemindOnceInEvery || 5,
                 IsEnableOTP: Doc?.IsEnableOTP || false,
-                TimeToCompleteDays: parseInt(Doc?.TimeToCompleteDays) || 15,
                 AllowModifications: Doc?.AllowModifications || false,
                 ...SignatureType,
                 ...NotifyOnSignatures,
@@ -408,7 +406,8 @@ const ReportTable = (props) => {
         setSelectedTeam(formatedList);
       }
       setIsShareWith({ [item.objectId]: true });
-    } else if (act.action === "duplicate") {
+    }
+    else if (act.action === "duplicate") {
       setIsModal({ [`duplicate_${item.objectId}`]: true });
     } else if (act.action === "rename") {
       setIsModal({ [`rename_${item.objectId}`]: true });
@@ -423,6 +422,8 @@ const ReportTable = (props) => {
   const indexOfLastDoc = currentPage * props.docPerPage;
   const indexOfFirstDoc = indexOfLastDoc - props.docPerPage;
   const currentList = props.List?.slice(indexOfFirstDoc, indexOfLastDoc);
+
+  
 
   // Change page
   const paginateFront = () => {
@@ -492,7 +493,8 @@ const ReportTable = (props) => {
       setActLoader({});
     }
   };
-  const handleClose = () => {
+  const handleClose = (
+  ) => {
     setIsRevoke({});
     setIsDeleteModal({});
     setReason("");
@@ -523,9 +525,6 @@ const ReportTable = (props) => {
 
   const copytoclipboard = (share) => {
     copytoData(share.url);
-    if (copyUrlRef.current) {
-      copyUrlRef.current.textContent = share.url; // Update text safely
-    }
     setCopied({ ...copied, [share.email]: true });
   };
   //function to handle revoke/decline docment
@@ -651,7 +650,11 @@ const ReportTable = (props) => {
         if (isCompleted) {
           setIsDownloadModal({ [item.objectId]: true });
         } else {
-          const signedUrl = await getSignedUrl(url, docId, templateId);
+          const signedUrl = await getSignedUrl(
+            url,
+            docId,
+            templateId
+          );
           await fetchUrl(signedUrl, pdfName);
         }
         setActLoader({});
@@ -678,8 +681,10 @@ const ReportTable = (props) => {
     const signPdf = `${window.location.origin}/login/${encodeBase64}`;
     const variables = {
       document_title: doc.Name,
-      sender_name: doc.ExtUserPtr.Name,
-      sender_mail: doc.ExtUserPtr.Email,
+      sender_name:
+        doc.ExtUserPtr.Name,
+      sender_mail:
+        doc.ExtUserPtr.Email,
       sender_phone: doc.ExtUserPtr?.Phone || "",
       receiver_name: userDetails?.Name || "",
       receiver_email: userDetails?.Email,
@@ -707,8 +712,10 @@ const ReportTable = (props) => {
     const signPdf = `${window.location.origin}/login/${encodeBase64}`;
     const variables = {
       document_title: doc.Name,
-      sender_name: doc.ExtUserPtr.Name,
-      sender_mail: doc.ExtUserPtr.Email,
+      sender_name:
+        doc.ExtUserPtr.Name,
+      sender_mail:
+        doc.ExtUserPtr.Email,
       sender_phone: doc.ExtUserPtr?.Phone || "",
       receiver_name: userDetails?.Name || "",
       receiver_email: userDetails?.Email || "",
@@ -748,8 +755,10 @@ const ReportTable = (props) => {
     const signPdf = `${window.location.origin}/login/${encodeBase64}`;
     const variables = {
       document_title: doc.Name,
-      sender_name: doc.ExtUserPtr.Name,
-      sender_mail: doc.ExtUserPtr.Email,
+      sender_name:
+        doc.ExtUserPtr.Name,
+      sender_mail:
+        doc.ExtUserPtr.Email,
       sender_phone: doc.ExtUserPtr?.Phone || "",
       receiver_name: user?.signerPtr?.Name || "",
       receiver_email: user?.email ? user?.email : user?.signerPtr?.Email,
@@ -764,7 +773,7 @@ const ReportTable = (props) => {
       `{{sender_name}} has requested you to sign "{{document_title}}"`;
     const body =
       doc?.RequestBody ||
-      `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team ${appName}</p><br></body> </html>`;
+      `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team OpenSign™</p><br></body> </html>`;
     const res = replaceMailVaribles(subject, body, variables);
     setMail((prev) => ({ ...prev, subject: res.subject, body: res.body }));
     setIsNextStep({ [user.Id]: true });
@@ -779,11 +788,14 @@ const ReportTable = (props) => {
       sessionToken: localStorage.getItem("accesstoken")
     };
     let params = {
-      replyto: doc?.ExtUserPtr?.Email || "",
+      replyto:
+        doc?.ExtUserPtr?.Email ||
+        "",
       extUserId: doc?.ExtUserPtr?.objectId,
       recipient: userDetails?.Email,
       subject: mail.subject,
-      from: doc?.ExtUserPtr?.Email,
+      from:
+        doc?.ExtUserPtr?.Email,
       html: mail.body
     };
     try {
@@ -1012,23 +1024,11 @@ const ReportTable = (props) => {
       );
       if (matchSigner) {
         const timezone = extClass?.[0]?.Timezone || "";
-        const DateFormat = extClass?.[0]?.DateFormat || "MM/DD/YYYY";
-        const Is12Hr = extClass?.[0]?.Is12HourTime || false;
         const signedon = matchSigner?.SignedOn
-          ? formatDateTime(
-              new Date(matchSigner?.SignedOn),
-              DateFormat,
-              timezone,
-              Is12Hr
-            )
+          ? formatTimeInTimezone(new Date(matchSigner?.SignedOn), timezone)
           : "-";
         const viewedon = matchSigner?.ViewedOn
-          ? formatDateTime(
-              new Date(matchSigner?.ViewedOn),
-              DateFormat,
-              timezone,
-              Is12Hr
-            )
+          ? formatTimeInTimezone(new Date(matchSigner?.ViewedOn), timezone)
           : "-";
         return {
           id: i,
@@ -1421,13 +1421,10 @@ const ReportTable = (props) => {
         )}
         <div className="flex flex-row items-center justify-between my-2 mx-3 text-[20px] md:text-[23px]">
           <div className="font-light">
-            {t(`report-name.${props.ReportName}`)}{" "}
+            {t(`report-name.${props.ReportName}`)}
             {props.report_help && (
-              <span className="text-xs md:text-[13px] font-normal">
-                <Tooltip
-                  id="report_help"
-                  message={t(`report-help.${props.ReportName}`)}
-                />
+              <span className="text-xs md:text-[13px] font-normal ml-[4px]"> {/* Increased margin from ml-[2px] to ml-[4px] */}
+                <Tooltip message={t(`report-help.${props.ReportName}`)} />
               </span>
             )}
           </div>
@@ -1549,6 +1546,7 @@ const ReportTable = (props) => {
                   : "h-screen"
               : ""
           }`}
+          style={{ height: '75vh', overflowY: 'auto' }} // Set fixed height and enable scrolling
         >
           <table className="op-table border-collapse w-full mb-4">
             <thead className="text-[14px] text-center">
@@ -1584,19 +1582,18 @@ const ReportTable = (props) => {
                           {item?.Phone || "-"}
                         </td>
                         <td className="px-3 py-2">
-                          <div className="text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-start items-center">
+                          <div className={`text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-start items-center`}> {/* Apply red background if trash icon */}
                             {props.actions?.length > 0 &&
                               props.actions.map((act, index) => (
-                                <button
+                                <span
                                   key={index}
                                   onClick={() => handleActionBtn(act, item)}
                                   title={t(`btnLabel.${act.hoverLabel}`)}
-                                  className={`${
-                                    act?.btnColor ? act.btnColor : ""
-                                  } op-btn op-btn-sm`}
+                                  className={`${act?.btnColor ? act.btnColor : ""} op-text-primary mx-2`} // Added margin for spacing
+                                  style={{ color: 'red' }} // Test with inline style
                                 >
-                                  <i className={act.btnIcon}></i>
-                                </button>
+                                  <i className={`${act.btnIcon} cursor-pointer ${act.btnIcon === 'fa-light fa-trash' ? "": "op-text-primary"} text-xl`}></i> {/* Increased icon size */}
+                                </span>
                               ))}
                             {isDeleteModal[item.objectId] && (
                               <ModalUi
@@ -1668,9 +1665,7 @@ const ReportTable = (props) => {
                         {props.heading.includes("Folder") && (
                           <td className="p-2 text-center">
                             {item?.Folder?.Name ||
-                              t("sidebar.OpenSign™ Drive", {
-                                appName: drivename
-                              })}
+                              t("My Drive")}
                           </td>
                         )}
                         <td className="p-2 text-center">
@@ -1727,18 +1722,24 @@ const ReportTable = (props) => {
                                           handleActionBtn(act, item)
                                         }
                                         title={t(`btnLabel.${act.hoverLabel}`)}
-                                        className={
+                                        className={`${
                                           act.action !== "option"
                                             ? `${
                                                 act?.btnColor || ""
                                               } op-btn op-btn-sm mr-1`
                                             : "text-base-content focus:outline-none text-lg mr-2 relative"
-                                        }
+                                        } ${
+                                          act.btnIcon === "fa-light fa-trash" ? "bg-red-500 border-none hover:bg-red-500" : ""
+                                        }`}
                                       >
-                                        <i className={act.btnIcon}></i>
+                                        <i className={`${act.btnIcon} text-white`}></i>
                                         {act.btnLabel && (
                                           <span className="uppercase font-medium">
-                                            {`${t(`btnLabel.${act.btnLabel}`)}`}
+                                            {
+                                                  `${t(
+                                                    `btnLabel.${act.btnLabel}`
+                                                  )}`
+                                            }
                                           </span>
                                         )}
                                         {/* template report */}
@@ -1810,21 +1811,22 @@ const ReportTable = (props) => {
                                   <React.Fragment key={index}>
                                     {handleBtnVisibility(act, item) && (
                                       <div
-                                        role="button"
+                                        role="span"
                                         data-tut={act?.selector}
                                         onClick={() =>
                                           handleActionBtn(act, item)
                                         }
                                         title={t(`btnLabel.${act.hoverLabel}`)}
-                                        className={
+                                        className={`cursor-pointer ${
                                           act.action !== "option"
-                                            ? `${
-                                                act?.btnColor || ""
-                                              } op-btn op-btn-sm mr-1`
+                                            ? `${act?.btnColor || ""} mr-1`
                                             : "text-base-content focus:outline-none text-lg mr-2 relative"
-                                        }
+                                        }`}
+                                        style={{
+                                          "color": "red"
+                                        }}
                                       >
-                                        <i className={act.btnIcon}></i>
+                                        <i className={`${act.btnIcon} text-xl ${act?.btnIcon === 'fa-light fa-trash' ? '': 'op-text-primary'}`}></i>
                                         {act.btnLabel && (
                                           <span className="uppercase font-medium">
                                             {t(`btnLabel.${act.btnLabel}`)}
@@ -1907,26 +1909,28 @@ const ReportTable = (props) => {
                           {isShareWith[item.objectId] && (
                             <div className="op-modal op-modal-open">
                               <div className="max-h-90 bg-base-100 w-[95%] md:max-w-[500px] rounded-box relative">
-                                <h3 className="text-base-content font-bold text-lg pt-[15px] px-[20px]">
-                                  {t("share-with")}
-                                </h3>
-                                <div
-                                  className="op-btn op-btn-sm op-btn-circle op-btn-ghost text-base-content absolute right-2 top-2 z-40"
-                                  onClick={() => setIsShareWith({})}
-                                >
-                                  ✕
-                                </div>
-                                <div className="px-2 mt-3 w-full h-full">
-                                  <div className="op-input op-input-bordered op-input-sm w-full h-full text-[13px] break-all">
-                                    {selectedTeam?.[0]?.label}
-                                  </div>
-                                </div>
-                                <button
-                                  onClick={(e) => handleShareWith(e, item)}
-                                  className="op-btn op-btn-primary ml-[10px] my-3"
-                                >
-                                  {t("submit")}
-                                </button>
+                                      <h3 className="text-base-content font-bold text-lg pt-[15px] px-[20px]">
+                                        {t("share-with")}
+                                      </h3>
+                                      <div
+                                        className="op-btn op-btn-sm op-btn-circle op-btn-ghost text-base-content absolute right-2 top-2 z-40"
+                                        onClick={() => setIsShareWith({})}
+                                      >
+                                        ✕
+                                      </div>
+                                      <div className="px-2 mt-3 w-full h-full">
+                                        <div className="op-input op-input-bordered op-input-sm w-full h-full text-[13px] break-all">
+                                          {selectedTeam?.[0]?.label}
+                                        </div>
+                                      </div>
+                                      <button
+                                        onClick={(e) =>
+                                          handleShareWith(e, item)
+                                        }
+                                        className="op-btn op-btn-primary ml-[10px] my-3"
+                                      >
+                                        {t("submit")}
+                                      </button>
                               </div>
                             </div>
                           )}
@@ -2019,7 +2023,9 @@ const ReportTable = (props) => {
                           {isBulkSend[item.objectId] && (
                             <ModalUi
                               isOpen
-                              title={t("quick-send")}
+                              title={
+                                    t("quick-send")
+                              }
                               handleClose={() => setIsBulkSend({})}
                             >
                               {isLoader[item.objectId] ? (
@@ -2079,11 +2085,6 @@ const ReportTable = (props) => {
                                     </div>
                                   </div>
                                 ))}
-                                <p
-                                  id="copyUrl"
-                                  ref={copyUrlRef}
-                                  className="hidden"
-                                ></p>
                               </div>
                             </ModalUi>
                           )}

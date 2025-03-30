@@ -129,7 +129,7 @@ export default function reportJson(id) {
         actions: [
           {
             btnId: "1378",
-            hoverLabel: "Edit",
+            hoverLabel: "View",
             btnColor: "op-btn-primary",
             btnIcon: "fa-light fa-eye",
             redirectUrl: "draftDocument",

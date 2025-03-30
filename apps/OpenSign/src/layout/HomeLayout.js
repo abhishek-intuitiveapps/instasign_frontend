@@ -13,10 +13,9 @@ import { useCookies } from "react-cookie";
 import Loader from "../primitives/Loader";
 import { showHeader } from "../redux/reducers/showHeader";
 import { useTranslation } from "react-i18next";
+import { setPaymentMode } from "../redux/reducers/PaymentReducer";
 
 const HomeLayout = () => {
-  const appName =
-    "OpenSign™";
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -34,12 +33,39 @@ const HomeLayout = () => {
 
   const tenantId = localStorage.getItem("TenantId");
 
+  const djangoUrl = 'http://localhost:8000';
+
   useEffect(() => {
     const language = localStorage.getItem("i18nextLng");
     i18n.changeLanguage(language);
     localStorage.setItem("isGuestSigner", "");
+    getRefreshToken();
+    getDjangoUserDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getDjangoUserDetails = async () => {
+    try {
+      const djangoToken = localStorage.getItem("django");
+      const response = await axios.get(`${djangoUrl}/base/api/v1/get/user/detail/`, {
+        headers: {
+          Authorization: `Bearer ${djangoToken}`
+        }
+      });
+
+      const userData = response.data.data[0];
+      localStorage.setItem("djangoUser", JSON.stringify(userData));
+      if (userData.payment_mode === 'pre_paid') {
+        dispatch(setPaymentMode(false)); // Set to false for Prepaid
+      } else if (userData.payment_mode === 'post_paid') {
+        dispatch(setPaymentMode(true)); // Set to true for Postpaid
+      }
+      // dispatch(setPaymentMode(userData.payment_mode))
+      console.log("User data fetched successfully:", userData);
+    } catch (error) {
+      console.log("Error fetching user details:", error.message);
+    }
+  }
 
   useEffect(() => {
     if (!tenantId) {
@@ -69,6 +95,31 @@ const HomeLayout = () => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tenantId]);
+
+  const getRefreshToken = async () => {
+    const refreshToken = localStorage.getItem("djangoRefresh");
+    if (!refreshToken) {
+      console.error("No refresh token found in localStorage");
+      return;
+    }
+
+    try {
+      const response = await axios.post(`${djangoUrl}/base/api/token/refresh/`, {
+        refresh: refreshToken
+      }, {
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      // Assuming the new access token is returned in the 'access' field
+      localStorage.setItem("django", response.data.access);
+      console.log("Token refreshed successfully");
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+    }
+  };
+
   //function to use save data in cookies storage
   const saveCookies = () => {
     const main_Domain = window.location.origin;
@@ -151,7 +202,7 @@ const HomeLayout = () => {
         ...resArr,
         {
           selector: '[data-tut="reactourLast"]',
-          content: t("tour-mssg.home-layout-3", { appName }),
+          content: t("tour-mssg.home-layout-3"),
           position: "top"
           // style: { backgroundColor: "#abd4d2" },
         }
@@ -226,11 +277,11 @@ const HomeLayout = () => {
       console.log("err ", err);
     } finally {
       localStorage.removeItem("accesstoken");
-      navigate("/", { replace: true, state: { from: location } });
+      navigate("/login", { replace: true, state: { from: location } });
     }
   };
   return (
-    <div>
+    <div className="flex flex-col h-screen">
       <div className="sticky top-0 z-[501]">
         {!isLoader && (
           <Header showSidebar={showSidebar} setIsMenu={setIsOpen} />
@@ -243,31 +294,18 @@ const HomeLayout = () => {
               <Loader />
             </div>
           ) : (
-            <>
-              <div className="flex md:flex-row flex-col z-50">
-                <Sidebar isOpen={isOpen} closeSidebar={closeSidebar} />
-                <div
-                  id="renderList"
-                  className="relative h-screen flex flex-col justify-between w-full overflow-y-auto"
-                >
-                  <div className="bg-base-200 p-3">{<Outlet />}</div>
-                  <div className="z-30">
-                    <Footer />
-                  </div>
-                </div>
+            <div className="flex md:flex-row flex-col z-50 flex-grow overflow-hidden">
+              <Sidebar isOpen={isOpen} closeSidebar={closeSidebar} />
+              <div
+                id="renderList"
+                className="relative flex flex-col justify-between w-full overflow-y-auto"
+              >
+                <div className="bg-base-200 p-2 flex-grow">{<Outlet />}</div>
+                {/* <div className="z-30">
+                  <Footer />
+                </div> */}
               </div>
-              <Tour
-                onRequestClose={closeTour}
-                steps={tourConfigs}
-                isOpen={isTour}
-                closeWithMask={false}
-                disableKeyboardNavigation={["esc"]}
-                // disableInteraction={true}
-                scrollOffset={-100}
-                rounded={5}
-                showCloseButton={isCloseBtn}
-              />
-            </>
+            </div>
           )}
         </>
       ) : (

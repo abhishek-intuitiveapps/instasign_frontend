@@ -10,16 +10,23 @@ import {
   saveLanguageInLocal
 } from "../constant/Utils";
 import { useTranslation } from "react-i18next";
-import { appInfo } from "../constant/appinfo";
-
-const Header = ({ showSidebar, setIsMenu, isConsole }) => {
+const Header = ({ showSidebar, setIsMenu }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { width } = useWindowSize();
   const username = localStorage.getItem("username") || "";
   const image = localStorage.getItem("profileImg") || dp;
   const [isOpen, setIsOpen] = useState(false);
-  const [applogo, setAppLogo] = useState("");
+  const [applogo, setAppLogo] = useState(
+    localStorage.getItem("appLogo") || " "
+  );
+  const [isOpenSettings, setIsOpenSettings] = useState(false);
+  const Extand_Class = localStorage.getItem("Extand_Class");
+  const extClass = Extand_Class && JSON.parse(Extand_Class);
+  let userRole = "contracts_User";
+  if (extClass && extClass.length > 0) {
+    userRole = extClass[0].UserRole;
+  }
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -36,8 +43,7 @@ const Header = ({ showSidebar, setIsMenu, isConsole }) => {
       if (applogo?.logo) {
         setAppLogo(applogo?.logo);
       } else {
-        const logo = localStorage.getItem("appLogo") || appInfo.applogo;
-        setAppLogo(logo);
+        setAppLogo(localStorage.getItem("appLogo") || "");
       }
   }
 
@@ -64,7 +70,7 @@ const Header = ({ showSidebar, setIsMenu, isConsole }) => {
     localStorage.setItem("baseUrl", baseUrl);
     localStorage.setItem("parseAppId", appid);
 
-    navigate("/");
+    navigate("/login");
   };
 
   //handle to close profile drop down menu onclick screen
@@ -86,36 +92,25 @@ const Header = ({ showSidebar, setIsMenu, isConsole }) => {
   return (
     <div>
       <div className="op-navbar bg-base-100 shadow">
-        <div className="flex-none">
-          <button
-            className="op-btn op-btn-square op-btn-ghost focus:outline-none hover:bg-transparent op-btn-sm no-animation"
-            onClick={showSidebar}
-          >
-            <i className="fa-light fa-bars text-xl text-base-content"></i>
-          </button>
-        </div>
         <div className="flex-1 ml-2">
           <div className="h-[25px] md:h-[40px] w-auto overflow-hidden">
-            {applogo && (
-              <img
-                className="object-contain h-full w-auto"
-                src={applogo}
-                alt="logo"
-              />
-            )}
+            <img
+              className="object-contain h-full w-auto"
+              src={applogo}
+              alt="img"
+            />
           </div>
         </div>
-        <div id="profile-menu" className="flex-none gap-2">
-          <div>
-            <FullScreenButton />
-          </div>
+        <div id="profile-menu" className="flex-none gap-2 flex items-center">
+          
+          {/* <FullScreenButton /> */}
           {width >= 768 && (
             <div
               onClick={toggleDropdown}
               className="cursor-pointer w-[35px] h-[35px] rounded-full ring-[1px] ring-offset-2 ring-gray-400 overflow-hidden"
             >
               <img
-                className="w-[35px] h-[35px] object-contain"
+                className="w-full h-full object-cover"
                 src={image}
                 alt="img"
               />
@@ -124,74 +119,128 @@ const Header = ({ showSidebar, setIsMenu, isConsole }) => {
           {width >= 768 && (
             <div
               onClick={toggleDropdown}
-              role="button"
-              tabIndex="0"
               className="cursor-pointer text-base-content text-sm"
             >
               {username && username}
             </div>
           )}
-          <div
-            className="op-dropdown op-dropdown-open op-dropdown-end"
-            id="profile-menu"
-          >
+          <div className="op-dropdown op-dropdown-end" id="profile-menu">
             <div
               tabIndex={0}
               role="button"
-              onClick={toggleDropdown}
               className="op-btn op-btn-ghost op-btn-xs w-[10px] h-[20px] hover:bg-transparent"
             >
-              <i className="fa-light fa-angle-down text-base-content"></i>
+              <i
+                tabIndex={0}
+                role="button"
+                onClick={toggleDropdown}
+                className="fa-light fa-angle-down text-base-content"
+              ></i>
             </div>
             <ul
               tabIndex={0}
-              className={`mt-3 z-[1] p-2 shadow op-dropdown-open op-menu op-menu-sm op-dropdown-content text-base-content bg-base-100 rounded-box w-52 ${
+              className={`mt-3 z-[1] p-2 shadow op-menu op-menu-sm op-dropdown-content text-base-content bg-base-100 rounded-box w-52 ${
                 isOpen ? "" : "hidden"
               }`}
             >
-              {!isConsole && (
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate("/profile");
+                }}
+                className="flex"
+              >
+                <span className="flex">
+                  <i className="fa-light fa-user" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("profile")}</span>
+                </span>
+              </li>
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate("/report/contacts");
+                }}
+                className="flex"
+              >
+                <span className="flex">
+                  <i className="fa-light fa-address-book" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("Contactbook")}</span>
+                </span>
+              </li>
+              <li
+                onClick={() => {
+                  setIsOpenSettings(!isOpenSettings);
+                }}
+                className="flex justify-between"
+              >
+                <span className="flex">
+                  <i className="fa-light fa-cog" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("Settings")}</span>
+                  <i
+                  className="fa-light fa-angle-down ml-12 text-base-content cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpenSettings(!isOpenSettings);
+                  }}
+                />
+                </span>
+                
+              </li>
+              {isOpenSettings && (
                 <>
-                    <li
-                      onClick={() =>
-                        openInNewTab("https://docs.opensignlabs.com")
-                      }
-                    >
-                      <span>
-                        <i className="fa-light fa-book"></i> {t("docs")}
-                      </span>
-                    </li>
-                  <li
-                    onClick={() => {
-                      setIsOpen(false);
-                      navigate("/profile");
-                    }}
-                  >
-                    <span>
-                      <i className="fa-light fa-user"></i> {t("profile")}
+                  <li className="ml-4 flex" onClick={() => navigate("/managesign")}>
+                    <span className="flex">
+                      <i className="fa-light fa-signature" style={{ width: "24px" }}></i>
+                      <span className="ml-2">{t("My Signature")}</span>
                     </span>
                   </li>
-                  <li
-                    onClick={() => {
-                      setIsOpen(false);
-                      navigate("/changepassword");
-                    }}
-                  >
-                    <span>
-                      <i className="fa-light fa-lock"></i>{" "}
-                      {t("change-password")}
-                    </span>
-                  </li>
+                  {userRole === "contracts_Admin" || userRole === "contracts_OrgAdmin" ? (
+                    <>
+                      <li className="ml-4 flex" onClick={() => navigate("/preferences")}>
+                        <span className="flex">
+                          <i className="fa-light fa-sliders-h" style={{ width: "24px" }}></i>
+                          <span className="ml-2">{t("Preferences")}</span>
+                        </span>
+                      </li>
+                      <li className="ml-4 flex" onClick={() => navigate("/users")}>
+                        <span className="flex">
+                          <i className="fa-light fa-users" style={{ width: "24px" }}></i>
+                          <span className="ml-2">{t("Users")}</span>
+                        </span>
+                      </li>
+                    </>
+                  ) : null}
                 </>
               )}
-              <li onClick={closeDropdown}>
-                <span>
-                  <i className="fa-light fa-arrow-right-from-bracket"></i>{" "}
-                  {t("log-out")}
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate("/changepassword");
+                }}
+                className="flex"
+              >
+                <span className="flex">
+                  <i className="fa-light fa-lock" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("change-password")}</span>
+                </span>
+              </li>
+              <li onClick={closeDropdown} className="flex">
+                <span className="flex">
+                  <i className="fa-light fa-arrow-right-from-bracket" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("log-out")}</span>
                 </span>
               </li>
             </ul>
           </div>
         </div>
+        <div className="flex-none">
+            <button
+              className="op-btn op-btn-square op-btn-ghost focus:outline-none hover:bg-transparent op-btn-sm no-animation"
+              onClick={showSidebar}
+            >
+              <i className="fa-light fa-bars text-xl text-base-content"></i>
+            </button>
+          </div>
       </div>
     </div>
   );

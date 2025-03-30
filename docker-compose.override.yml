@@ -1,0 +1,11 @@
+services:
+  client:
+    build:
+      context: ./apps/OpenSign
+      dockerfile: Dockerfile
+    command: ["npm", "run", "start-dev"]
+  server:
+    build:
+      context: ./apps/OpenSignServer
+      dockerfile: Dockerfile
+    command: ["npm", "run", "start"]

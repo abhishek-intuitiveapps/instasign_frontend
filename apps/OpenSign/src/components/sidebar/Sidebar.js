@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Menu from "./Menu";
 import Submenu from "./SubMenu";
-import SocialMedia from "../SocialMedia";
+import SocialMedia from "./SocialMedia";
 import dp from "../../assets/images/dp.png";
 import sidebarList, { subSetting } from "../../json/menuJson";
 import { useNavigate } from "react-router";
@@ -83,7 +83,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
       className={`absolute lg:relative bg-base-100 h-screen overflow-y-auto transition-all z-[500] shadow-lg hide-scrollbar
      ${isOpen ? "w-full md:w-[300px]" : "w-0"}`}
     >
-      <div className="flex px-2 py-3 gap-2 items-center shadow-md">
+      {/* <div className="flex px-2 py-3 gap-2 items-center shadow-md">
         <div
           onClick={() => handleProfile()}
           className="w-[75px] h-[75px] rounded-full ring-[2px] ring-offset-2 ring-gray-400 overflow-hidden cursor-pointer"
@@ -110,7 +110,7 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
             {tenantname}
           </p>
         </div>
-      </div>
+      </div> */}
       <nav
         className="op-menu op-menu-sm"
         aria-label="OpenSign Sidebar Navigation"
@@ -140,9 +140,9 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
           )}
         </ul>
       </nav>
-        <footer className="mt-4 flex justify-center items-center text-[25px] text-base-content gap-3">
-          <SocialMedia />
-        </footer>
+      {/* <footer className="mt-4 flex justify-center items-center text-[25px] text-base-content gap-3">
+        <SocialMedia />
+      </footer> */}
     </aside>
   );
 };

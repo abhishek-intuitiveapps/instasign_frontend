@@ -5,7 +5,7 @@ FROM node:18
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json first to leverage Docker cache
-COPY ./package*.json ./
+COPY ./package*.json .
 
 # Install application dependencies
 RUN npm install
@@ -21,5 +21,5 @@ EXPOSE 3000
 # ENV NODE_ENV production
 
 # Run the application
-ENTRYPOINT npm run start
+ENTRYPOINT npm run start-dev
 

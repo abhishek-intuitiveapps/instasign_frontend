@@ -4,7 +4,6 @@ import axios from "axios";
 import { openInNewTab } from "../constant/Utils";
 import { useTranslation } from "react-i18next";
 const Footer = () => {
-  const appName = "OpenSign™";
   const { t } = useTranslation();
   const [showButton, setShowButton] = useState(false);
   const [version, setVersion] = useState("");
@@ -40,20 +39,24 @@ const Footer = () => {
     };
   }, []);
 
-  const openUrl = () => {
-    openInNewTab(
-      "https://github.com/OpenSignLabs/OpenSign/releases/tag/" + version
-    );
-  };
+  const appName = "InstaSign™";
+  // const openUrl = () => {
+  //   openInNewTab(
+  //     "https://github.com/OpenSignLabs/OpenSign/releases/tag/" + version
+  //   );
+  // };
   return (
     <>
       <footer className="op-footer op-footer-center py-3 bg-base-300 text-base-content text-center text-[13px]">
         <aside>
           <p>
             {t("all-right")} &copy; {new Date().getFullYear()} &nbsp;
-            <span onClick={openUrl} className="hover:underline cursor-pointer">
+            {/* <span onClick={openUrl} className="hover:underline cursor-pointer">
               {appName} ( {t("version")}:{" "}
               {version ? version : `${Package.version} `})
+            </span> */}
+            <span className="hover:underline cursor-pointer">
+              {appName} 
             </span>
           </p>
         </aside>

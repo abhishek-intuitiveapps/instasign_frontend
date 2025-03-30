@@ -1,4 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
+import {
+  themeColor
+} from "../constant/const";
 import { PDFDocument } from "pdf-lib";
 import "../styles/signature.css";
 import Parse from "parse";
@@ -40,8 +43,7 @@ import {
   defaultWidthHeight,
   addWidgetOptions,
   textWidget,
-  compressedFileSize,
-  mailTemplate
+  compressedFileSize
 } from "../constant/Utils";
 import Header from "../components/pdf/PdfHeader";
 import RenderPdf from "../components/pdf/RenderPdf";
@@ -64,9 +66,9 @@ import WidgetComponent from "../components/pdf/WidgetComponent";
 import PlaceholderCopy from "../components/pdf/PlaceholderCopy";
 import TextFontSetting from "../components/pdf/TextFontSetting";
 
-function PdfRequestFiles() {
+function PdfRequestFiles(
+) {
   const { t } = useTranslation();
-  const appName = "OpenSign™";
   const [pdfDetails, setPdfDetails] = useState([]);
   const [signedSigners, setSignedSigners] = useState([]);
   const [unsignedSigners, setUnSignedSigners] = useState([]);
@@ -159,7 +161,6 @@ function PdfRequestFiles() {
     signId: ""
   });
   const [showSignPagenumber, setShowSignPagenumber] = useState([]);
-  const [owner, setOwner] = useState({});
   const [, drop] = useDrop({
     accept: "BOX",
     drop: (item, monitor) => addPositionOfSignature(item, monitor),
@@ -170,8 +171,10 @@ function PdfRequestFiles() {
   let sendmail;
   let getDocId = "";
   let contactBookId = "";
-  const route = window.location.pathname;
-  const getQuery = window.location?.search?.split("?"); //['','sendmail=false']
+  const route =
+    window.location.pathname;
+  const getQuery =
+    window.location?.search?.split("?"); //['','sendmail=false']
   if (getQuery) {
     sendmail = getQuery?.[1]?.split("=")[1]; //false
   }
@@ -194,7 +197,9 @@ function PdfRequestFiles() {
       getDocumentDetails(getDocumentId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getDocumentId]);
+  }, [
+    getDocumentId
+  ]);
   useEffect(() => {
     const updateSize = () => {
       if (divRef.current) {
@@ -296,7 +301,6 @@ function PdfRequestFiles() {
           setHandleError(t("something-went-wrong-mssg"));
         }
         setExtUserId(documentData[0]?.ExtUserPtr?.objectId);
-        setOwner(documentData?.[0]?.ExtUserPtr);
         const isCompleted =
           documentData[0].IsCompleted && documentData[0].IsCompleted;
         const expireDate = documentData[0].ExpiryDate.iso;
@@ -449,9 +453,35 @@ function PdfRequestFiles() {
           setRequestSignTour(true);
         } else {
           const isEnableOTP = documentData?.[0]?.IsEnableOTP || false;
-          const sessionToken = localStorage.getItem("accesstoken");
-          if (sessionToken) {
-            //condition to check current user exist in contracts_Users class and check tour message status
+          if (!isEnableOTP) {
+            try {
+              const resContact = await axios.post(
+                `${localStorage.getItem("baseUrl")}functions/getcontact`,
+                { contactId: currUserId },
+                {
+                  headers: {
+                    "Content-Type": "application/json",
+                    "X-Parse-Application-Id": localStorage.getItem("parseAppId")
+                  }
+                }
+              );
+              const contact = resContact?.data?.result;
+              setContractName("_Contactbook");
+              setSignerUserId(contact?.objectId);
+              const tourData = contact?.TourStatus && contact?.TourStatus;
+              if (tourData && tourData.length > 0) {
+                const checkTourRequest =
+                  tourData?.some((data) => data?.requestSign) || false;
+                setTourStatus(tourData);
+                setRequestSignTour(checkTourRequest);
+              } else {
+                setRequestSignTour(false);
+              }
+            } catch (err) {
+              console.log("err while getting tourstatus", err);
+            }
+          } else {
+            //else condition to check current user exist in contracts_Users class and check tour message status
             //if not then check user exist in contracts_Contactbook class and check tour message status
             const res = await contractUsers();
             if (res === "Error: Something went wrong!") {
@@ -508,33 +538,6 @@ function PdfRequestFiles() {
                 setHandleError(t("user-not-exist"));
               }
             }
-          } else if (!isEnableOTP) {
-            try {
-              const resContact = await axios.post(
-                `${localStorage.getItem("baseUrl")}functions/getcontact`,
-                { contactId: currUserId },
-                {
-                  headers: {
-                    "Content-Type": "application/json",
-                    "X-Parse-Application-Id": localStorage.getItem("parseAppId")
-                  }
-                }
-              );
-              const contact = resContact?.data?.result;
-              setContractName("_Contactbook");
-              setSignerUserId(contact?.objectId);
-              const tourData = contact?.TourStatus && contact?.TourStatus;
-              if (tourData && tourData.length > 0) {
-                const checkTourRequest =
-                  tourData?.some((data) => data?.requestSign) || false;
-                setTourStatus(tourData);
-                setRequestSignTour(checkTourRequest);
-              } else {
-                setRequestSignTour(false);
-              }
-            } catch (err) {
-              console.log("err while getting tourstatus", err);
-            }
           }
         }
         setIsUiLoading(false);
@@ -555,7 +558,7 @@ function PdfRequestFiles() {
       setIsLoading({ isLoad: false });
     } catch (err) {
       console.log("Error: error in getDocumentDetails", err);
-      setHandleError(t("something-went-wrong-mssg"));
+      setHandleError("Error: Something went wrong!");
       setIsLoading({ isLoad: false });
     }
   };
@@ -760,11 +763,7 @@ function PdfRequestFiles() {
               documentData === "Error: Something went wrong!" ||
               (documentData.result && documentData.result.error)
             ) {
-              if (documentData?.result?.error?.includes("deleted")) {
-                setHandleError(t("document-deleted"));
-              } else {
-                setHandleError(t("something-went-wrong-mssg"));
-              }
+              setHandleError("Error: Something went wrong!");
             } else {
               setHandleError("Document not Found!");
             }
@@ -833,14 +832,14 @@ function PdfRequestFiles() {
                         "en-US",
                         { day: "numeric", month: "long", year: "numeric" }
                       );
-                      let senderEmail = pdfDetails?.[0]?.ExtUserPtr?.Email;
+                      let senderEmail = pdfDetails?.[0].ExtUserPtr.Email;
                       let senderPhone = pdfDetails?.[0]?.ExtUserPtr?.Phone;
-                      const senderName = pdfDetails?.[0].ExtUserPtr.Name;
-                      const documentName = pdfDetails?.[0].Name;
+                      const senderName = `${pdfDetails?.[0].ExtUserPtr.Name}`;
+
                       try {
-                        let url = `${localStorage.getItem(
-                          "baseUrl"
-                        )}functions/sendmailv3`;
+                        const imgPng =
+                          "https://qikinnovation.ams3.digitaloceanspaces.com/logo.png";
+                        let url = `${localStorage.getItem("baseUrl")}functions/sendmailv3`;
                         const headers = {
                           "Content-Type": "application/json",
                           "X-Parse-Application-Id":
@@ -860,12 +859,19 @@ function PdfRequestFiles() {
                             `${pdfDetails?.[0].objectId}/${user.Email}`
                           );
                         }
-                        let signPdf = `${hostUrl}/login/${encodeBase64}`;
+                        let signPdf =
+                              `${hostUrl}/login/${encodeBase64}`;
+                        const openSignUrl =
+                          "https://www.opensignlabs.com/contact-us";
                         const orgName = pdfDetails[0]?.ExtUserPtr.Company
                           ? pdfDetails[0].ExtUserPtr.Company
                           : "";
+                        const themeBGcolor = themeColor;
                         let replaceVar;
-                        if (requestBody && requestSubject) {
+                        if (
+                          requestBody &&
+                          requestSubject
+                        ) {
                           const replacedRequestBody = requestBody.replace(
                             /"/g,
                             "'"
@@ -876,9 +882,11 @@ function PdfRequestFiles() {
                             "</body> </html>";
 
                           const variables = {
-                            document_title: documentName,
-                            sender_name: senderName,
-                            sender_mail: senderEmail,
+                            document_title: pdfDetails?.[0].Name,
+                            sender_name:
+                              senderName,
+                            sender_mail:
+                              senderEmail,
                             sender_phone: senderPhone,
                             receiver_name: user?.Name || "",
                             receiver_email: user.Email,
@@ -893,25 +901,41 @@ function PdfRequestFiles() {
                             variables
                           );
                         }
-                        const mailparam = {
-                          senderName: senderName,
-                          senderMail: senderEmail,
-                          title: documentName,
-                          organization: orgName,
-                          localExpireDate: localExpireDate,
-                          sigingUrl: signPdf
-                        };
+
                         let params = {
-                          replyto: senderEmail || "",
+                          replyto:
+                            senderEmail ||
+                            "",
                           extUserId: extUserId,
                           recipient: user.Email,
                           subject: replaceVar?.subject
                             ? replaceVar?.subject
-                            : mailTemplate(mailparam).subject,
-                          from: senderEmail,
+                            : `${pdfDetails?.[0].ExtUserPtr.Name} has requested you to sign "${pdfDetails?.[0].Name}"`,
+                          from:
+                            senderEmail,
                           html: replaceVar?.body
                             ? replaceVar?.body
-                            : mailTemplate(mailparam).body
+                            : "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /> </head>   <body> <div style='background-color: #f5f5f5; padding: 20px'=> <div   style=' box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;background: white;padding-bottom: 20px;'> <div style='padding:10px 10px 0 10px'><img src=" +
+                              imgPng +
+                              " height='50' style='padding: 20px,width:170px,height:40px' /></div>  <div  style=' padding: 2px;font-family: system-ui;background-color:" +
+                              themeBGcolor +
+                              ";'><p style='font-size: 20px;font-weight: 400;color: white;padding-left: 20px;' > Digital Signature Request</p></div><div><p style='padding: 20px;font-family: system-ui;font-size: 14px;   margin-bottom: 10px;'> " +
+                              pdfDetails?.[0].ExtUserPtr.Name +
+                              " has requested you to review and sign <strong> " +
+                              pdfDetails?.[0].Name +
+                              "</strong>.</p><div style='padding: 5px 0px 5px 25px;display: flex;flex-direction: row;justify-content: space-around;'><table> <tr> <td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Sender</td> <td> </td> <td  style='color:#626363;font-weight:bold'>" +
+                              senderEmail +
+                              "</td></tr><tr><td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Organization</td> <td> </td><td style='color:#626363;font-weight:bold'> " +
+                              orgName +
+                              "</td></tr> <tr> <td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Expires on</td><td> </td> <td style='color:#626363;font-weight:bold'>" +
+                              localExpireDate +
+                              "</td></tr><tr> <td></td> <td> </td></tr></table> </div> <div style='margin-left:70px'><a target=_blank href=" +
+                              signPdf +
+                              "> <button style='padding: 12px 12px 12px 12px;background-color: #d46b0f;color: white;  border: 0px;box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;font-weight:bold;margin-top:30px'>Sign here</button></a> </div> <div style='display: flex; justify-content: center;margin-top: 10px;'> </div></div></div><div><p> This is an automated email from OpenSign™. For any queries regarding this email, please contact the sender " +
+                              senderEmail +
+                              " directly.If you think this email is inappropriate or spam, you may file a complaint with OpenSign™   <a href= " +
+                              openSignUrl +
+                              " target=_blank>here</a>.</p> </div></div></body> </html>"
                         };
                         await axios.post(url, params, { headers: headers });
                       } catch (error) {
@@ -924,15 +948,12 @@ function PdfRequestFiles() {
                   } else {
                     const url =
                       updateDoc?.[0]?.SignedUrl || updateDoc?.[0]?.URL;
-                    const fileAdapter = "";
+                    const fileAdapter =
+                          "";
                     const isCompleted = updateDoc?.[0]?.IsCompleted
                       ? `&completed=true`
                       : "";
-                    const params = `docid=${
-                      updateDoc[0].objectId
-                    }&docurl=${encodeURIComponent(
-                      url
-                    )}${isCompleted}${fileAdapter}`;
+                    const params = `docid=${updateDoc[0].objectId}&docurl=${encodeURIComponent(url)}${isCompleted}${fileAdapter}`;
                     window.location.href = `/success?${params}`;
                   }
                 } else {
@@ -948,7 +969,7 @@ function PdfRequestFiles() {
                 setIsAlert({
                   title: "Error",
                   isShow: true,
-                  alertMessage: t("pdf-uncompatible", { appName: appName })
+                  alertMessage: t("pdf-uncompatible")
                 });
               }
             } catch (err) {
@@ -1513,6 +1534,7 @@ function PdfRequestFiles() {
     );
   };
 
+
   const clickOnZoomIn = () => {
     onClickZoomIn(scale, zoomPercent, setScale, setZoomPercent);
   };
@@ -1649,7 +1671,7 @@ function PdfRequestFiles() {
         scale: containerScale,
         zIndex: posZIndex,
         type: dragTypeValue,
-        options: addWidgetOptions(dragTypeValue, owner),
+        options: addWidgetOptions(dragTypeValue),
         Width: widgetWidth / (containerScale * scale),
         Height: widgetHeight / (containerScale * scale)
       };
@@ -1676,7 +1698,7 @@ function PdfRequestFiles() {
         scale: containerScale,
         zIndex: posZIndex,
         type: dragTypeValue,
-        options: addWidgetOptions(dragTypeValue, owner),
+        options: addWidgetOptions(dragTypeValue),
         Width: widgetWidth / (containerScale * scale),
         Height: widgetHeight / (containerScale * scale)
       };
@@ -1827,579 +1849,594 @@ function PdfRequestFiles() {
   };
   return (
     <DndProvider backend={HTML5Backend}>
-      <Title title={"Request Sign"} />
-      {isLoading.isLoad ? (
-        <LoaderWithMsg isLoading={isLoading} />
-      ) : handleError ? (
-        <HandleError handleError={handleError} />
-      ) : (
-        <div>
-          {!isAgree &&
-            currentSigner &&
-            !isExpired &&
-            !alreadySign &&
-            !isCompleted?.isCertificate &&
-            !isDecline?.isDeclined && (
-              <AgreementSign
-                setIsAgree={setIsAgree}
-                setIsAgreeTour={setIsAgreeTour}
-                showFirstWidget={showFirstWidget}
-              />
-            )}
-          <Tour
-            showNumber={false}
-            showNavigation={false}
-            showNavigationNumber={false}
-            onRequestClose={handleCloseAgreeTour}
-            steps={AgreementTour}
-            isOpen={isAgreeTour}
-            rounded={5}
-            closeWithMask={false}
-          />
-
-          {isUiLoading && (
-            <div className="absolute h-[100vh] w-full flex flex-col justify-center items-center z-[999] bg-[#e6f2f2] bg-opacity-80">
-              <Loader />
-              <span className="text-[13px] text-base-content">
-                {t("loading-mssg")}
-              </span>
-            </div>
-          )}
-          {isUiLoading && (
-            <div className="absolute h-[100vh] w-full flex flex-col justify-center items-center z-[999] bg-[#e6f2f2] bg-opacity-80">
-              <Loader />
-              <span className="text-[13px] text-base-content">
-                {t("loading-mssg")}
-              </span>
-            </div>
-          )}
-          {isCelebration && (
-            <div className="relative z-[1000]">
-              <Confetti
-                width={window.innerWidth}
-                height={window.innerHeight}
-                recycle={false} // Prevents confetti from repeating
-                gravity={0.1} // Adjust the gravity to control the speed
-              />
-            </div>
-          )}
-          <div
-            style={{
-              pointerEvents:
-                isExpired ||
-                (isDecline.isDeclined && isDecline.currnt === "another")
-                  ? "none"
-                  : "auto"
-            }}
-            className={`${
-              isGuestSignFlow ? "border-[0.5px] border-gray-300" : "op-card"
-            } relative overflow-hidden flex flex-col md:flex-row justify-between bg-base-300`}
-          >
-            {!requestSignTour &&
-              isAgree &&
-              signerObjectId &&
-              requestSignTourFunction()}
-            <Tour
-              showNumber={false}
-              showNavigation={false}
-              showNavigationNumber={false}
-              onRequestClose={closeTour}
-              steps={tourConfig}
-              isOpen={widgetsTour}
-              rounded={5}
-              closeWithMask={false}
-            />
-
-            {/* this modal is used to show decline alert */}
-            <PdfDeclineModal
-              show={isDecline.isDeclined}
-              headMsg={t("document-declined")}
-              bodyMssg={
-                isDecline.currnt === "Sure"
-                  ? t("decline-alert-1")
-                  : isDecline.currnt === "YouDeclined"
-                    ? t("decline-alert-2")
-                    : isDecline.currnt === "another" && handleDeclineMssg()
-              }
-              footerMessage={isDecline.currnt === "Sure"}
-              declineDoc={declineDoc}
-              setIsDecline={setIsDecline}
-            />
-            {/* this modal is used for show expired alert */}
-            <PdfDeclineModal
-              show={isExpired}
-              doc={pdfDetails?.[0]}
-              headMsg={t("expired-doc-title")}
-              bodyMssg={t("expired-on-mssg", { expiredDate })}
-              isDownloadBtn={true}
-              handleDownloadBtn={handleDownloadBtn}
-              handleExpiry={handleExpiry}
-            />
-            <ModalUi
-              isOpen={defaultSignAlert.isShow}
-              title={t("auto-sign-all")}
-              handleClose={() =>
-                setDefaultSignAlert({ isShow: false, alertMessage: "" })
-              }
-            >
-              <div className="h-full p-[20px]">
-                <p>{defaultSignAlert.alertMessage}</p>
-                <div className="h-[1px] w-full my-[15px] bg-[#9f9f9f]"></div>
-                {defaultSignImg ? (
-                  <>
-                    <button
-                      onClick={() => addDefaultSignature()}
-                      type="button"
-                      className="op-btn op-btn-primary"
-                    >
-                      {t("yes")}
-                    </button>
-                    <button
-                      onClick={() =>
-                        setDefaultSignAlert({
-                          isShow: false,
-                          alertMessage: ""
-                        })
-                      }
-                      type="button"
-                      className="op-btn op-btn-secondary ml-1"
-                    >
-                      {t("close")}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() =>
-                      setIsAlert({ isShow: false, alertMessage: "" })
-                    }
-                    type="button"
-                    className="op-btn op-btn-primary"
-                  >
-                    {t("ok")}
-                  </button>
-                )}
-              </div>
-            </ModalUi>
-            {/* this component used to render all pdf pages in left side */}
-            <RenderAllPdfPage
-              signerPos={signerPos}
-              id={uniqueId}
-              allPages={allPages}
-              setAllPages={setAllPages}
-              setPageNumber={setPageNumber}
-              pageNumber={pageNumber}
-              containerWH={containerWH}
-              pdfBase64Url={pdfBase64Url}
-              signedUrl={pdfDetails?.[0]?.SignedUrl || ""}
-            />
-            {/* pdf render view */}
-            <div className=" w-full md:w-[57%] flex mr-4">
-              <PdfZoom
-                clickOnZoomIn={clickOnZoomIn}
-                clickOnZoomOut={clickOnZoomOut}
-                isDisableEditTools={true}
-                allPages={allPages}
-                setAllPages={setAllPages}
-                setPageNumber={setPageNumber}
-              />
-              <PlaceholderCopy
-                isPageCopy={isPageCopy}
-                setIsPageCopy={setIsPageCopy}
-                xyPosition={signerPos}
-                setXyPosition={setSignerPos}
-                allPages={allPages}
-                pageNumber={pageNumber}
-                signKey={signKey}
-                Id={uniqueId}
-                widgetType={widgetType}
-                setUniqueId={setUniqueId}
-              />
-              <div className=" w-full md:w-[95%] ">
-                {/* this modal is used show this document is already sign */}
-                <ModalUi
-                  isOpen={isCompleted.isModal}
-                  title={t("document-signed")}
-                  handleClose={() =>
-                    setIsCompleted((prev) => ({ ...prev, isModal: false }))
-                  }
-                  reduceWidth={
-                    !isCompleted?.message && "md:min-w-[440px] md:max-w-[400px]"
-                  }
-                >
-                  <div className="h-full p-[20px] text-base-content">
-                    {isCompleted?.message ? (
-                      <>
-                        <p>{isCompleted?.message}</p>
-                        {!isredirectCanceled && redirectUrl && (
-                          <div className="flex flex-row gap-1 items-center justify-center mb-3 mt-2">
-                            <p>Redirecting you in {redirectTimeLeft} sec...</p>
-                            <button
-                              onClick={handleRedirectCancel}
-                              className="underline cursor-pointer op-text-primary focus:outline-none ml-2"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="px-[15px]">
-                        <span>{t("document-signed-alert-4")}</span>
-                      </div>
-                    )}
-                    {!isCompleted?.message && (
-                      <div className="flex flex-col mt-3 gap-1 px-[10px] justify-center items-center">
-                        {!isredirectCanceled && redirectUrl && (
-                          <div className="flex flex-row gap-1 items-center justify-center mb-3">
-                            <p>Redirecting you in {redirectTimeLeft} sec...</p>
-                            <button
-                              onClick={handleRedirectCancel}
-                              className="underline cursor-pointer op-text-primary focus:outline-none ml-2"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        )}
-                        <div className={`${!redirectUrl ? "m-2" : ""}`}>
-                          <button
-                            onClick={(e) =>
-                              handleToPrint(e, setIsDownloading, pdfDetails)
-                            }
-                            type="button"
-                            className="font-[500] text-[13px] mr-[5px] op-btn op-btn-neutral"
-                          >
-                            <i
-                              className="fa-light fa-print"
-                              aria-hidden="true"
-                            ></i>
-                            <span className="hidden lg:block">
-                              {t("print")}
-                            </span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleDownloadCertificate(
-                                pdfDetails,
-                                setIsDownloading
-                              )
-                            }
-                            className="font-[500] text-[13px] mr-[5px] op-btn op-btn-secondary"
-                          >
-                            <i
-                              className="fa-light fa-award mx-[3px] lg:mx-0"
-                              aria-hidden="true"
-                            ></i>
-                            <span className="hidden lg:block">
-                              {t("certificate")}
-                            </span>
-                          </button>
-                          <button
-                            type="button"
-                            className="font-[500] text-[13px] mr-[5px] op-btn op-btn-primary"
-                            onClick={() => {
-                              setIsCompleted((prev) => ({
-                                ...prev,
-                                isModal: false
-                              }));
-                              setIsDownloadModal(true);
-                            }}
-                          >
-                            <i
-                              className="fa-light fa-download"
-                              aria-hidden="true"
-                            ></i>
-                            <span className="hidden lg:block">
-                              {t("download")}
-                            </span>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </ModalUi>
-                {isDownloading === "pdf" && (
-                  <div className="fixed z-[1000] inset-0 flex justify-center items-center bg-black bg-opacity-30">
-                    <Loader />
-                  </div>
-                )}
-                <ModalUi
-                  isOpen={
-                    isDownloading === "certificate" ||
-                    isDownloading === "certificate_err"
-                  }
-                  title={
-                    isDownloading === "certificate" ||
-                    isDownloading === "certificate_err"
-                      ? t("generating-certificate")
-                      : t("pdf-download")
-                  }
-                  handleClose={() => setIsDownloading("")}
-                >
-                  <div className="p-3 md:p-5 text-[13px] md:text-base text-center text-base-content">
-                    {isDownloading === "certificate" ? (
-                      <p>{t("generate-certificate-alert")}</p>
-                    ) : (
-                      <p>{t("generate-certificate-err")}</p>
-                    )}
-                  </div>
-                </ModalUi>
-                {/* this component is used for signature pad modal */}
-                {documentId && isSignPad && (
-                  <SignPad
-                    saveSignCheckbox={saveSignCheckbox}
-                    setSaveSignCheckbox={setSaveSignCheckbox}
-                    signatureTypes={signatureType}
-                    isSignPad={isSignPad}
-                    isStamp={isStamp}
-                    setIsImageSelect={setIsImageSelect}
-                    setIsSignPad={setIsSignPad}
-                    setImage={setImage}
-                    isImageSelect={isImageSelect}
-                    imageRef={imageRef}
-                    onImageChange={onImageChange}
-                    setSignature={setSignature}
-                    image={image}
-                    onSaveImage={saveImage}
-                    onSaveSign={saveSign}
-                    defaultSign={defaultSignImg}
-                    myInitial={myInitial}
-                    setDefaultSignImg={setDefaultSignImg}
-                    setMyInitial={setMyInitial}
-                    isInitial={isInitial}
-                    setIsInitial={setIsInitial}
-                    setIsStamp={setIsStamp}
-                    currWidgetsDetails={currWidgetsDetails}
-                    setCurrWidgetsDetails={setCurrWidgetsDetails}
-                    setIsAutoSign={setIsAutoSign}
-                    isAutoSign={isAutoSign}
+      <Title
+        title={
+              "Request Sign"
+        }
+      />
+          {isLoading.isLoad ? (
+            <LoaderWithMsg isLoading={isLoading} />
+          ) : handleError ? (
+            <HandleError handleError={handleError} />
+          ) : (
+            <div>
+              {!isAgree &&
+                currentSigner &&
+                !isExpired &&
+                !alreadySign &&
+                !isCompleted?.isCertificate &&
+                !isDecline?.isDeclined && (
+                  <AgreementSign
+                    setIsAgree={setIsAgree}
+                    setIsAgreeTour={setIsAgreeTour}
+                    showFirstWidget={showFirstWidget}
                   />
                 )}
-                {/* pdf header which contain funish back button */}
-                <Header
-                  isPdfRequestFiles={true}
-                  pageNumber={pageNumber}
-                  allPages={allPages}
-                  changePage={changePage}
-                  pdfDetails={pdfDetails}
-                  signerPos={signerPos}
-                  isSigned={isSigned}
-                  isCompleted={isCompleted.isCertificate}
-                  embedWidgetsData={embedWidgetsData}
-                  isShowHeader={true}
-                  setIsDecline={setIsDecline}
-                  decline={true}
-                  currentSigner={currentSigner}
-                  alreadySign={alreadySign}
-                  containerWH={containerWH}
-                  clickOnZoomIn={clickOnZoomIn}
-                  clickOnZoomOut={clickOnZoomOut}
-                  isDisablePdfEditTools={true}
-                  setIsDownloadModal={setIsDownloadModal}
-                  pdfBase64={pdfBase64Url}
-                  isGuestSignFlow={isGuestSignFlow}
+              <Tour
+                showNumber={false}
+                showNavigation={false}
+                showNavigationNumber={false}
+                onRequestClose={handleCloseAgreeTour}
+                steps={AgreementTour}
+                isOpen={isAgreeTour}
+                rounded={5}
+                closeWithMask={false}
+              />
+
+              {isUiLoading && (
+                <div className="absolute h-[100vh] w-full flex flex-col justify-center items-center z-[999] bg-[#e6f2f2] bg-opacity-80">
+                  <Loader />
+                  <span className="text-[13px] text-base-content">
+                    {t("loading-mssg")}
+                  </span>
+                </div>
+              )}
+              {isUiLoading && (
+                <div className="absolute h-[100vh] w-full flex flex-col justify-center items-center z-[999] bg-[#e6f2f2] bg-opacity-80">
+                  <Loader />
+                  <span className="text-[13px] text-base-content">
+                    {t("loading-mssg")}
+                  </span>
+                </div>
+              )}
+              {isCelebration && (
+                <div className="relative z-[1000]">
+                  <Confetti
+                    width={window.innerWidth}
+                    height={window.innerHeight}
+                    recycle={false} // Prevents confetti from repeating
+                    gravity={0.1} // Adjust the gravity to control the speed
+                  />
+                </div>
+              )}
+              <div
+                style={{
+                  pointerEvents:
+                    isExpired ||
+                    (isDecline.isDeclined && isDecline.currnt === "another")
+                      ? "none"
+                      : "auto"
+                }}
+                className={`${
+                      isGuestSignFlow
+                      ? "border-[0.5px] border-gray-300"
+                      : "op-card"
+                } relative overflow-hidden flex flex-col md:flex-row justify-between bg-base-300`}
+              >
+                {!requestSignTour &&
+                  isAgree &&
+                  signerObjectId &&
+                  requestSignTourFunction()}
+                <Tour
+                  showNumber={false}
+                  showNavigation={false}
+                  showNavigationNumber={false}
+                  onRequestClose={closeTour}
+                  steps={tourConfig}
+                  isOpen={widgetsTour}
+                  rounded={5}
+                  closeWithMask={false}
                 />
 
-                <div
-                  ref={divRef}
-                  data-tut="pdfArea"
-                  className="h-full md:h-[95%]"
+                {/* this modal is used to show decline alert */}
+                <PdfDeclineModal
+                  show={isDecline.isDeclined}
+                  headMsg={t("document-declined")}
+                  bodyMssg={
+                    isDecline.currnt === "Sure"
+                      ? t("decline-alert-1")
+                      : isDecline.currnt === "YouDeclined"
+                        ? t("decline-alert-2")
+                        : isDecline.currnt === "another" && handleDeclineMssg()
+                  }
+                  footerMessage={isDecline.currnt === "Sure"}
+                  declineDoc={declineDoc}
+                  setIsDecline={setIsDecline}
+                />
+                {/* this modal is used for show expired alert */}
+                <PdfDeclineModal
+                  show={isExpired}
+                  doc={pdfDetails?.[0]}
+                  headMsg={t("expired-doc-title")}
+                  bodyMssg={t("expired-on-mssg", { expiredDate })}
+                  isDownloadBtn={true}
+                  handleDownloadBtn={handleDownloadBtn}
+                  handleExpiry={handleExpiry}
+                />
+                <ModalUi
+                  isOpen={defaultSignAlert.isShow}
+                  title={t("auto-sign-all")}
+                  handleClose={() =>
+                    setDefaultSignAlert({ isShow: false, alertMessage: "" })
+                  }
                 >
-                  {containerWH && (
-                    <RenderPdf
-                      setIsPageCopy={setIsPageCopy}
-                      drop={drop}
-                      pageNumber={pageNumber}
-                      pdfOriginalWH={pdfOriginalWH}
-                      pdfNewWidth={pdfNewWidth}
-                      setIsSignPad={setIsSignPad}
-                      setIsStamp={setIsStamp}
-                      setSignKey={setSignKey}
-                      pdfDetails={pdfDetails}
-                      signerPos={signerPos}
-                      successEmail={false}
-                      pdfUrl={pdfUrl}
-                      numPages={numPages}
-                      pageDetails={pageDetails}
-                      pdfRequest={true}
-                      signerObjectId={signerObjectId}
-                      signedSigners={signedSigners}
-                      setPdfLoad={setPdfLoad}
-                      pdfLoad={pdfLoad}
-                      setSignerPos={setSignerPos}
-                      containerWH={containerWH}
-                      setIsInitial={setIsInitial}
-                      setValidateAlert={setValidateAlert}
-                      unSignedWidgetId={unSignedWidgetId}
-                      setSelectWidgetId={setSelectWidgetId}
-                      selectWidgetId={selectWidgetId}
-                      setCurrWidgetsDetails={setCurrWidgetsDetails}
-                      divRef={divRef}
-                      setIsResize={setIsResize}
-                      isResize={isResize}
-                      setScale={setScale}
-                      scale={scale}
-                      uniqueId={uniqueId}
-                      pdfBase64Url={pdfBase64Url}
-                      setIsAgreeTour={setIsAgreeTour}
-                      isAgree={isAgree}
-                      handleTabDrag={handleTabDrag}
-                      handleStop={handleStop}
-                      isDragging={isDragging}
-                      isAlllowModify={pdfDetails[0]?.AllowModifications}
-                      setUniqueId={setUniqueId}
-                      handleDeleteSign={handleDeleteSign}
-                      handleTextSettingModal={handleTextSettingModal}
-                      setWidgetType={setWidgetType}
-                      assignedWidgetId={assignedWidgetId}
-                      setRequestSignTour={setRequestSignTour}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="w-full md:w-[23%] bg-base-100 overflow-y-auto hide-scrollbar ">
-              <div className={`max-h-screen`}>
-                <div className="w-full hidden md:inline-block">
-                  {signedSigners.length > 0 && (
-                    <>
-                      <div
-                        data-tut="reactourSecond"
-                        className="mx-2 pr-2 pt-2 pb-1 text-[15px] text-base-content font-semibold border-b-[1px] border-base-300"
-                      >
-                        <span>{t("signed-by")}</span>
-                      </div>
-                      <div className="mt-[2px]">
-                        {signedSigners.map((obj, ind) => {
-                          return (
-                            <div key={ind}>
-                              <SignerListComponent
-                                ind={ind}
-                                obj={obj}
-                                isMenu={isHeader}
-                                signerPos={signerPos}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-
-                  {unsignedSigners.length > 0 && (
-                    <>
-                      <div
-                        data-tut="reactourFirst"
-                        className="mx-2 pr-2 pt-2 pb-1 text-[15px] text-base-content font-semibold border-b-[1px] border-base-300"
-                      >
-                        <span>{t("yet-to-sign")}</span>
-                      </div>
-                      <div className="mt-[5px]">
-                        {unsignedSigners.map((obj, ind) => {
-                          return (
-                            <div key={ind}>
-                              <SignerListComponent
-                                ind={ind}
-                                obj={obj}
-                                isMenu={isHeader}
-                                signerPos={signerPos}
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </>
-                  )}
-                  {(defaultSignImg || myInitial) &&
-                    !alreadySign &&
-                    currentSigner && (
-                      <DefaultSignature
-                        defaultSignImg={defaultSignImg}
-                        myInitial={myInitial}
-                        userObjectId={signerObjectId}
-                        setIsLoading={setIsLoading}
-                        xyPosition={signerPos}
-                        uniqueId={uniqueId}
-                        setDefaultSignAlert={setDefaultSignAlert}
-                        isDefault={
-                          signatureType?.find((x) => x.name === "default")
-                            ?.enabled || false
+                  <div className="h-full p-[20px]">
+                    <p>{defaultSignAlert.alertMessage}</p>
+                    <div className="h-[1px] w-full my-[15px] bg-[#9f9f9f]"></div>
+                    {defaultSignImg ? (
+                      <>
+                        <button
+                          onClick={() => addDefaultSignature()}
+                          type="button"
+                          className="op-btn op-btn-primary"
+                        >
+                          {t("yes")}
+                        </button>
+                        <button
+                          onClick={() =>
+                            setDefaultSignAlert({
+                              isShow: false,
+                              alertMessage: ""
+                            })
+                          }
+                          type="button"
+                          className="op-btn op-btn-secondary ml-1"
+                        >
+                          {t("close")}
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() =>
+                          setIsAlert({ isShow: false, alertMessage: "" })
                         }
-                        isAgree={isAgree}
-                        setIsAgreeTour={setIsAgreeTour}
+                        type="button"
+                        className="op-btn op-btn-primary"
+                      >
+                        {t("ok")}
+                      </button>
+                    )}
+                  </div>
+                </ModalUi>
+                {/* this component used to render all pdf pages in left side */}
+                <RenderAllPdfPage
+                  signerPos={signerPos}
+                  id={uniqueId}
+                  allPages={allPages}
+                  setAllPages={setAllPages}
+                  setPageNumber={setPageNumber}
+                  pageNumber={pageNumber}
+                  containerWH={containerWH}
+                  pdfBase64Url={pdfBase64Url}
+                  signedUrl={pdfDetails?.[0]?.SignedUrl || ""}
+                />
+                {/* pdf render view */}
+                <div className=" w-full md:w-[57%] flex mr-4">
+                  <PdfZoom
+                    clickOnZoomIn={clickOnZoomIn}
+                    clickOnZoomOut={clickOnZoomOut}
+                    isDisableEditTools={true}
+                    allPages={allPages}
+                    setAllPages={setAllPages}
+                    setPageNumber={setPageNumber}
+                  />
+                  <PlaceholderCopy
+                    isPageCopy={isPageCopy}
+                    setIsPageCopy={setIsPageCopy}
+                    xyPosition={signerPos}
+                    setXyPosition={setSignerPos}
+                    allPages={allPages}
+                    pageNumber={pageNumber}
+                    signKey={signKey}
+                    Id={uniqueId}
+                    widgetType={widgetType}
+                    setUniqueId={setUniqueId}
+                  />
+                  <div className=" w-full md:w-[95%] ">
+                    {/* this modal is used show this document is already sign */}
+                    <ModalUi
+                      isOpen={isCompleted.isModal}
+                      title={t("document-signed")}
+                      handleClose={() =>
+                        setIsCompleted((prev) => ({ ...prev, isModal: false }))
+                      }
+                      reduceWidth={
+                        !isCompleted?.message &&
+                        "md:min-w-[440px] md:max-w-[400px]"
+                      }
+                    >
+                      <div className="h-full p-[20px] text-base-content">
+                        {isCompleted?.message ? (
+                          <>
+                            <p>{isCompleted?.message}</p>
+                            {!isredirectCanceled && redirectUrl && (
+                              <div className="flex flex-row gap-1 items-center justify-center mb-3 mt-2">
+                                <p>
+                                  Redirecting you in {redirectTimeLeft} sec...
+                                </p>
+                                <button
+                                  onClick={handleRedirectCancel}
+                                  className="underline cursor-pointer op-text-primary focus:outline-none ml-2"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <div className="px-[15px]">
+                            <span>{t("document-signed-alert-4")}</span>
+                          </div>
+                        )}
+                        {!isCompleted?.message && (
+                          <div className="flex flex-col mt-3 gap-1 px-[10px] justify-center items-center">
+                            {!isredirectCanceled && redirectUrl && (
+                              <div className="flex flex-row gap-1 items-center justify-center mb-3">
+                                <p>
+                                  Redirecting you in {redirectTimeLeft} sec...
+                                </p>
+                                <button
+                                  onClick={handleRedirectCancel}
+                                  className="underline cursor-pointer op-text-primary focus:outline-none ml-2"
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            )}
+                            <div className={`${!redirectUrl ? "m-2" : ""}`}>
+                              <button
+                                onClick={(e) =>
+                                  handleToPrint(e, setIsDownloading, pdfDetails)
+                                }
+                                type="button"
+                                className="font-[500] text-[13px] mr-[5px] op-btn op-btn-neutral"
+                              >
+                                <i
+                                  className="fa-light fa-print"
+                                  aria-hidden="true"
+                                ></i>
+                                <span className="hidden lg:block">
+                                  {t("print")}
+                                </span>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleDownloadCertificate(
+                                    pdfDetails,
+                                    setIsDownloading
+                                  )
+                                }
+                                className="font-[500] text-[13px] mr-[5px] op-btn op-btn-secondary"
+                              >
+                                <i
+                                  className="fa-light fa-award mx-[3px] lg:mx-0"
+                                  aria-hidden="true"
+                                ></i>
+                                <span className="hidden lg:block">
+                                  {t("certificate")}
+                                </span>
+                              </button>
+                              <button
+                                type="button"
+                                className="font-[500] text-[13px] mr-[5px] op-btn op-btn-primary"
+                                onClick={() => {
+                                  setIsCompleted((prev) => ({
+                                    ...prev,
+                                    isModal: false
+                                  }));
+                                  setIsDownloadModal(true);
+                                }}
+                              >
+                                <i
+                                  className="fa-light fa-download"
+                                  aria-hidden="true"
+                                ></i>
+                                <span className="hidden lg:block">
+                                  {t("download")}
+                                </span>
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </ModalUi>
+                    {isDownloading === "pdf" && (
+                      <div className="fixed z-[1000] inset-0 flex justify-center items-center bg-black bg-opacity-30">
+                        <Loader />
+                      </div>
+                    )}
+                    <ModalUi
+                      isOpen={
+                        isDownloading === "certificate" ||
+                        isDownloading === "certificate_err"
+                      }
+                      title={
+                        isDownloading === "certificate" ||
+                        isDownloading === "certificate_err"
+                          ? t("generating-certificate")
+                          : t("pdf-download")
+                      }
+                      handleClose={() => setIsDownloading("")}
+                    >
+                      <div className="p-3 md:p-5 text-[13px] md:text-base text-center text-base-content">
+                        {isDownloading === "certificate" ? (
+                          <p>{t("generate-certificate-alert")}</p>
+                        ) : (
+                          <p>{t("generate-certificate-err")}</p>
+                        )}
+                      </div>
+                    </ModalUi>
+                    {/* this component is used for signature pad modal */}
+                    {documentId && isSignPad && (
+                      <SignPad
+                        saveSignCheckbox={saveSignCheckbox}
+                        setSaveSignCheckbox={setSaveSignCheckbox}
+                        signatureTypes={signatureType}
+                        isSignPad={isSignPad}
+                        isStamp={isStamp}
+                        setIsImageSelect={setIsImageSelect}
+                        setIsSignPad={setIsSignPad}
+                        setImage={setImage}
+                        isImageSelect={isImageSelect}
+                        imageRef={imageRef}
+                        onImageChange={onImageChange}
+                        setSignature={setSignature}
+                        image={image}
+                        onSaveImage={saveImage}
+                        onSaveSign={saveSign}
+                        defaultSign={defaultSignImg}
+                        myInitial={myInitial}
+                        setDefaultSignImg={setDefaultSignImg}
+                        setMyInitial={setMyInitial}
+                        isInitial={isInitial}
+                        setIsInitial={setIsInitial}
+                        setIsStamp={setIsStamp}
+                        currWidgetsDetails={currWidgetsDetails}
+                        setCurrWidgetsDetails={setCurrWidgetsDetails}
+                        setIsAutoSign={setIsAutoSign}
+                        isAutoSign={isAutoSign}
                       />
                     )}
-                </div>
-                {pdfDetails[0]?.AllowModifications &&
-                  currentSigner &&
-                  !alreadySign && (
-                    <div data-tut="reactourFourth">
-                      <WidgetComponent
-                        pdfUrl={pdfUrl}
-                        handleDivClick={handleDivClick}
-                        handleMouseLeave={handleMouseLeave}
-                        xyPosition={signerPos}
-                        addPositionOfSignature={addPositionOfSignature}
-                        isAlllowModify={true}
-                      />
+                    {/* pdf header which contain funish back button */}
+                    <Header
+                      isPdfRequestFiles={
+                            true
+                      }
+                      pageNumber={pageNumber}
+                      allPages={allPages}
+                      changePage={changePage}
+                      pdfDetails={pdfDetails}
+                      signerPos={signerPos}
+                      isSigned={isSigned}
+                      isCompleted={isCompleted.isCertificate}
+                      embedWidgetsData={
+                            embedWidgetsData
+                      }
+                      isShowHeader={true}
+                      setIsDecline={setIsDecline}
+                      decline={true}
+                      currentSigner={currentSigner}
+                      alreadySign={alreadySign}
+                      containerWH={containerWH}
+                      clickOnZoomIn={clickOnZoomIn}
+                      clickOnZoomOut={clickOnZoomOut}
+                      isDisablePdfEditTools={true}
+                      setIsDownloadModal={setIsDownloadModal}
+                      pdfBase64={pdfBase64Url}
+                      isGuestSignFlow={isGuestSignFlow}
+                    />
+
+                    <div
+                      ref={divRef}
+                      data-tut="pdfArea"
+                      className="h-full md:h-[95%]"
+                    >
+                      {containerWH && (
+                        <RenderPdf
+                          setIsPageCopy={setIsPageCopy}
+                          drop={drop}
+                          pageNumber={pageNumber}
+                          pdfOriginalWH={pdfOriginalWH}
+                          pdfNewWidth={pdfNewWidth}
+                          setIsSignPad={setIsSignPad}
+                          setIsStamp={setIsStamp}
+                          setSignKey={setSignKey}
+                          pdfDetails={pdfDetails}
+                          signerPos={signerPos}
+                          successEmail={false}
+                          pdfUrl={pdfUrl}
+                          numPages={numPages}
+                          pageDetails={pageDetails}
+                          pdfRequest={true}
+                          signerObjectId={signerObjectId}
+                          signedSigners={signedSigners}
+                          setPdfLoad={setPdfLoad}
+                          pdfLoad={pdfLoad}
+                          setSignerPos={setSignerPos}
+                          containerWH={containerWH}
+                          setIsInitial={setIsInitial}
+                          setValidateAlert={setValidateAlert}
+                          unSignedWidgetId={unSignedWidgetId}
+                          setSelectWidgetId={setSelectWidgetId}
+                          selectWidgetId={selectWidgetId}
+                          setCurrWidgetsDetails={setCurrWidgetsDetails}
+                          divRef={divRef}
+                          setIsResize={setIsResize}
+                          isResize={isResize}
+                          setScale={setScale}
+                          scale={scale}
+                          uniqueId={uniqueId}
+                          pdfBase64Url={pdfBase64Url}
+                          setIsAgreeTour={setIsAgreeTour}
+                          isAgree={isAgree}
+                          handleTabDrag={handleTabDrag}
+                          handleStop={handleStop}
+                          isDragging={isDragging}
+                          isAlllowModify={pdfDetails[0]?.AllowModifications}
+                          setUniqueId={setUniqueId}
+                          handleDeleteSign={handleDeleteSign}
+                          handleTextSettingModal={handleTextSettingModal}
+                          setWidgetType={setWidgetType}
+                          assignedWidgetId={assignedWidgetId}
+                          setRequestSignTour={setRequestSignTour}
+                        />
+                      )}
                     </div>
-                  )}
+                  </div>
+                </div>
+
+                <div className="w-full md:w-[23%] bg-base-100 overflow-y-auto hide-scrollbar ">
+                  <div className={`max-h-screen`}>
+                    <div className="w-full hidden md:inline-block">
+                      {signedSigners.length > 0 && (
+                        <>
+                          <div
+                            data-tut="reactourSecond"
+                            className="mx-2 pr-2 pt-2 pb-1 text-[15px] text-base-content font-semibold border-b-[1px] border-base-300"
+                          >
+                            <span>{t("signed-by")}</span>
+                          </div>
+                          <div className="mt-[2px]">
+                            {signedSigners.map((obj, ind) => {
+                              return (
+                                <div key={ind}>
+                                  <SignerListComponent
+                                    ind={ind}
+                                    obj={obj}
+                                    isMenu={isHeader}
+                                    signerPos={signerPos}
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </>
+                      )}
+
+                      {unsignedSigners.length > 0 && (
+                        <>
+                          <div
+                            data-tut="reactourFirst"
+                            className="mx-2 pr-2 pt-2 pb-1 text-[15px] text-base-content font-semibold border-b-[1px] border-base-300"
+                          >
+                            <span>{t("yet-to-sign")}</span>
+                          </div>
+                          <div className="mt-[5px]">
+                            {unsignedSigners.map((obj, ind) => {
+                              return (
+                                <div key={ind}>
+                                  <SignerListComponent
+                                    ind={ind}
+                                    obj={obj}
+                                    isMenu={isHeader}
+                                    signerPos={signerPos}
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </>
+                      )}
+                      {(defaultSignImg || myInitial) &&
+                        !alreadySign &&
+                        currentSigner && (
+                          <DefaultSignature
+                            defaultSignImg={defaultSignImg}
+                            myInitial={myInitial}
+                            userObjectId={signerObjectId}
+                            setIsLoading={setIsLoading}
+                            xyPosition={signerPos}
+                            uniqueId={uniqueId}
+                            setDefaultSignAlert={setDefaultSignAlert}
+                            isDefault={
+                              signatureType?.find((x) => x.name === "default")
+                                ?.enabled || false
+                            }
+                            isAgree={isAgree}
+                            setIsAgreeTour={setIsAgreeTour}
+                          />
+                        )}
+                    </div>
+                    {pdfDetails[0]?.AllowModifications &&
+                      currentSigner &&
+                      !alreadySign && (
+                        <div data-tut="reactourFourth">
+                          <WidgetComponent
+                            pdfUrl={pdfUrl}
+                            handleDivClick={handleDivClick}
+                            handleMouseLeave={handleMouseLeave}
+                            xyPosition={signerPos}
+                            addPositionOfSignature={addPositionOfSignature}
+                            isAlllowModify={true}
+                          />
+                        </div>
+                      )}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-      <ModalUi
-        isOpen={validateAlert}
-        title={t("validation-alert")}
-        handleClose={() => setValidateAlert(false)}
-      >
-        <div className="h-[100%] p-[20px]">
-          <p>{t("validation-alert-1")}</p>
-          <div className="h-[1px] bg-[#9f9f9f] w-full my-[15px]"></div>
-          <button
-            onClick={() => setValidateAlert(false)}
-            type="button"
-            className="op-btn op-btn-ghost"
+          )}
+          <ModalUi
+            isOpen={validateAlert}
+            title={t("validation-alert")}
+            handleClose={() => setValidateAlert(false)}
           >
-            {t("close")}
-          </button>
-        </div>
-      </ModalUi>
-      <DownloadPdfZip
-        setIsDownloadModal={setIsDownloadModal}
-        isDownloadModal={isDownloadModal}
-        pdfDetails={pdfDetails}
-        isDocId={true}
-        pdfBase64={pdfBase64Url}
-      />
-      <ModalUi
-        isOpen={isAlert.isShow}
-        title={isAlert?.title || t("alert-message")}
-        handleClose={() => setIsAlert({ isShow: false, alertMessage: "" })}
-      >
-        <div className="h-full p-[20px]">
-          <p>{isAlert.alertMessage}</p>
-          <button
-            onClick={() => setIsAlert({ isShow: false, alertMessage: "" })}
-            type="button"
-            className="op-btn op-btn-primary mt-3 px-4"
+            <div className="h-[100%] p-[20px]">
+              <p>{t("validation-alert-1")}</p>
+              <div className="h-[1px] bg-[#9f9f9f] w-full my-[15px]"></div>
+              <button
+                onClick={() => setValidateAlert(false)}
+                type="button"
+                className="op-btn op-btn-ghost"
+              >
+                {t("close")}
+              </button>
+            </div>
+          </ModalUi>
+          <DownloadPdfZip
+            setIsDownloadModal={setIsDownloadModal}
+            isDownloadModal={isDownloadModal}
+            pdfDetails={pdfDetails}
+            isDocId={true}
+            pdfBase64={pdfBase64Url}
+          />
+          <ModalUi
+            isOpen={isAlert.isShow}
+            title={isAlert?.title || t("alert-message")}
+            handleClose={() => setIsAlert({ isShow: false, alertMessage: "" })}
           >
-            {t("close")}
-          </button>
-        </div>
-      </ModalUi>
-      <TextFontSetting
-        isTextSetting={isTextSetting}
-        setIsTextSetting={setIsTextSetting}
-        fontSize={fontSize}
-        setFontSize={setFontSize}
-        fontColor={fontColor}
-        setFontColor={setFontColor}
-        handleSaveFontSize={handleSaveFontSize}
-        currWidgetsDetails={currWidgetsDetails}
-      />
+            <div className="h-full p-[20px]">
+              <p>{isAlert.alertMessage}</p>
+              <button
+                onClick={() => setIsAlert({ isShow: false, alertMessage: "" })}
+                type="button"
+                className="op-btn op-btn-primary mt-3 px-4"
+              >
+                {t("close")}
+              </button>
+            </div>
+          </ModalUi>
+          <TextFontSetting
+            isTextSetting={isTextSetting}
+            setIsTextSetting={setIsTextSetting}
+            fontSize={fontSize}
+            setFontSize={setFontSize}
+            fontColor={fontColor}
+            setFontColor={setFontColor}
+            handleSaveFontSize={handleSaveFontSize}
+            currWidgetsDetails={currWidgetsDetails}
+          />
     </DndProvider>
   );
 }

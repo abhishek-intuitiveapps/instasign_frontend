@@ -19,7 +19,20 @@ import Loader from "./primitives/Loader";
 import UserList from "./pages/UserList";
 import { serverUrl_fn } from "./constant/appinfo";
 import DocSuccessPage from "./pages/DocSuccessPage";
-import ValidateSession from "./primitives/ValidateSession";
+import Transaction from "./pages/Transaction";
+import SignUp from "./pages/Signup";
+import Wallet from "./pages/Wallet";
+import MonthlyBills from "./pages/MonthlyBills";
+import { useSelector, useDispatch } from "react-redux";
+import { setPaymentMode } from "./redux/reducers/PaymentReducer";
+import Website from "./website/Website";
+import Home from "./website/Pages/Home";
+import Policy from "./website/Pages/Policy";
+import Refund from "./website/Pages/Refund";
+import Contact from "./website/components/Contact";
+import ServiceAndDelivery from "./website/Pages/ServiceAndDelivery";
+import Terms from "./website/Pages/Terms";
+import Faq from "./website/components/FAQ";
 const DebugPdf = lazy(() => import("./pages/DebugPdf"));
 const ForgetPassword = lazy(() => import("./pages/ForgetPassword"));
 const GuestLogin = lazy(() => import("./pages/GuestLogin"));
@@ -30,7 +43,6 @@ const ManageSign = lazy(() => import("./pages/Managesign"));
 const AddAdmin = lazy(() => import("./pages/AddAdmin"));
 const UpdateExistUserAdmin = lazy(() => import("./pages/UpdateExistUserAdmin"));
 const Preferences = lazy(() => import("./pages/Preferences"));
-
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
 const AppLoader = () => {
   return (
@@ -41,9 +53,16 @@ const AppLoader = () => {
 };
 function App() {
   const [isloading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
+  const paymentMode = useSelector((state) => state.payment.mode);
+
   useEffect(() => {
+    const storedPaymentMode = localStorage.getItem('paymentMode');
+    if (storedPaymentMode !== null) {
+      dispatch(setPaymentMode(storedPaymentMode === 'true'));
+    }
     handleCredentials();
-  }, []);
+  }, [dispatch]);
 
   const handleCredentials = () => {
     const appId = process.env.REACT_APP_APPID
@@ -66,8 +85,17 @@ function App() {
       ) : (
         <BrowserRouter>
           <Routes>
+          <Route path="/" element={<Website/>}>
+              <Route index element={<Home/>} />
+              <Route path="policy" element={<Policy/>} />
+              <Route path="terms" element={<Terms/>} />
+              <Route path="service" element={<ServiceAndDelivery/>} />
+              <Route path="refund" element={<Refund/>} />
+              <Route path="contact" element={<Contact/>} />
+              <Route path="faq" element={<Faq/>} />
+            </Route>
             <Route element={<ValidateRoute />}>
-              <Route exact path="/" element={<Login />} />
+              <Route exact path="/login" element={<Login />} />
                   <Route
                     path="/addadmin"
                     element={<LazyPage Page={AddAdmin} />}
@@ -76,6 +104,7 @@ function App() {
                     path="/upgrade-2.1"
                     element={<LazyPage Page={UpdateExistUserAdmin} />}
                   />
+                  <Route path="/signup" element={<LazyPage Page={SignUp} />} />
             </Route>
             <Route element={<Validate />}>
               <Route
@@ -110,26 +139,29 @@ function App() {
               path="/forgetpassword"
               element={<LazyPage Page={ForgetPassword} />}
             />
-            <Route
-              element={
-                <ValidateSession>
-                  <HomeLayout />
-                </ValidateSession>
-              }
-            >
+            <Route element={<HomeLayout />}>
               <Route
                 path="/changepassword"
                 element={<LazyPage Page={ChangePassword} />}
               />
               <Route path="/form/:id" element={<Form />} />
+              {!paymentMode && (
+                <Route path="/wallet" element={<Wallet />} />
+              )}
+              {/* <Route path="/transaction" element={<PageNotFound/>} /> */}
               <Route path="/report/:id" element={<Report />} />
               <Route path="/dashboard/:id" element={<Dashboard />} />
+              <Route path="/transaction" element={<Transaction/>} />
+              
+              {paymentMode && (
+                <Route path="/monthlybills" element={<MonthlyBills/>} />
+              )}
               <Route
                 path="/profile"
                 element={<LazyPage Page={UserProfile} />}
               />
               <Route
-                path="/drive"
+                path="/mydrive"
                 element={<LazyPage Page={Opensigndrive} />}
               />
               <Route
@@ -172,6 +204,7 @@ function App() {
               />
             </Route>
             <Route path="/success" element={<DocSuccessPage />} />
+ 
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </BrowserRouter>

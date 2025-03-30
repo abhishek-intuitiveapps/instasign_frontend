@@ -2,6 +2,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
+import { useDispatch, useSelector } from 'react-redux';
 import { Navigate, useNavigate } from "react-router";
 import Parse from "parse";
 import { SaveFileSize } from "../constant/saveFileSize";
@@ -18,6 +19,9 @@ import ModalUi from "../primitives/ModalUi";
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import SelectLanguage from "../components/pdf/SelectLanguage";
+import { setPaymentMode } from "../redux/reducers/PaymentReducer";
+import countries from "../json/CountriesJson";
+import _ from 'lodash';
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -42,10 +46,98 @@ function UserProfile() {
   const [otp, setOtp] = useState("");
   const [otpLoader, setOtpLoader] = useState(false);
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [isKyceeVerified, setIsKyceeVerified] = useState(false);
+   
+  const dispatch = useDispatch();
+  const paymentMode = useSelector((state) => state.payment.mode);
+  const [tempPaymentMode, setTempPaymentMode] = useState(paymentMode);
+  const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
+  const djangoUrl = 'http://localhost:8000';
+
+  useEffect(() => {
+    setTempPaymentMode(paymentMode);
+  }, [paymentMode]);
+
   useEffect(() => {
     getUserDetail();
+    getDjangoUserDetails();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const getDjangoUserDetails = async () => {
+    try {
+      const djangoToken = localStorage.getItem("django");
+      const response = await axios.get(`${djangoUrl}/base/api/v1/get/user/detail/`, {
+        headers: {
+          Authorization: `Bearer ${djangoToken}`
+        }
+      });
+
+      const userData = response.data.data[0];
+      // Update isPostpaid based on the fetched user data
+      // setIsPostpaid(userData.payment_mode === 'post_paid'); // Set isPostpaid based on payment_mode
+      setIsKyceeVerified(userData.is_kycee_verified);
+      console.log("User data fetched successfully:", userData);
+    } catch (error) {
+      console.log("Error fetching user details:", error.message);
+    }
+  }
+
+  const handleKyceeVerifyBtn = async() => {
+    try {
+      const payload = {
+        email: "rishabh@intuitiveapps.com",
+        first_name: "rishabh",
+        last_name: "bilwal",
+        phone_number: "+919910629281",
+        verification_type: "instant",
+        unique_client_id: "TEST01",
+        client_secret: "APxVALVWjQrdNQFIOAKZuvXGGnhOxLrQKVwfBNNOvEEOvShNhaGptvvWBaoFVjyiJqOcVtwitJbslNXMwsmTffedXVfjwamoUfrm",
+        type: "prod"
+      };
+
+      const response = await axios.post("https://sandbox.kycee.in/api/v1/external/gateway/create/verification", payload);
+      
+      if (response.data && response.data.data && response.data.data.token) {
+        window.open(`https://sandbox.kycee.in/?token=${response.data.data.token}`, '_blank');
+        startKyceeVerificationCheck(); // Start checking after opening the new tab
+      }
+    } catch (error) {
+      console.error("Error during Kycee verification:", error);
+    }
+  }
+
+  const startKyceeVerificationCheck = () => {
+    const intervalId = setInterval(async () => {
+      try {
+        const djangoToken = localStorage.getItem("django");
+        const response = await axios.get(`${djangoUrl}/base/api/v1/get/user/detail/`, {
+          headers: {
+            Authorization: `Bearer ${djangoToken}`
+          }
+        });
+
+        const userData = response.data.data[0];
+        
+        // Set isPostpaid based on payment_mode
+        // if (userData.payment_mode === 'pre_paid') {
+        //   setIsPostpaid(false); // Set to false for Prepaid
+        // } else if (userData.payment_mode === 'post_paid') {
+        //   setIsPostpaid(true); // Set to true for Postpaid
+        // }
+
+        if (userData.is_kycee_verified) {
+          setIsKyceeVerified(true);
+          clearInterval(intervalId); // Stop checking if verified
+        }
+      } catch (error) {
+        console.log("Error fetching user details:", error.message);
+      }
+    }, 30000); // 30 seconds
+
+    setTimeout(() => clearInterval(intervalId), 5 * 60 * 1000); // Stop after 5 minutes
+  };
+
   const getUserDetail = async () => {
     setIsLoader(true);
     const currentUser = JSON.parse(JSON.stringify(Parse.User.current()));
@@ -98,6 +190,8 @@ function UserProfile() {
                   Name: res.name,
                   Phone: res?.phone || ""
                 });
+                await updatePaymentMode(tempPaymentMode ? 'post_paid' : 'pre_paid');
+                dispatch(setPaymentMode(tempPaymentMode));
                 alert(t("profile-update-alert"));
                 setEditMode(false);
                 setIsLoader(false);
@@ -116,6 +210,9 @@ function UserProfile() {
       }
     }
   };
+
+  // Debounced version of handleSubmit
+  const debouncedHandleSubmit = _.debounce(handleSubmit, 300);
 
   //  `updateExtUser` is used to update user details in extended class
   const updateExtUser = async (obj) => {
@@ -204,6 +301,7 @@ function UserProfile() {
     setIsVerifyModal(true);
     await handleSendOTP(Parse.User.current().getEmail());
   };
+
   const handleCloseVerifyModal = async () => {
     setIsVerifyModal(false);
   };
@@ -241,12 +339,34 @@ function UserProfile() {
   };
 
   const handleCancel = () => {
+    setTempPaymentMode(paymentMode);
     setEditMode(false);
     SetName(localStorage.getItem("username"));
     SetPhone(UserProfile && UserProfile.phone);
     setImage(localStorage.getItem("profileImg"));
     setCompany(extendUser && extendUser?.[0]?.Company);
     setJobTitle(extendUser?.[0]?.JobTitle);
+  };
+
+  const updatePaymentMode = async (mode) => {
+    try {
+      const djangoToken = localStorage.getItem("django");
+      const response = await axios.post(`${djangoUrl}/base/api/v1/update/settings/`, {
+        payment_mode: mode
+      }, {
+        headers: {
+          Authorization: `Bearer ${djangoToken}`
+        }
+      });
+      console.log("Payment mode updated successfully:", response.data);
+    } catch (error) {
+      console.error("Error updating payment mode:", error);
+    }
+  };
+
+  const getCountryName = (countryCode) => {
+    const country = countries.find((c) => c.code === countryCode);
+    return country ? country.name : countryCode;
   };
 
   return (
@@ -257,164 +377,239 @@ function UserProfile() {
           <Loader />
         </div>
       ) : (
-        <div className="flex justify-center items-center w-full relative">
-          <div className="bg-base-100 text-base-content flex flex-col justify-center shadow-md rounded-box w-[450px]">
-            <div className="flex flex-col justify-center items-center my-4">
-              <div className="w-[200px] h-[200px] overflow-hidden rounded-full">
-                <img
-                  className="object-contain w-full h-full"
-                  src={Image === "" ? dp : Image}
-                  alt="dp"
-                />
-              </div>
-              {editmode && (
-                <input
-                  type="file"
-                  className="op-file-input op-file-input-bordered op-file-input-sm max-w-[270px] mt-4 text-sm"
-                  accept="image/png, image/gif, image/jpeg"
-                  onChange={(e) => {
-                    let files = e.target.files;
-                    fileUpload(files[0]);
-                  }}
-                />
-              )}
-              {percentage !== 0 && (
-                <div className="flex items-center gap-x-2">
-                  <div className="h-2 rounded-full w-[200px] md:w-[400px] bg-gray-200">
-                    <div
-                      className="h-2 rounded-full bg-blue-500"
-                      style={{ width: `${percentage}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-black text-sm">{percentage}%</span>
+        <div className="flex flex-col items-center w-full relative h-[80vh]">
+          <div className="bg-base-100 text-base-content flex flex-col justify-between shadow-md rounded-box w-full p-4">
+            <div className="flex flex-row justify-start items-center mb-4">
+              <div className="flex flex-col justify-center items-center mr-8">
+                <div className="w-[250px] h-[250px] overflow-hidden rounded-full">
+                  <img
+                    className="object-cover w-full h-full"
+                    src={Image === "" ? dp : Image}
+                    alt="dp"
+                  />
                 </div>
-              )}
-              <div className="text-base font-semibold pt-4">
-                {localStorage.getItem("_user_role")}
+                {editmode && (
+                  <input
+                    type="file"
+                    className="op-file-input op-file-input-bordered op-file-input-sm max-w-[270px] mt-4 text-sm"
+                    accept="image/png, image/gif, image/jpeg"
+                    onChange={(e) => {
+                      let files = e.target.files;
+                      fileUpload(files[0]);
+                    }}
+                  />
+                )}
+                {percentage !== 0 && (
+                  <div className="flex items-center gap-x-2 mt-2">
+                    <div className="h-2 rounded-full w-[150px] bg-gray-200">
+                      <div
+                        className="h-2 rounded-full bg-blue-500"
+                        style={{ width: `${percentage}%` }}
+                      ></div>
+                    </div>
+                    <span className="text-black text-sm">{percentage}%</span>
+                  </div>
+                )}
+                <div className="text-base font-semibold pt-4">
+                  {localStorage.getItem("_user_role")}
+                </div>
               </div>
-            </div>
-            <ul className="w-full flex flex-col p-2 text-sm">
-              <li
-                className={`flex justify-between items-center border-y-[1px] border-gray-300 break-all ${
-                  editmode ? "py-1.5" : "py-2"
-                }`}
-              >
-                <span className="font-semibold">{t("name")}:</span>{" "}
-                {editmode ? (
-                  <input
-                    type="text"
-                    value={name}
-                    className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
-                    onChange={(e) => SetName(e.target.value)}
-                  />
-                ) : (
-                  <span>{localStorage.getItem("username")}</span>
-                )}
-              </li>
-              <li
-                className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
-                  editmode ? "py-1.5" : "py-2"
-                }`}
-              >
-                <span className="font-semibold">{t("phone")}:</span>{" "}
-                {editmode ? (
-                  <input
-                    type="text"
-                    className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
-                    onChange={(e) => SetPhone(e.target.value)}
-                    value={Phone}
-                  />
-                ) : (
-                  <span>{UserProfile && UserProfile.phone}</span>
-                )}
-              </li>
-              <li className="flex justify-between items-center border-b-[1px] border-gray-300 py-2 break-all">
-                <span
-                  data-tooltip-id="email-tooltip"
-                  className="font-semibold flex gap-1"
+              <ul className="flex flex-col p-2 text-sm w-full">
+                <li
+                  className={`flex justify-between items-center border-y-[1px] border-gray-300 break-all ${
+                    editmode ? "py-1.5" : "py-2"
+                  }`}
                 >
-                  {t("email")} :{" "}
-                  {editmode && (
-                    <Tooltip
-                      message={t("email-help")}
-                      maxWidth="max-w-[250px]"
+                  <span className="font-semibold">{t("name")}:</span>{" "}
+                  {editmode ? (
+                    <input
+                      type="text"
+                      value={name}
+                      className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
+                      onChange={(e) => SetName(e.target.value)}
                     />
-                  )}
-                </span>
-                <span>{UserProfile && UserProfile.email}</span>
-              </li>
-              <li
-                className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
-                  editmode ? "py-1.5" : "py-2"
-                }`}
-              >
-                <span className="font-semibold">{t("company")}:</span>{" "}
-                {editmode ? (
-                  <input
-                    type="text"
-                    value={company}
-                    className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
-                    onChange={(e) => setCompany(e.target.value)}
-                  />
-                ) : (
-                  <span>{extendUser?.[0].Company}</span>
-                )}
-              </li>
-              <li
-                className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
-                  editmode ? "py-1.5" : "py-2"
-                }`}
-              >
-                <span className="font-semibold">{t("job-title")}:</span>{" "}
-                {editmode ? (
-                  <input
-                    type="text"
-                    value={jobTitle}
-                    className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
-                    onChange={(e) => setJobTitle(e.target.value)}
-                  />
-                ) : (
-                  <span>{extendUser?.[0]?.JobTitle}</span>
-                )}
-              </li>
-              <li className="flex justify-between items-center border-b-[1px] border-gray-300 py-2 break-all">
-                <span className="font-semibold">{t("is-email-verified")}:</span>{" "}
-                <span>
-                  {isEmailVerified ? (
-                    "Verified"
                   ) : (
-                    <span>
-                      Not verified(
-                      <span
-                        onClick={() => handleVerifyBtn()}
-                        className="hover:underline text-blue-600 cursor-pointer"
-                      >
-                        verify
-                      </span>
-                      )
-                    </span>
+                    <span>{localStorage.getItem("username")}</span>
                   )}
-                </span>
-              </li>
-              <li
-                className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
-                  editmode ? "py-1.5" : "py-2"
-                }`}
-              >
-                <span className="font-semibold">{t("language")}:</span>{" "}
-                <SelectLanguage
-                  isProfile={true}
-                  updateExtUser={updateExtUser}
-                />
-              </li>
-            </ul>
-            <div className="flex justify-center gap-2 pt-2 pb-3 md:pt-3 md:pb-4">
+                </li>
+                <li
+                  className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
+                    editmode ? "py-1.5" : "py-2"
+                  }`}
+                >
+                  <span className="font-semibold">{t("phone")}:</span>{" "}
+                  {editmode ? (
+                    <input
+                      type="text"
+                      className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
+                      onChange={(e) => SetPhone(e.target.value)}
+                      value={Phone}
+                    />
+                  ) : (
+                    <span>{UserProfile && UserProfile.phone}</span>
+                  )}
+                </li>
+                <li className="flex justify-between items-center border-b-[1px] border-gray-300 py-2 break-all">
+                  <span
+                    data-tooltip-id="email-tooltip"
+                    className="font-semibold flex gap-1"
+                  >
+                    {t("email")}:{" "}
+                    {editmode && (
+                      <Tooltip
+                        message={t("email-help")}
+                        maxWidth="max-w-[250px]"
+                      />
+                    )}
+                  </span>
+                  <span>{UserProfile && UserProfile.email}</span>
+                </li>
+                <li
+                  className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
+                    editmode ? "py-1.5" : "py-2"
+                  }`}
+                >
+                  <span className="font-semibold">{t("company")}:</span>{" "}
+                  {editmode ? (
+                    <input
+                      type="text"
+                      value={company}
+                      className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
+                      onChange={(e) => setCompany(e.target.value)}
+                    />
+                  ) : (
+                    <span>{extendUser?.[0].Company}</span>
+                  )}
+                </li>
+                {/* <li
+                  className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
+                    editmode ? "py-1.5" : "py-2"
+                  }`}
+                >
+                  <span className="font-semibold">{t("job-title")}:</span>{" "}
+                  {editmode ? (
+                    <input
+                      type="text"
+                      value={jobTitle}
+                      className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
+                      onChange={(e) => setJobTitle(e.target.value)}
+                    />
+                  ) : (
+                    <span>{extendUser?.[0]?.JobTitle}</span>
+                  )}
+                </li> */}
+                {/* <li className="flex justify-between items-center border-b-[1px] border-gray-300 py-2 break-all">
+                  <span className="font-semibold">{t("Email Verified")}:</span>{" "}
+                  <span>
+                    {isEmailVerified ? (
+                      <span className="bg-green-100 text-green-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
+                        Verified
+                      </span>
+                    ) : (
+                      <span className="bg-red-100 text-red-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded">
+                        Not verified (
+                        <span
+                          onClick={() => handleVerifyBtn()}
+                          className="hover:underline text-blue-600 cursor-pointer"
+                        >
+                          verify
+                        </span>
+                        )
+                      </span>
+                    )}
+                  </span>
+                </li> */}
+                <li className="flex justify-between items-center border-b-[1px] border-gray-300 py-2 break-all">
+                  <span className="font-semibold">{t("Email Verified")}:</span>{" "}
+                  <span className="flex items-center justify-center">
+                    {isEmailVerified ? (
+                      <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded text-center">
+                        Verified
+                      </span>
+                    ) : (
+                      <span className="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded text-center">
+                        Not verified (
+                        <span
+                          onClick={() => handleVerifyBtn()}
+                          className="hover:underline text-blue-600 cursor-pointer"
+                        >
+                          verify
+                        </span>
+                        )
+                      </span>
+                    )}
+                  </span>
+                </li>
+                <li className="flex justify-between items-center border-b-[1px] border-gray-300 py-2 break-all">
+                  <span className="font-semibold">{t("Identity Verified")}:</span>{" "}
+                  <span className="flex items-center justify-center">
+                    {isKyceeVerified ? (
+                      <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded text-center">
+                        Verified
+                      </span>
+                    ) : (
+                      <span className="bg-red-100 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded text-center">
+                        Not verified (
+                        <span
+                          onClick={() => handleKyceeVerifyBtn()}
+                          className="hover:underline text-blue-600 cursor-pointer"
+                        >
+                          verify
+                        </span>
+                        )
+                      </span>
+                    )}
+                  </span>
+                </li>
+                {/* <li
+                  className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
+                    editmode ? "py-1.5" : "py-2"
+                  }`}
+                >
+                  <span className="font-semibold">{t("language")}:</span>{" "}
+                  <SelectLanguage
+                    isProfile={true}
+                    updateExtUser={updateExtUser}
+                  />
+                </li> */}
+                <li
+                  className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
+                    editmode ? "py-1.5" : "py-2"
+                  }`}
+                >
+                  <span className="font-semibold">{t("Country")}:</span>{" "}
+                  <span>{getCountryName(djangoUser.country)}</span>
+                </li>
+                <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
+                  <span className="font-semibold">Payment Mode:</span>
+                  <div className="flex items-center">
+                    <span className="mr-2">{"Prepaid"}</span>
+                    <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={tempPaymentMode}
+                        onChange={() => {
+                          const newPostpaidStatus = !tempPaymentMode;
+                          setTempPaymentMode(newPostpaidStatus);
+                          console.log("Payment mode changed to:", newPostpaidStatus);
+                        }}
+                        disabled={!editmode}
+                      />
+                      <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
+                    </label>
+                    <span className="ml-2">Postpaid</span>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div className="flex justify-center gap-4 pt-4">
               <button
                 type="button"
                 onClick={(e) => {
-                    editmode ? handleSubmit(e) : setEditMode(true);
+                  editmode ? debouncedHandleSubmit(e) : setEditMode(true);
                 }}
-                className="op-btn op-btn-primary w-[100px]"
+                className="op-btn text-white op-btn-primary w-[100px]"
               >
                 {editmode ? t("save") : t("edit")}
               </button>
@@ -425,7 +620,7 @@ function UserProfile() {
                 }
                 className={`op-btn ${
                   editmode ? "op-btn-ghost w-[100px]" : "op-btn-secondary"
-                }`}
+                } ${!editmode ? "bg-[#D6DBE5] text-black border border-gray-300 hover:bg-gray-300" : ""}`}
               >
                 {editmode ? t("cancel") : t("change-password")}
               </button>

@@ -3,8 +3,6 @@ import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 
 const Menu = ({ item, isOpen, closeSidebar }) => {
-  const appName = "OpenSign™";
-  const drivename = appName === "OpenSign™" ? "OpenSign™" : "";
   const { t } = useTranslation();
   return (
     <li key={item.title} role="none" className="my-0.5">
@@ -16,19 +14,16 @@ const Menu = ({ item, isOpen, closeSidebar }) => {
         }
         className={({ isActive }) =>
           `${
-            isActive ? " bg-base-300 text-base-content" : ""
-          } flex items-center justify-start text-left p-3 lg:p-4 text-base-content hover:text-base-content focus:bg-base-300 hover:bg-base-300 hover:no-underline focus:outline-none`
+            isActive ? "bg-base-200 text-base-content op-text-primary" : ""
+          } flex items-center text-left p-3 lg:p-4 text-base-content hover:text-[#002864] focus:text-[#002864] hover:bg-base-200 hover:no-underline focus:outline-none`
         }
+        
         onClick={closeSidebar}
         tabIndex={isOpen ? 0 : -1}
         role="menuitem"
       >
-        <span className="w-[20px] h-[20px] flex justify-center">
-          <i className={`${item.icon} text-[18px]`} aria-hidden="true"></i>
-        </span>
-        <span className="ml-3 lg:ml-4">
-          {t(`sidebar.${item.title}`, { appName: drivename })}
-        </span>
+        <i className={`${item.icon} text-[18px] mt-1 hover:text-[#002864] focus:text-[#002864]`} aria-hidden="true"></i>
+        <span className="ml-3 lg:ml-4 hover:text-[#002864] focus:text-[#002864]">{t(`${item.title}`)}</span>
       </NavLink>
     </li>
   );
