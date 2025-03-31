@@ -53,6 +53,8 @@ function Login() {
   const [errMsg, setErrMsg] = useState();
   const [isChecked, setIsChecked] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  const djangoUrl = 'https://api.instasign.ai';
   
 
   useEffect(() => {
@@ -98,7 +100,7 @@ function Login() {
       if (email && password) {
         try {
           // Send Axios request to get access and refresh tokens
-          const response = await axios.post("https://api.dev.instasign.ai/base/api/token/", {
+          const response = await axios.post(`${djangoUrl}/base/api/token/`, {
             email: state.email,
             password: state.password
           });
