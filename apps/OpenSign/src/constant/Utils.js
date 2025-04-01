@@ -1008,7 +1008,7 @@ export const embedDocId = async (pdfDoc, documentId, allPages) => {
   const font = await pdfDoc.embedFont(fontBytes, { subset: true });
   for (let i = 0; i < allPages; i++) {
     const fontSize = 10;
-    const textContent = documentId && `InstagSign™ DocumentId: ${documentId} `;
+    const textContent = documentId && `InstaSign™ DocumentId: ${documentId} `;
     const pages = pdfDoc.getPages();
     const page = pages[i];
     try {
@@ -2327,7 +2327,7 @@ export const handleDownloadCertificate = async (
       if (isZip) {
         return certificateUrl;
       } else {
-        saveAs(certificateUrl, `Certificate_signed_by_OpenSign™.pdf`);
+        saveAs(certificateUrl, `Certificate_signed_by_InstaSign™.pdf`);
       }
     } catch (err) {
       console.log("err in download in certificate", err);

@@ -1,4 +1,5 @@
 import React,{ useEffect, useRef, useState } from "react";
+import Title from "../../components/Title";
 
 const AccordionItem = ({ title, content, isOpen, onClick }) => {
   const contentRef = useRef(null);
@@ -36,6 +37,7 @@ const AccordionItem = ({ title, content, isOpen, onClick }) => {
           : 'opacity-0 translate-y-10'
       } ${isOpen ? 'fade-in' : ''}`}
     >
+      <Title title="FAQs" drive={false} />
       <button
         className="w-full px-6 py-4 hover:bg-blue-50 op-text-primary font-medium text-left flex justify-between items-center"
         onClick={onClick}

@@ -143,11 +143,11 @@ function SignYourSelf() {
   const [isDownloadModal, setIsDownloadModal] = useState(false);
   const [isResize, setIsResize] = useState(false);
   const [isUploadPdf, setIsUploadPdf] = useState(false);
-  const [walletStatus, setWalletStatus] = useState(false);
-  const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  const paymentMode = useSelector((state) => state.payment.mode);
+  // const [walletStatus, setWalletStatus] = useState(false);
+  // const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+  // const paymentMode = useSelector((state) => state.payment.mode);
 
-  const djangoUrl = 'http://localhost:8000';
+  const djangoUrl = 'https://api.dev.instasign.ai';
 
   const [saveSignCheckbox, setSaveSignCheckbox] = useState({
     isVisible: false,
@@ -182,21 +182,21 @@ function SignYourSelf() {
     if (documentId) {
       getDocumentDetails(true);
     }
-    if (!paymentMode) {
-      fetchStatus();
-    }
+    // if (!paymentMode) {
+    //   fetchStatus();
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    console.log("wallet condition", walletStatus);
-    if (walletStatus || paymentMode) {
-      console.log("this condition run");
-      setIsWalletModalOpen(false);
-    } else {
-      setIsWalletModalOpen(true);
-    }
-  }, [walletStatus, paymentMode]);
+  // useEffect(() => {
+  //   console.log("wallet condition", walletStatus);
+  //   if (walletStatus || paymentMode) {
+  //     console.log("this condition run");
+  //     setIsWalletModalOpen(false);
+  //   } else {
+  //     setIsWalletModalOpen(true);
+  //   }
+  // }, [walletStatus, paymentMode]);
 
   useEffect(() => {
     const updateSize = () => {
@@ -218,25 +218,25 @@ function SignYourSelf() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [divRef.current, isHeader]);
 
-  const fetchStatus = async () => {
-    try {
-        const response = await axios.get(`${djangoUrl}/base/api/v1/check/activity/access/`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('django')}`
-            }
-        });
-        console.log('Status fetched:', response.data.status);
-        setWalletStatus(response.data.status);
-        // setWalletStatus(true);
-        // Handle the response as needed
-    } catch (error) {
-        console.error('Error fetching status:', error);
-    }
-  };
+  // const fetchStatus = async () => {
+  //   try {
+  //       const response = await axios.get(`${djangoUrl}/base/api/v1/check/activity/access/`, {
+  //           headers: {
+  //               'Authorization': `Bearer ${localStorage.getItem('django')}`
+  //           }
+  //       });
+  //       console.log('Status fetched:', response.data.status);
+  //       setWalletStatus(response.data.status);
+  //       // setWalletStatus(true);
+  //       // Handle the response as needed
+  //   } catch (error) {
+  //       console.error('Error fetching status:', error);
+  //   }
+  // };
 
-  const handleAddCredits = () => {
-    navigate("/wallet");
-  };
+  // const handleAddCredits = () => {
+  //   navigate("/wallet");
+  // };
 
   //function for get document details for perticular signer with signer'object id
   const getDocumentDetails = async (showComplete) => {
@@ -1565,7 +1565,7 @@ function SignYourSelf() {
         currWidgetsDetails={currWidgetsDetails}
       />
     </DndProvider>
-    {isWalletModalOpen && (
+    {/* {isWalletModalOpen && (
         <ModalUi isOpen={isWalletModalOpen} handleClose={() => {
           // setIsWalletModalOpen(false);
           navigate("/dashboard/35KBoSgoAK"); // Redirect to the dashboard
@@ -1579,7 +1579,7 @@ function SignYourSelf() {
             </button>
           </div>
         </ModalUi>
-      )}
+      )} */}
       </>
   );
 }
