@@ -12,7 +12,7 @@ const AddCreditsModal = ({ show, handleClose }) => {
   const [gstRate, setGstRate] = useState(0.18); // Default value
   const djangoToken = localStorage.getItem('django')
   const [loadingQRCode, setLoadingQRCode] = useState(true);
-  const djangoUrl = 'https://api.instasign.ai';
+  const djangoUrl = 'https://api.dev.instasign.ai';
 
 
   useEffect(() => {
@@ -78,7 +78,7 @@ const AddCreditsModal = ({ show, handleClose }) => {
         }
       );
       console.log("API Response:", response.data);
-      alert("Payment successfully recorded");
+      alert("Payment Submitted – Awaiting Verification");
       handleClose();
       setUtrNumber("");
     } catch (error) {

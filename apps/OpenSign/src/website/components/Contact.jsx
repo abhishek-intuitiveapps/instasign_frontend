@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import React from "react";
 import styled, { keyframes } from "styled-components";
-
+import Title from "../../components/Title";
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -285,6 +285,7 @@ const Contact = () => {
 
   return (
     <ContactSection id="contact" className={isVisible ? 'fade-in' : ''} ref={ref}>
+      <Title title="Contact Us" drive={false} />
       <Container>
         <Header>
           <h2>Contact Us</h2>
@@ -298,7 +299,7 @@ const Contact = () => {
                 <h3>India</h3>
                 <InfoItem>
                   <Icon><MapPinIcon /></Icon>
-                  <p>B-85 Dashrath Puri,</p>
+                  <p>B-85 Dashrath Puri, Palam Road, New Delhi-110045</p>
                 </InfoItem>
                 <InfoItem>
                   <Icon><PhoneIcon /></Icon>
@@ -306,7 +307,7 @@ const Contact = () => {
                 </InfoItem>
                 <InfoItem>
                   <Icon><MailIcon /></Icon>
-                  <p>hr.india@intuitiveapps.com</p>
+                  <p>cs@instasign.com</p>
                 </InfoItem>
               </InfoContent>
             </InfoCard>
@@ -316,7 +317,7 @@ const Contact = () => {
                 <h3>USA</h3>
                 <InfoItem>
                   <Icon><MapPinIcon /></Icon>
-                  <p>2802 E. Lincoln St, Suite # 1D</p>
+                  <p>2802 E. Lincoln St, Suite # 1D, Bloomington, IL 61704</p>
                 </InfoItem>
                 <InfoItem>
                   <Icon><PhoneIcon /></Icon>
@@ -324,7 +325,7 @@ const Contact = () => {
                 </InfoItem>
                 <InfoItem>
                   <Icon><MailIcon /></Icon>
-                  <p>hr@intuitiveapps.com</p>
+                  <p>cs@instasign.com</p>
                 </InfoItem>
               </InfoContent>
             </InfoCard>
@@ -334,7 +335,7 @@ const Contact = () => {
                 <h3>Canada</h3>
                 <InfoItem>
                   <Icon><MapPinIcon /></Icon>
-                  <p>206 Coventry Crt NE</p>
+                  <p>206 Coventry Crt NE, Calgary, Alberta T3K5E8</p>
                 </InfoItem>
                 <InfoItem>
                   <Icon><PhoneIcon /></Icon>
@@ -342,7 +343,7 @@ const Contact = () => {
                 </InfoItem>
                 <InfoItem>
                   <Icon><MailIcon /></Icon>
-                  <p>hr@intuitiveapps.com</p>
+                  <p>cs@instasign.com</p>
                 </InfoItem>
               </InfoContent>
             </InfoCard>

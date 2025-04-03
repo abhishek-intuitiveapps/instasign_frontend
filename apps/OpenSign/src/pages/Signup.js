@@ -43,7 +43,7 @@ function SignUp() {
     confirmPassword: "",
   });
   const [isCompanySignup, setIsCompanySignup] = useState("no");
-  const djangoUrl = 'https://api.instasign.ai';
+  const djangoUrl = 'https://api.dev.instasign.ai';
 
   // Add state for form fields
   const [formData, setFormData] = useState({

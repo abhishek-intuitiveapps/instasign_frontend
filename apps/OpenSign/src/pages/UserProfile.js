@@ -52,7 +52,7 @@ function UserProfile() {
   const paymentMode = useSelector((state) => state.payment.mode);
   const [tempPaymentMode, setTempPaymentMode] = useState(paymentMode);
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
-  const djangoUrl = 'https://api.instasign.ai';
+  const djangoUrl = 'https://api.dev.instasign.ai';
 
   useEffect(() => {
     setTempPaymentMode(paymentMode);

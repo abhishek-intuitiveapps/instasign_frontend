@@ -16,7 +16,7 @@ const BillingPage = () => {
   const [transactionsData, setTransactionsData] = useState([]); // Add state for transactions data
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
   const djangoToken = localStorage.getItem('django'); // Commenting out the token retrieval
-  const djangoUrl = 'https://api.instasign.ai';
+  const djangoUrl = 'https://api.dev.instasign.ai';
   
    // Retrieve rowsPerPage from localStorage or default to 25
   const [rowsPerPage, setRowsPerPage] = useState(() => {

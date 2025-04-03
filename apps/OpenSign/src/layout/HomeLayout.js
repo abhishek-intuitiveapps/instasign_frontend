@@ -33,7 +33,7 @@ const HomeLayout = () => {
 
   const tenantId = localStorage.getItem("TenantId");
 
-  const djangoUrl = 'https://api.instasign.ai';
+  const djangoUrl = 'https://api.dev.instasign.ai';
 
   useEffect(() => {
     const language = localStorage.getItem("i18nextLng");
