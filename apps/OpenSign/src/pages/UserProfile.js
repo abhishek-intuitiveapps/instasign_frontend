@@ -86,13 +86,15 @@ function UserProfile() {
   const handleKyceeVerifyBtn = async() => {
     try {
       const payload = {
-        email: "rishabh@intuitiveapps.com",
-        first_name: "rishabh",
-        last_name: "bilwal",
-        phone_number: "+919910629281",
+        email: djangoUser.email,
+        first_name: djangoUser.first_name,
+        last_name: djangoUser.last_name,
+        phone_number: djangoUser.phone_number, // Fallback if phone not available
         verification_type: "instant",
-        unique_client_id: "TEST01",
-        client_secret: "APxVALVWjQrdNQFIOAKZuvXGGnhOxLrQKVwfBNNOvEEOvShNhaGptvvWBaoFVjyiJqOcVtwitJbslNXMwsmTffedXVfjwamoUfrm",
+        unique_client_id: djangoUser.id,
+        client_secret: process.env.KYCEE_CLIENT_SECRET,
+        verification_application: "instasign",
+        verification_product:"uuid",
         type: "prod"
       };
 

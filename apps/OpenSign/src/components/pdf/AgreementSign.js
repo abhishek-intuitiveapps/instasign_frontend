@@ -45,6 +45,9 @@ function AgreementSign(props) {
                 if (isChecked) {
                   props.setIsAgreeTour(false);
                   props.setIsAgree(true);
+                  if (props.kycRequired) {
+                    props.setIsKycModalOpen(true);
+                  }
                 } else {
                   props.setIsAgreeTour(true);
                 }
@@ -62,6 +65,8 @@ function AgreementSign(props) {
           setIsAgree={props.setIsAgree}
           setIsShowAgreeTerms={setIsShowAgreeTerms}
           showFirstWidget={props.showFirstWidget}
+          setIsKycModalOpen={props.setIsKycModalOpen}
+          kycRequired={props.kycRequired}
         />
       )}
     </>

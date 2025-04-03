@@ -299,7 +299,7 @@ const Contact = () => {
                 <h3>India</h3>
                 <InfoItem>
                   <Icon><MapPinIcon /></Icon>
-                  <p>B-85 Dashrath Puri, Palam Road, New Delhi-110045</p>
+                  <p>B-85 Dashrath Puri, Palam Road,<br /> New Delhi 110045</p>
                 </InfoItem>
                 <InfoItem>
                   <Icon><PhoneIcon /></Icon>
@@ -321,7 +321,7 @@ const Contact = () => {
                 </InfoItem>
                 <InfoItem>
                   <Icon><PhoneIcon /></Icon>
-                  <p>+1 408-341-9417</p>
+                  <p>+1 408.341.9417</p>
                 </InfoItem>
                 <InfoItem>
                   <Icon><MailIcon /></Icon>
@@ -335,11 +335,11 @@ const Contact = () => {
                 <h3>Canada</h3>
                 <InfoItem>
                   <Icon><MapPinIcon /></Icon>
-                  <p>206 Coventry Crt NE, Calgary, Alberta T3K5E8</p>
+                  <p>206 Coventry Crt NE,<br /> Calgary, Alberta T3K5E8</p>
                 </InfoItem>
                 <InfoItem>
                   <Icon><PhoneIcon /></Icon>
-                  <p>+1 408-341-9417</p>
+                  <p>+1 408.341.9417</p>
                 </InfoItem>
                 <InfoItem>
                   <Icon><MailIcon /></Icon>

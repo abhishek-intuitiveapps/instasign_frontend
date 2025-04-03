@@ -268,6 +268,7 @@ const AddSigner = (props) => {
           <div className="mb-3">
             <label htmlFor="phone" className="block text-xs font-semibold">
               {t("phone")}
+              <span className="text-[red] text-[13px]"> *</span>
             </label>
             <input
               type="text"
@@ -275,8 +276,11 @@ const AddSigner = (props) => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               disabled={addYourself}
+              required
+              onInvalid={(e) => e.target.setCustomValidity(t("input-required"))}
+              onInput={(e) => e.target.setCustomValidity("")}
               className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
-              placeholder={t("phone-optional")}
+              placeholder={t("phone")}
             />
           </div>
           <div className="mt-4 flex gap-x-2 justify-start">

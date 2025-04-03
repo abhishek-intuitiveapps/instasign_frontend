@@ -174,6 +174,7 @@ function PlaceHolderSign() {
     collect: (monitor) => ({ isOver: !!monitor.isOver() })
   });
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false); // Add state for the wallet modal
+  const [isKycRequired, setIsKycRequired] = useState(false); // Add state for KYC requirement
 
   const documentId = docId;
   const userEmail = localStorage.getItem('djangoUser')?.email; // Get user email from localStorage
@@ -298,6 +299,9 @@ function PlaceHolderSign() {
     //getting document details
     const documentData = await contractDocument(documentId);
     if (documentData && documentData.length > 0) {
+      // Set KYC requirement from document data
+      setIsKycRequired(documentData[0]?.KycRequired || false);
+      
       if (documentData[0]?.Placeholders?.length > 0) {
         const signerNotExist = documentData[0]?.Placeholders.some(
           (data) => !data.signerObjId
@@ -1231,7 +1235,7 @@ function PlaceHolderSign() {
           `${pdfDetails?.[0].objectId}/${signerMail[i].Email}/${objectId}`
         );
         let signPdf = `${hostUrl}/login/${encodeBase64}`;
-        const openSignUrl = "https://www.opensignlabs.com/";
+        const openSignUrl = `${hostUrl}`;
         const orgName = pdfDetails[0]?.ExtUserPtr.Company
           ? pdfDetails[0].ExtUserPtr.Company
           : "";
