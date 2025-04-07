@@ -7,7 +7,6 @@ import { NavLink, useNavigate, useLocation } from "react-router";
 import login_img from "../assets/images/instasign.jpg";
 import { useWindowSize } from "../hook/useWindowSize";
 import ModalUi from "../primitives/ModalUi";
-import AccountActivationModal from "../components/shared/AccountActivationModal";
 import {
   emailRegex,
 } from "../constant/const";
@@ -680,11 +679,6 @@ function Login() {
         </div>
       )}
       
-      <AccountActivationModal
-        isOpen={showActivationModal}
-        onClose={() => setShowActivationModal(false)}
-        onActivate={handleActivateAccount}
-      />
     </>
   );
 }
