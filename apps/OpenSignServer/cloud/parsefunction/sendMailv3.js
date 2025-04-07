@@ -20,6 +20,9 @@ async function sendMailProvider(req, plan, monthchange) {
           user: process.env.SMTP_USERNAME ? process.env.SMTP_USERNAME : process.env.SMTP_USER_EMAIL,
           pass: process.env.SMTP_PASS,
         },
+        tls: {
+          rejectUnauthorized: false, // <- add this
+        },
       });
     } else {
       if (mailgunApiKey) {
