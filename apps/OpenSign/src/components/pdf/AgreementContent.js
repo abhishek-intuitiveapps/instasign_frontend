@@ -11,6 +11,9 @@ function AgreementContent(props) {
     props.setIsAgree(true);
     props.setIsShowAgreeTerms(false);
     props.showFirstWidget();
+    if (props.kycRequired) {
+      props.setIsKycModalOpen(true);
+    }
   };
   return (
     <div>

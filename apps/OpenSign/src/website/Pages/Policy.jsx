@@ -1,63 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React,{ useEffect, useRef, useState } from "react";
 import Title from "../../components/Title";
-
-const AccordionItem = ({ title, content, isOpen, onClick }) => {
-  const contentRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const itemRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (itemRef.current) {
-      observer.observe(itemRef.current);
-    }
-
-    return () => {
-      if (itemRef.current) {
-        observer.unobserve(itemRef.current);
-      }
-    };
-  }, []);
-
-  return (
-    <div 
-      ref={itemRef}
-      className={`border-b border-neutral/20 transition-all duration-1000 ease-in-out transform ${
-        isVisible 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-10'
-      } ${isOpen ? 'fade-in' : ''}`}
-    >
-      <Title title="Privacy Policy" drive={false} />
-      <button
-        className="w-full px-6 py-4 hover:bg-blue-50 op-text-primary font-medium text-left flex justify-between items-center"
-        onClick={onClick}
-      >
-        {title}
-        <span className={`transform transition-transform duration-700 ${isOpen ? 'rotate-180' : ''}`}>
-          ▼
-        </span>
-      </button>
-      <div 
-        className={`overflow-hidden transition-all duration-700 ease-in-out`}
-        style={{ maxHeight: isOpen ? contentRef.current?.scrollHeight + 'px' : '0' }}
-      >
-        <div ref={contentRef} className="px-6 pb-4 text-secondary">
-          {content}
-        </div>
-      </div>
-    </div>
-  );
-};
+import AccordionItem from "../components/AccordionItem";
 
 const Policy = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -100,10 +43,10 @@ const Policy = () => {
           <li>Phone Number: A contact number is often collected to send SMS verification codes or for contact purposes.</li>
           <li>Location: Instasign may collect your location as part of the verification process to cross-verify that the user is physically present in a specific location.</li>
           <strong>Official Identification:</strong>
-          <li>Government-issued ID: Users are typically required to provide any official identification such as a passport number, driver's license number, Aadhar card number or national ID card number for verification.</li>
+          <li>Government-issued ID: Users are typically required to provide any official identification such as a passport number, driver's license number, Aadhar card number or national ID card number for Validation.</li>
           <li>CIN and GSTIN Number: Users are typically required to provide a CIN and GSTIN number for Business account verification.</li>
           <strong>Biometric Data:</strong>
-          <li>Facial Recognition: Some Instasign applications use facial recognition technology to match the provided images with the identification documents.</li>
+          <li>Facial Recognition: Some Instasign applications may use facial recognition technology to match the provided images with the identification documents.</li>
           <strong>Consent and Authorization:</strong>
           <li>Agreement to Terms: Users are often required to consent to the terms and conditions of the Instasign process.</li>
           <li>Authorization: Permission to access official records and databases for verification purposes.</li>
@@ -118,9 +61,10 @@ const Policy = () => {
       content: (
         <ul className="list-disc list-inside">
           <li>Account creation and management.</li>
-          <li>Instasign verification.</li>
+          <li>Manage your account.</li>
           <li>Providing and improving our services.</li>
           <li>Communicating with you about updates, promotions, and important information.</li>
+          <li>Comply with legal requirements.</li>
         </ul>
       ),
     },
@@ -210,6 +154,7 @@ const Policy = () => {
 
   return (
     <section id="refund" className="py-16 md:py-24 bg-white" ref={ref}>
+      <Title title="Policy" drive={false} />
       <div className="container mx-auto px-4">
         <div className={`text-center mb-12 transition-all duration-1000 ease-in-out transform ${
           isVisible 

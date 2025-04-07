@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Modal, Button } from "react-bootstrap";
 import axios from 'axios';
 import Loader from '../primitives/Loader';
+import env_data from "../env_data.json";
 
 
 const AddCreditsModal = ({ show, handleClose }) => {
@@ -12,7 +13,7 @@ const AddCreditsModal = ({ show, handleClose }) => {
   const [gstRate, setGstRate] = useState(0.18); // Default value
   const djangoToken = localStorage.getItem('django')
   const [loadingQRCode, setLoadingQRCode] = useState(true);
-  const djangoUrl = 'https://api.instasign.ai';
+  const djangoUrl = env_data.django_url;
 
 
   useEffect(() => {
@@ -78,7 +79,7 @@ const AddCreditsModal = ({ show, handleClose }) => {
         }
       );
       console.log("API Response:", response.data);
-      alert("Payment successfully recorded");
+      alert("Payment Submitted – Awaiting Verification");
       handleClose();
       setUtrNumber("");
     } catch (error) {

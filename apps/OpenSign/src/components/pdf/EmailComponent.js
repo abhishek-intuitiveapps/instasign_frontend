@@ -61,7 +61,7 @@ function EmailComponent({
           "X-Parse-Application-Id": localStorage.getItem("parseAppId"),
           sessionToken: localStorage.getItem("accesstoken")
         };
-        const openSignUrl = "https://www.opensignlabs.com/contact-us";
+        const openSignUrl = "https://www.opensignlabs.com/contact";
         const themeBGcolor = themeColor;
         let params = {
           extUserId: extUserId,

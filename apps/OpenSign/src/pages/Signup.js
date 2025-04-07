@@ -17,6 +17,7 @@ import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import SelectLanguage from "../components/pdf/SelectLanguage";
 import countries from "../json/CountriesJson";
+import env_data from "../env_data.json";
 
 function SignUp() {
   const { t, i18n } = useTranslation();
@@ -43,7 +44,7 @@ function SignUp() {
     confirmPassword: "",
   });
   const [isCompanySignup, setIsCompanySignup] = useState("no");
-  const djangoUrl = 'https://api.instasign.ai';
+  const djangoUrl = env_data.django_url;
 
   // Add state for form fields
   const [formData, setFormData] = useState({

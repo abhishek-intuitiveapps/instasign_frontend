@@ -22,6 +22,7 @@ import SelectLanguage from "../components/pdf/SelectLanguage";
 import { setPaymentMode } from "../redux/reducers/PaymentReducer";
 import countries from "../json/CountriesJson";
 import _ from 'lodash';
+import env_data from "../env_data.json";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ function UserProfile() {
   const paymentMode = useSelector((state) => state.payment.mode);
   const [tempPaymentMode, setTempPaymentMode] = useState(paymentMode);
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
-  const djangoUrl = 'https://api.instasign.ai';
+  const djangoUrl = env_data.django_url;
 
   useEffect(() => {
     setTempPaymentMode(paymentMode);
@@ -86,13 +87,15 @@ function UserProfile() {
   const handleKyceeVerifyBtn = async() => {
     try {
       const payload = {
-        email: "rishabh@intuitiveapps.com",
-        first_name: "rishabh",
-        last_name: "bilwal",
-        phone_number: "+919910629281",
+        email: djangoUser.email,
+        first_name: djangoUser.first_name,
+        last_name: djangoUser.last_name,
+        phone_number: djangoUser.phone_number, // Fallback if phone not available
         verification_type: "instant",
-        unique_client_id: "TEST01",
-        client_secret: "APxVALVWjQrdNQFIOAKZuvXGGnhOxLrQKVwfBNNOvEEOvShNhaGptvvWBaoFVjyiJqOcVtwitJbslNXMwsmTffedXVfjwamoUfrm",
+        unique_client_id: djangoUser.id,
+        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET,
+        verification_application: "instasign",
+        verification_product:"uuid",
         type: "prod"
       };
 

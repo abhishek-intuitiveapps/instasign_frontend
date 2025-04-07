@@ -25,3 +25,8 @@ yarn-error.log*
 apps/OpenSign/public/mfbuild/*
 microfrontends/SignDocuments/build/*
 apps/OpenSignServer/files/files/*
+
+.env.prod
+docker-compose.override.yml
+docker-compose.dev.yml
+apps/OpenSign/src/env_data.json

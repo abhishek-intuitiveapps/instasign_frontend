@@ -1,63 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import React,{ useEffect, useRef, useState } from "react";
 import Title from "../../components/Title"; 
-
-const AccordionItem = ({ title, content, isOpen, onClick }) => {
-  const contentRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const itemRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (itemRef.current) {
-      observer.observe(itemRef.current);
-    }
-
-    return () => {
-      if (itemRef.current) {
-        observer.unobserve(itemRef.current);
-      }
-    };
-  }, []);
-
-  return (
-    <div 
-      ref={itemRef}
-      className={`border-b border-neutral/20 transition-all duration-1000 ease-in-out transform ${
-        isVisible 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-10'
-      } ${isOpen ? 'fade-in' : ''}`}
-    >
-      <Title title="Terms And Conditions" drive={false} />
-      <button
-        className="w-full px-6 py-4 hover:bg-blue-50 op-text-primary font-medium text-left flex justify-between items-center"
-        onClick={onClick}
-      >
-        {title}
-        <span className={`transform transition-transform duration-700 ${isOpen ? 'rotate-180' : ''}`}>
-          ▼
-        </span>
-      </button>
-      <div 
-        className={`overflow-hidden transition-all duration-700 ease-in-out`}
-        style={{ maxHeight: isOpen ? contentRef.current?.scrollHeight + 'px' : '0' }}
-      >
-        <div ref={contentRef} className="px-6 pb-4 text-secondary">
-          {content}
-        </div>
-      </div>
-    </div>
-  );
-};
+import AccordionItem from "../components/AccordionItem";
 
 const Terms = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -101,16 +44,16 @@ const Terms = () => {
       title: 'User Registration',
       content: (
         <ul className="list-disc list-inside">
-          <li>To use certain features of the Platform, you may be required to register an account. You agree to provide accurate and complete information during the registration process.</li>
+          <li>To use certain features of the Platform, you may be required to register an account. You agree to provide accurate and complete information during the registration process as per government laws.</li>
         </ul>
       ),
     },
     {
       id: 'item-3',
-      title: 'Identity Verification',
+      title: 'Identity Validation',
       content: (
         <ul className="list-disc list-inside">
-          <li>The Platform collects and processes personal information for identity verification purposes. You consent to the use of this information for authentication and compliance with applicable laws and regulations.</li>
+          <li>The Platform collects and processes personal information for account authorization process. Your consent to the use of this information for authentication and compliance with applicable laws and regulations.</li>
         </ul>
       ),
     },
@@ -128,7 +71,7 @@ const Terms = () => {
       title: 'Compliance with Laws',
       content: (
         <ul className="list-disc list-inside">
-          <li>Users agree to comply with all applicable laws and regulations related to identity verification and privacy.</li>
+          <li>Users agree to comply with all applicable laws and regulations related to instasign account authorization and privacy.</li>
         </ul>
       ),
     },
@@ -182,6 +125,7 @@ const Terms = () => {
 
   return (
     <section id="terms" className="py-16 md:py-24 bg-white" ref={ref}>
+      <Title title="Terms And Condition" drive={false} />
       <div className="container mx-auto px-4">
         <div className={`text-center mb-12 transition-all duration-1000 ease-in-out transform ${
           isVisible 
