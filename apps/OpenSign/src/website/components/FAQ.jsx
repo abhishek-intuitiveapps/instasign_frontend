@@ -33,8 +33,8 @@ const Faq = () => {
   const faqData = [
     {
       id: 'item-1',
-      title: 'How does KYC verification work?',
-      content: 'Instasign automatically checks the KYC status of recipients when they sign. Verified signers get a watermark on the document, providing an additional layer of security and authenticity to your important documents.'
+      title: 'How does instasign work?',
+      content: 'Instasign automatically verifies the status of uploaded documents associated with the signer. Signers who have been successfully authenticated receive a watermark on the document, enhancing security and ensuring authenticity.'
     },
     {
       id: 'item-2',

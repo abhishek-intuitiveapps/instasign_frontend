@@ -43,10 +43,10 @@ const Policy = () => {
           <li>Phone Number: A contact number is often collected to send SMS verification codes or for contact purposes.</li>
           <li>Location: Instasign may collect your location as part of the verification process to cross-verify that the user is physically present in a specific location.</li>
           <strong>Official Identification:</strong>
-          <li>Government-issued ID: Users are typically required to provide any official identification such as a passport number, driver's license number, Aadhar card number or national ID card number for verification.</li>
+          <li>Government-issued ID: Users are typically required to provide any official identification such as a passport number, driver's license number, Aadhar card number or national ID card number for Validation.</li>
           <li>CIN and GSTIN Number: Users are typically required to provide a CIN and GSTIN number for Business account verification.</li>
           <strong>Biometric Data:</strong>
-          <li>Facial Recognition: Some Instasign applications use facial recognition technology to match the provided images with the identification documents.</li>
+          <li>Facial Recognition: Some Instasign applications may use facial recognition technology to match the provided images with the identification documents.</li>
           <strong>Consent and Authorization:</strong>
           <li>Agreement to Terms: Users are often required to consent to the terms and conditions of the Instasign process.</li>
           <li>Authorization: Permission to access official records and databases for verification purposes.</li>
@@ -61,9 +61,10 @@ const Policy = () => {
       content: (
         <ul className="list-disc list-inside">
           <li>Account creation and management.</li>
-          <li>Instasign verification.</li>
+          <li>Manage your account.</li>
           <li>Providing and improving our services.</li>
           <li>Communicating with you about updates, promotions, and important information.</li>
+          <li>Comply with legal requirements.</li>
         </ul>
       ),
     },

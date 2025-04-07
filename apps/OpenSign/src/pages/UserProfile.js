@@ -92,7 +92,7 @@ function UserProfile() {
         phone_number: djangoUser.phone_number, // Fallback if phone not available
         verification_type: "instant",
         unique_client_id: djangoUser.id,
-        client_secret: process.env.KYCEE_CLIENT_SECRET,
+        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET || "APxVALVWjQrdNQFIOAKZuvXGGnhOxLrQKVwfBNNOvEEOvShNhaGptvvWBaoFVjyiJqOcVtwitJbslNXMwsmTffedXVfjwamoUfrm",
         verification_application: "instasign",
         verification_product:"uuid",
         type: "prod"

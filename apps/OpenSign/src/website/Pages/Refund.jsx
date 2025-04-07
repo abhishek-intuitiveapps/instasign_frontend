@@ -35,8 +35,8 @@ const Refund = () => {
       title: "Credit Purchase",
       content: (
         <ul className="list-disc list-inside">
-          <li>Users have the option to buy credits on our platform to complete verification services.</li>
-          <li>The credits purchased are non-transferable and are solely intended for the specified verification purposes.</li>
+          <li>Users have the option to buy credits on our platform following account registration and approval.</li>
+          <li>The credits purchased are non-transferable and are solely intended for the specified designated services functionalities.</li>
         </ul>
       ),
     },

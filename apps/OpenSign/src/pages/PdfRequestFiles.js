@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import {
   themeColor
 } from "../constant/const";
@@ -72,6 +72,8 @@ import TextFontSetting from "../components/pdf/TextFontSetting";
 function PdfRequestFiles(
 ) {
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const kycdone = searchParams.get('kycdone');
   const [pdfDetails, setPdfDetails] = useState([]);
   const [signedSigners, setSignedSigners] = useState([]);
   const [unsignedSigners, setUnSignedSigners] = useState([]);
@@ -1916,14 +1918,18 @@ function PdfRequestFiles(
       const firstName = nameParts[0] || "";
       const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
       
+      const currentUrl = window.location.href;
+      
       const payload = {
         email: currentSignerDetails.Email,
         first_name: firstName,
         last_name: lastName,
         phone_number: currentSignerDetails.Phone || "", // Fallback if phone not available
         verification_type: "instant",
-        unique_client_id: currWidgetsDetails.objectId,
-        client_secret: process.env.KYCEE_CLIENT_SECRET,
+        unique_client_id: documentId,
+        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET || "APxVALVWjQrdNQFIOAKZuvXGGnhOxLrQKVwfBNNOvEEOvShNhaGptvvWBaoFVjyiJqOcVtwitJbslNXMwsmTffedXVfjwamoUfrm",
+        redirect_url: `${currentUrl}?kycdone=true`,
+        fallback_url: `${currentUrl}?kycdone=true`,
         verification_application: "instasign",
         verification_product: "uuid",
         type: "prod"
@@ -1944,6 +1950,17 @@ function PdfRequestFiles(
       });
     }
   };
+
+  useEffect(() => {
+    const currentUrl = window.location.href;
+    console.log('Current URL:', currentUrl);
+    console.log('kycdone value:', kycdone);
+    
+    if (kycdone === 'true') {
+      console.log('Closing KYC modal');
+      setIsKycModalOpen(false);
+    }
+  }, [kycdone]);
 
   return (
     <><DndProvider backend={HTML5Backend}>
@@ -1983,7 +2000,7 @@ function PdfRequestFiles(
               closeWithMask={false}
             />
 
-            {isKycModalOpen && pdfDetails?.[0]?.KycRequired && (
+            {isKycModalOpen && pdfDetails?.[0]?.KycRequired && kycdone !== 'true' && (
               <ModalUi 
                 isOpen={isKycModalOpen} 
                 handleClose={() => {
@@ -1998,7 +2015,6 @@ function PdfRequestFiles(
                     className="op-btn op-btn-primary mt-2 text-lg text-white"
                     onClick={() => {
                       handleKyceeVerifyBtn();
-                      // setIsKycModalOpen(false);
                     }}
                   >
                     Start

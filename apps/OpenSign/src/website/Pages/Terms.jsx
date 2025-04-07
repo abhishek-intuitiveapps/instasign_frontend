@@ -44,16 +44,16 @@ const Terms = () => {
       title: 'User Registration',
       content: (
         <ul className="list-disc list-inside">
-          <li>To use certain features of the Platform, you may be required to register an account. You agree to provide accurate and complete information during the registration process.</li>
+          <li>To use certain features of the Platform, you may be required to register an account. You agree to provide accurate and complete information during the registration process as per government laws.</li>
         </ul>
       ),
     },
     {
       id: 'item-3',
-      title: 'Identity Verification',
+      title: 'Identity Validation',
       content: (
         <ul className="list-disc list-inside">
-          <li>The Platform collects and processes personal information for identity verification purposes. You consent to the use of this information for authentication and compliance with applicable laws and regulations.</li>
+          <li>The Platform collects and processes personal information for account authorization process. Your consent to the use of this information for authentication and compliance with applicable laws and regulations.</li>
         </ul>
       ),
     },
@@ -71,7 +71,7 @@ const Terms = () => {
       title: 'Compliance with Laws',
       content: (
         <ul className="list-disc list-inside">
-          <li>Users agree to comply with all applicable laws and regulations related to identity verification and privacy.</li>
+          <li>Users agree to comply with all applicable laws and regulations related to instasign account authorization and privacy.</li>
         </ul>
       ),
     },

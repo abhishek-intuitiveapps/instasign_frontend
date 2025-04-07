@@ -35,7 +35,7 @@ const ServiceAndDelivery = () => {
         <li>Online payments are processed instantly, and UPI purchases are verified through the UTR (Unique Transaction Reference) number.</li>
       </ul>
     )},
-    { id: 'item-2', title: 'UPI Purchase Verification', content: (
+    { id: 'item-2', title: 'UPI Purchase', content: (
       <ul className="list-disc list-inside">
         <li>For UPI purchases, users need to provide the UTR number for verification. The system checks the UTR number and payment status for approval.</li>
         <li>If approved, credits are promptly added to the user's account wallet.</li>
