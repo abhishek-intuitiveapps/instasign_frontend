@@ -1927,7 +1927,7 @@ function PdfRequestFiles(
         phone_number: currentSignerDetails.Phone || "", // Fallback if phone not available
         verification_type: "instant",
         unique_client_id: documentId,
-        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET || "APxVALVWjQrdNQFIOAKZuvXGGnhOxLrQKVwfBNNOvEEOvShNhaGptvvWBaoFVjyiJqOcVtwitJbslNXMwsmTffedXVfjwamoUfrm",
+        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET,
         redirect_url: `${currentUrl}?kycdone=true`,
         fallback_url: `${currentUrl}?kycdone=true`,
         verification_application: "instasign",
