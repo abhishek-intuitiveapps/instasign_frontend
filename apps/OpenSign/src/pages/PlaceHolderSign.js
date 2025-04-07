@@ -68,7 +68,7 @@ import Alert from "../primitives/Alert";
 import AsyncSelect from "react-select/async";
 import AddContact from "../primitives/AddContact";
 import EmptyWalletImage from "../assets/images/empty_wallet.png"; // Add the import for the image
-
+import env_data from "../env_data.json";
 function PlaceHolderSign() {
   const { t } = useTranslation();
   const editorRef = useRef();
@@ -180,7 +180,7 @@ function PlaceHolderSign() {
   const userEmail = localStorage.getItem('djangoUser')?.email; // Get user email from localStorage
   const token = localStorage.getItem('django'); 
 
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = env_data.django_url;
 
   useEffect(() => {
     if (documentId) {

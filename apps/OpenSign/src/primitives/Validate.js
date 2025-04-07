@@ -4,13 +4,14 @@ import { Outlet, useNavigate, useLocation } from "react-router";
 import ModalUi from "./ModalUi";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import env_data from "../env_data.json";  
 
 const Validate = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const location = useLocation();
   const [isUserValid, setIsUserValid] = useState(true);
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = env_data.django_url;
 
   useEffect(() => {
     (async () => {

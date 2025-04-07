@@ -5,7 +5,7 @@ import PaginationComponent from "./PaginationComponent"; // Adjust the import pa
 import AddCreditsModal from "./AddCreditsModal";
 import Loader from "../primitives/Loader";
 import Title from "../components/Title";
-
+import env_data from "../env_data.json";
 const MonthlyBills = () => {
   const [activeTable, setActiveTable] = useState("transactions");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,7 +18,7 @@ const MonthlyBills = () => {
   const [isLoading, setIsLoading] = useState(false); // Add isLoading state
   const djangoToken = localStorage.getItem('django'); // Commenting out the token retrieval
   const paymentMode = useSelector((state) => state.payment.mode);
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = env_data.django_url;
    // Retrieve rowsPerPage from localStorage or default to 25
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const savedRowsPerPage = localStorage.getItem("rowsPerPage");

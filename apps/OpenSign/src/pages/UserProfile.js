@@ -22,6 +22,7 @@ import SelectLanguage from "../components/pdf/SelectLanguage";
 import { setPaymentMode } from "../redux/reducers/PaymentReducer";
 import countries from "../json/CountriesJson";
 import _ from 'lodash';
+import env_data from "../env_data.json";
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ function UserProfile() {
   const paymentMode = useSelector((state) => state.payment.mode);
   const [tempPaymentMode, setTempPaymentMode] = useState(paymentMode);
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = env_data.django_url;
 
   useEffect(() => {
     setTempPaymentMode(paymentMode);

@@ -14,6 +14,7 @@ import Loader from "../primitives/Loader";
 import { showHeader } from "../redux/reducers/showHeader";
 import { useTranslation } from "react-i18next";
 import { setPaymentMode } from "../redux/reducers/PaymentReducer";
+import env_data from "../env_data.json";
 
 const HomeLayout = () => {
   const { t, i18n } = useTranslation();
@@ -31,9 +32,10 @@ const HomeLayout = () => {
   const [tourConfigs, setTourConfigs] = useState([]);
   const [, setCookie] = useCookies(["accesstoken", "main_Domain"]);
 
+
   const tenantId = localStorage.getItem("TenantId");
 
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = env_data.django_url;
 
   useEffect(() => {
     const language = localStorage.getItem("i18nextLng");

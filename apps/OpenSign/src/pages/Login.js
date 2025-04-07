@@ -7,6 +7,7 @@ import { NavLink, useNavigate, useLocation } from "react-router";
 import login_img from "../assets/images/instasign.jpg";
 import { useWindowSize } from "../hook/useWindowSize";
 import ModalUi from "../primitives/ModalUi";
+import AccountActivationModal from "../components/shared/AccountActivationModal";
 import {
   emailRegex,
 } from "../constant/const";
@@ -22,6 +23,7 @@ import {
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import SelectLanguage from "../components/pdf/SelectLanguage";
+import env_data from "../env_data.json";
 
 
 function Login() {
@@ -30,6 +32,7 @@ function Login() {
   const location = useLocation();
   const dispatch = useDispatch();
   const { width } = useWindowSize();
+  const [showActivationModal, setShowActivationModal] = useState(false);
   const [state, setState] = useState({
     email: "",
     alertType: "success",
@@ -98,14 +101,18 @@ function Login() {
       if (email && password) {
         try {
           // Send Axios request to get access and refresh tokens
-          const response = await axios.post("https://api.dev.instasign.ai/base/api/token/", {
+          const response = await axios.post(`https:/${env_data.django_url}/base/api/token/`, {
             email: state.email,
             password: state.password
           });
-          console.log(response.data);
-          const { access, refresh } = response.data; // Destructure access and refresh tokens
           
-          // Store tokens in local storage with new names
+          // Check if account needs activation
+          if (response.data.needs_activation) {
+            setShowActivationModal(true);
+            return;
+          }
+
+          const { access, refresh } = response.data;
           localStorage.setItem("django", access);
           localStorage.setItem("djangoRefresh", refresh);
 
@@ -516,130 +523,170 @@ function Login() {
     setIsChecked(!isChecked);
   };
 
+  const handleActivateAccount = async ({ otp, cinFile }) => {
+    try {
+      const formData = new FormData();
+      formData.append('otp', otp);
+      formData.append('cin_certificate', cinFile);
+      
+      const response = await axios.post(
+        `${env_data.django_url}/base/api/activate-account/`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setShowActivationModal(false);
+        // Retry login after successful activation
+        handleSubmit(new Event('submit'));
+      } else {
+        setState({
+          ...state,
+          alertType: "danger",
+          alertMsg: "Account activation failed. Please try again."
+        });
+      }
+    } catch (error) {
+      setState({
+        ...state,
+        alertType: "danger",
+        alertMsg: error.response?.data?.message || "Account activation failed. Please try again."
+      });
+    }
+  };
+
   return (
     <>
-      {
-      state.loading ? (
-        <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
-          <Loader /> {/* Your loading component */}
-        </div>
-      ) : errMsg ? (
-        <div className="h-screen flex justify-center text-center items-center p-4 text-gray-500 text-base">
-          {errMsg}
+      <Title title={"Login"} />
+      {state.loading ? (
+        <div className="h-screen flex justify-center items-center">
+          <Loader />
         </div>
       ) : (
-        
-        <div className="flex h-screen">
-          <Title title={"Login Page"} />
-          <div className="hidden md:flex flex-none w-2/5 justify-center items-center bg-blue-500 overflow-hidden">
-            <img src={login_img} alt="Login Illustration" className="object-cover w-full h-full" />
-          </div>
-          <div className="flex-1 flex justify-center items-center bg-white">
-            <div className="w-full max-w-md p-8">
-              <h1 className="text-2xl font-bold text-left mb-6">{t("Sign In")}</h1>
-              <form onSubmit={handleSubmit} aria-label="Login Form">
-                <fieldset className="mb-3 relative">
-                  <div className="relative w-full max-w-md">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      <i className="fa fa-envelope"></i>
-                    </div>
-                    <input
-                      id="email"
-                      type="email"
-                      placeholder={t("Email")}
-                      className="w-full py-2 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      name="email"
-                      autoComplete="username"
-                      value={state.email}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </fieldset>
-                <fieldset className="mb-3 relative">
-                  <div className="relative w-full max-w-md">
-                    <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                      <i className="fa fa-lock"></i>
-                    </div>
-                    <input
-                      id="password"
-                      type={state.passwordVisible ? "text" : "password"}
-                      placeholder={t("Password")}
-                      className="w-full py-2 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      value={state.password}
-                      name="password"
-                      autoComplete="current-password"
-                      onChange={handleChange}
-                      required
-                    />
-                    <div 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-                      onClick={togglePasswordVisibility}
-                    >
-                      <i className={`fa ${state.passwordVisible ? 'fa-eye' : 'fa-eye-slash'}`}></i>
-                    </div>
-                  </div>
-                </fieldset>
-                <div className="flex items-center justify-between mb-4">
-                  <label className="flex items-center cursor-pointer">
-                    <div className="relative">
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="flex h-screen">
+            <Title title={"Login Page"} />
+            <div className="hidden md:flex flex-none w-2/5 justify-center items-center bg-blue-500 overflow-hidden">
+              <img src={login_img} alt="Login Illustration" className="object-cover w-full h-full" />
+            </div>
+            <div className="flex-1 flex justify-center items-center bg-white">
+              <div className="w-full max-w-md p-8">
+                <h1 className="text-2xl font-bold text-left mb-6">{t("Sign In")}</h1>
+                <form onSubmit={handleSubmit} aria-label="Login Form">
+                  <fieldset className="mb-3 relative">
+                    <div className="relative w-full max-w-md">
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        <i className="fa fa-envelope"></i>
+                      </div>
                       <input
-                        type="checkbox"
-                        className="sr-only"
-                        checked={isChecked}
-                        onChange={handleToggle}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
+                        id="email"
+                        type="email"
+                        placeholder={t("Email")}
+                        className="w-full py-2 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        name="email"
+                        autoComplete="username"
+                        value={state.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </fieldset>
+                  <fieldset className="mb-3 relative">
+                    <div className="relative w-full max-w-md">
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                        <i className="fa fa-lock"></i>
+                      </div>
+                      <input
+                        id="password"
+                        type={state.passwordVisible ? "text" : "password"}
+                        placeholder={t("Password")}
+                        className="w-full py-2 px-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={state.password}
+                        name="password"
+                        autoComplete="current-password"
+                        onChange={handleChange}
+                        required
                       />
                       <div 
-                        className={`w-5 h-5 border transition-colors ${
-                          isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
-                        } ${
-                          isFocused ? 'ring-2 ring-blue-500 ring-opacity-50 rounded-md' : 'rounded-md'
-                        }`}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                        onClick={togglePasswordVisibility}
                       >
-                        {isChecked && (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            strokeWidth={4}
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
+                        <i className={`fa ${state.passwordVisible ? 'fa-eye' : 'fa-eye-slash'}`}></i>
                       </div>
                     </div>
-                    <span className="ml-2">Keep me logged in</span>
-                  </label>
-                  <NavLink to="/forgetpassword" className="text-blue-500 hover:underline">
-                    {t("Forgot Password")}
-                  </NavLink>
+                  </fieldset>
+                  <div className="flex items-center justify-between mb-4">
+                    <label className="flex items-center cursor-pointer">
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={isChecked}
+                          onChange={handleToggle}
+                          onFocus={() => setIsFocused(true)}
+                          onBlur={() => setIsFocused(false)}
+                        />
+                        <div 
+                          className={`w-5 h-5 border transition-colors ${
+                            isChecked ? 'bg-blue-500 border-blue-500' : 'bg-white border-gray-300'
+                          } ${
+                            isFocused ? 'ring-2 ring-blue-500 ring-opacity-50 rounded-md' : 'rounded-md'
+                          }`}
+                        >
+                          {isChecked && (
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4 text-white absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                              strokeWidth={4}
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                      </div>
+                      <span className="ml-2">Keep me logged in</span>
+                    </label>
+                    <NavLink to="/forgetpassword" className="text-blue-500 hover:underline">
+                      {t("Forgot Password")}
+                    </NavLink>
+                  </div>
+                  <div className="grid grid-cols-1 gap-1 text-center">
+                    <button
+                      type="submit"
+                      className="w-full bg-blue-600 text-white font-bold py-3 rounded-md hover:bg-blue-700 transition duration-200"
+                    >
+                      {t("Sign In")}
+                    </button>
+                  </div>
+                </form>
+                <div className="text-center mt-2">
+                  <span className="text-sm">
+                    {t("Don't have an account?")} <NavLink to="/signup" className="text-blue-500 hover:underline">{t("Sign up")}</NavLink>
+                  </span>
                 </div>
-                <div className="grid grid-cols-1 gap-1 text-center">
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-600 text-white font-bold py-3 rounded-md hover:bg-blue-700 transition duration-200"
-                  >
-                    {t("Sign In")}
-                  </button>
-                </div>
-              </form>
-              <div className="text-center mt-2">
-                <span className="text-sm">
-                  {t("Don't have an account?")} <NavLink to="/signup" className="text-blue-500 hover:underline">{t("Sign up")}</NavLink>
-                </span>
+                {state.alertMsg && (
+                  <Alert type={state.alertType}>{state.alertMsg}</Alert>
+                )}
               </div>
-              {state.alertMsg && (
-                <Alert type={state.alertType}>{state.alertMsg}</Alert>
-              )}
             </div>
           </div>
         </div>
       )}
+      
+      <AccountActivationModal
+        isOpen={showActivationModal}
+        onClose={() => setShowActivationModal(false)}
+        onActivate={handleActivateAccount}
+      />
     </>
   );
 }
+
 export default Login;
