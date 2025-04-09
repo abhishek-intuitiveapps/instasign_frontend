@@ -121,7 +121,7 @@ const Header = ({ showSidebar, setIsMenu }) => {
               onClick={toggleDropdown}
               className="cursor-pointer text-base-content text-sm"
             >
-              {username && username}
+              {username && username.split(" ")[0]}
             </div>
           )}
           <div className="op-dropdown op-dropdown-end" id="profile-menu">
@@ -155,7 +155,7 @@ const Header = ({ showSidebar, setIsMenu }) => {
                   <span className="ml-2">{t("profile")}</span>
                 </span>
               </li>
-              <li
+              {/* <li
                 onClick={() => {
                   setIsOpen(false);
                   navigate("/report/contacts");
@@ -211,7 +211,7 @@ const Header = ({ showSidebar, setIsMenu }) => {
                     </>
                   ) : null}
                 </>
-              )}
+              )} */}
               <li
                 onClick={() => {
                   setIsOpen(false);

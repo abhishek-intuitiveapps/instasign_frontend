@@ -68,7 +68,8 @@ const Wallet = () => {
       if (response.data) {
         console.log("Offline orders fetched successfully:", response.data.data);
         // Assuming response.data.data is an array of orders
-        setCreditsData(prevData => [...prevData, ...response.data.data]); // Update creditsData state
+        // setCreditsData(prevData => [...prevData, ...response.data.data]); // Update creditsData state
+        setCreditsData(response.data.data);
       } else {
         console.error("Failed to fetch offline orders:", response.data.message);
       }
