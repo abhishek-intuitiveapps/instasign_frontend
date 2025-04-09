@@ -1,9 +1,9 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
-import { useNavigate } from "react-router";
-import axios from "axios";
+// import { useNavigate } from "react-router";
+// import axios from "axios";
 import { useTranslation } from "react-i18next";
-import { WalletCard } from "../../pages/WalletCard";
-import env_data from "../../env_data.json";
+// import { WalletCard } from "../../pages/WalletCard";
+// import env_data from "../../env_data.json";
 const DashboardButton = lazy(() => import("./DashboardButton"));
 const DashboardCard = lazy(() => import("./DashboardCard"));
 const DashboardReport = lazy(() => import("./DashboardReport"));
@@ -24,67 +24,67 @@ const buttonList = [
 ];
 const GetDashboard = (props) => {
   const { t } = useTranslation();
-  const [walletDetails, setWalletDetails] = useState(null);
-  const djangoUrl = env_data.django_url;
-  const djangoToken = localStorage.getItem("django");
-  const [userList, setUserList] = useState([]);
-  const navigate = useNavigate();
+  // const [walletDetails, setWalletDetails] = useState(null);
+  // const djangoUrl = env_data.django_url;
+  // const djangoToken = localStorage.getItem("django");
+  // const [userList, setUserList] = useState([]);
+  // const navigate = useNavigate();
 
 
-  const fetchWalletDetails = async () => {
-    try {
-      const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
-        headers: {
-          Authorization: `Bearer ${djangoToken}`,
-        },
-      });
-      if (response.data.status) {
-        console.log("Wallet details fetched successfully:", response.data.data);
-        setWalletDetails(response.data.data);
-      } else {
-        console.error("Failed to fetch wallet details:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching wallet details:", error);
-    }
-  };
+  // const fetchWalletDetails = async () => {
+  //   try {
+  //     const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
+  //       headers: {
+  //         Authorization: `Bearer ${djangoToken}`,
+  //       },
+  //     });
+  //     if (response.data.status) {
+  //       console.log("Wallet details fetched successfully:", response.data.data);
+  //       setWalletDetails(response.data.data);
+  //     } else {
+  //       console.error("Failed to fetch wallet details:", response.data.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching wallet details:", error);
+  //   }
+  // };
 
-  async function fetchUserList() {
-    try {
-      setIsLoader(true);
-      const extUser =
-        localStorage.getItem("Extand_Class") &&
-        JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
+  // async function fetchUserList() {
+  //   try {
+  //     setIsLoader(true);
+  //     const extUser =
+  //       localStorage.getItem("Extand_Class") &&
+  //       JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
 
-      if (extUser) {
-        const admin =
-          extUser?.UserRole &&
-          (extUser?.UserRole === "contracts_Admin" ||
-            extUser?.UserRole === "contracts_OrgAdmin")
-            ? true
-            : false;
-        // setIsAdmin(admin);
-      }
-      const res = await Parse.Cloud.run("getuserlistbyorg", {
-        organizationId: extUser.OrganizationId.objectId
-      });
-      const _userRes = JSON.parse(JSON.stringify(res));
-      setUserList(_userRes);
-    } catch (err) {
-      console.log("Err in fetch userlist", err);
-      // setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
-    } finally {
-      setTimeout(() => setIsAlert({ type: "success", msg: "" }), 1500);
-      // setIsLoader(false);
-    }
-  }
+  //     if (extUser) {
+  //       const admin =
+  //         extUser?.UserRole &&
+  //         (extUser?.UserRole === "contracts_Admin" ||
+  //           extUser?.UserRole === "contracts_OrgAdmin")
+  //           ? true
+  //           : false;
+  //       // setIsAdmin(admin);
+  //     }
+  //     const res = await Parse.Cloud.run("getuserlistbyorg", {
+  //       organizationId: extUser.OrganizationId.objectId
+  //     });
+  //     const _userRes = JSON.parse(JSON.stringify(res));
+  //     setUserList(_userRes);
+  //   } catch (err) {
+  //     console.log("Err in fetch userlist", err);
+  //     // setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
+  //   } finally {
+  //     setTimeout(() => setIsAlert({ type: "success", msg: "" }), 1500);
+  //     // setIsLoader(false);
+  //   }
+  // }
 
-  useEffect(() => {
-    fetchWalletDetails();
-    fetchUserList();
-  }, []);
+  // useEffect(() => {
+  //   fetchWalletDetails();
+  //   fetchUserList();
+  // }, []);
 
-  console.log("this is user list", userList);
+  // console.log("this is user list", userList);
 
   const Button = ({ label, redirectId, redirectType, icon }) => (
     <DashboardButton
@@ -186,7 +186,7 @@ const GetDashboard = (props) => {
           ))}
         </div>
       </div> */}
-      {walletDetails && (
+      {/* {walletDetails && (
         <div className="flex space-between gap-x-4 mb-2">
         <WalletCard 
         label="Company Credits" 
@@ -212,7 +212,7 @@ const GetDashboard = (props) => {
         updatedOn={0} // Use updated_at from wallet details
       />
       </div>
-      )}
+      )} */}
       
       <div className="grid grid-cols-12 w-full gap-x-4">
         {props?.dashboard?.columns?.map((col, i) =>
