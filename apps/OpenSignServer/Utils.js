@@ -5,7 +5,7 @@ import { PDFDocument } from 'pdf-lib';
 dotenv.config();
 
 export const cloudServerUrl = 'http://localhost:8080/app';
-export const appName = 'OpenSign™';
+export const appName = 'InstaSign™';
 
 export const color = [
   '#93a3db',

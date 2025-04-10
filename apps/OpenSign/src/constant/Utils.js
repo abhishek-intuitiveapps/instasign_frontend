@@ -2356,7 +2356,7 @@ export const handleDownloadCertificate = async (
             setIsDownloading("");
             return certificateUrl;
           } else {
-            saveAs(certificateUrl, `Certificate_signed_by_OpenSign™.pdf`);
+            saveAs(certificateUrl, `Certificate_signed_by_InstaSign™.pdf`);
             setIsDownloading("");
           }
         } else {
@@ -2381,7 +2381,7 @@ export const handleDownloadCertificate = async (
                 // Convert the response into a Blob
                 const certificateBlob = await fetchCertificate.blob();
                 setIsDownloading("");
-                saveAs(certificateBlob, `Certificate_signed_by_OpenSign™.pdf`);
+                saveAs(certificateBlob, `Certificate_signed_by_InstaSign™.pdf`);
               }
             } catch (err) {
               console.log("err in download in certificate", err);
