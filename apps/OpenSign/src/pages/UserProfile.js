@@ -583,27 +583,29 @@ function UserProfile() {
                   <span className="font-semibold">{t("Country")}:</span>{" "}
                   <span>{getCountryName(djangoUser.country)}</span>
                 </li>
-                <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
-                  <span className="font-semibold">Payment Mode:</span>
-                  <div className="flex items-center">
-                    <span className="mr-2">{"Prepaid"}</span>
-                    <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={tempPaymentMode}
-                        onChange={() => {
-                          const newPostpaidStatus = !tempPaymentMode;
-                          setTempPaymentMode(newPostpaidStatus);
-                          console.log("Payment mode changed to:", newPostpaidStatus);
-                        }}
-                        disabled={!editmode}
-                      />
-                      <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
-                    </label>
-                    <span className="ml-2">Postpaid</span>
-                  </div>
-                </li>
+                {djangoUser?.is_main_admin && (
+                  <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
+                    <span className="font-semibold">Payment Mode:</span>
+                    <div className="flex items-center">
+                      <span className="mr-2">{"Prepaid"}</span>
+                      <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        <input
+                          type="checkbox"
+                          className="sr-only peer"
+                          checked={tempPaymentMode}
+                          onChange={() => {
+                            const newPostpaidStatus = !tempPaymentMode;
+                            setTempPaymentMode(newPostpaidStatus);
+                            console.log("Payment mode changed to:", newPostpaidStatus);
+                          }}
+                          disabled={!editmode}
+                        />
+                        <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
+                      </label>
+                      <span className="ml-2">Postpaid</span>
+                    </div>
+                  </li>
+                )}
               </ul>
             </div>
             <div className="flex justify-center gap-4 pt-4">

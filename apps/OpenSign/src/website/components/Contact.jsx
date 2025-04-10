@@ -307,7 +307,7 @@ const Contact = () => {
                 </InfoItem>
                 <InfoItem>
                   <Icon><MailIcon /></Icon>
-                  <p>cs@instasign.com</p>
+                  <p>cs@instasign.ai</p>
                 </InfoItem>
               </InfoContent>
             </InfoCard>
@@ -325,7 +325,7 @@ const Contact = () => {
                 </InfoItem>
                 <InfoItem>
                   <Icon><MailIcon /></Icon>
-                  <p>cs@instasign.com</p>
+                  <p>cs@instasign.ai</p>
                 </InfoItem>
               </InfoContent>
             </InfoCard>
@@ -343,7 +343,7 @@ const Contact = () => {
                 </InfoItem>
                 <InfoItem>
                   <Icon><MailIcon /></Icon>
-                  <p>cs@instasign.com</p>
+                  <p>cs@instasign.ai</p>
                 </InfoItem>
               </InfoContent>
             </InfoCard>

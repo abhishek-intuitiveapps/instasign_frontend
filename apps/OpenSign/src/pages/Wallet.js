@@ -68,7 +68,8 @@ const Wallet = () => {
       if (response.data) {
         console.log("Offline orders fetched successfully:", response.data.data);
         // Assuming response.data.data is an array of orders
-        setCreditsData(prevData => [...prevData, ...response.data.data]); // Update creditsData state
+        // setCreditsData(prevData => [...prevData, ...response.data.data]); // Update creditsData state
+        setCreditsData(response.data.data);
       } else {
         console.error("Failed to fetch offline orders:", response.data.message);
       }
@@ -209,12 +210,12 @@ const Wallet = () => {
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
                     <td className="p-3 text-center border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
-                    <td className="p-3 text-center border">{item.date}</td>
+                    <td className="p-3 text-center border">{item.created_at}</td>
                     <td className="p-3 text-center border">{item.amount}</td>
-                    <td className="p-3 text-center border">{item.user}</td>
-                    <td className="p-3 text-center border">{item.unitPrice}</td>
+                    <td className="p-3 text-center border">{item.responsible_person}</td>
+                    <td className="p-3 text-center border">{item.unit_price}</td>
                     <td className="p-3 text-center border">{item.utr}</td>
-                    <td className="p-3 text-center border">{item.walletId}</td>
+                    <td className="p-3 text-center border">{item.order_wallet}</td>
                     <td className="p-3 border">
                       <span 
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center ${

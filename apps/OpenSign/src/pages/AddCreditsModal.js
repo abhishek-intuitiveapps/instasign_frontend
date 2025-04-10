@@ -79,7 +79,8 @@ const AddCreditsModal = ({ show, handleClose }) => {
         }
       );
       console.log("API Response:", response.data);
-      alert("Payment Submitted – Awaiting Verification");
+      // alert("Payment Submitted – Awaiting Verification");
+      alert(response.data.message);
       handleClose();
       setUtrNumber("");
     } catch (error) {

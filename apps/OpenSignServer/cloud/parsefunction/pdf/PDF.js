@@ -17,11 +17,12 @@ import { P12Signer } from '@signpdf/signer-p12';
 const serverUrl = cloudServerUrl; // process.env.SERVER_URL;
 const APPID = process.env.APP_ID;
 const masterKEY = process.env.MASTER_KEY;
-const eSignName = 'OpenSign';
-const eSigncontact = 'hello@opensignlabs.com';
+const eSignName = 'InstaSign';
+const eSigncontact = 'cs@instasign.ai';
 const logo =
   "<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' style='padding:20px'/>";
-const opurl = ` <a href=www.opensignlabs.com target=_blank>here</a>`;
+// const opurl = ` <a href=www.opensignlabs.com target=_blank>here</a>`;
+const opurl = ` <a href=https://instasign.ai/contact target=_blank>here</a>`;
 
 // `updateDoc` is used to create url in from pdfFile
 async function uploadFile(pdfName, filepath) {

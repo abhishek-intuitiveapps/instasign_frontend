@@ -1,9 +1,9 @@
 import React from "react";
 
 
-export const WalletCard = ({ label, value, icon, loading, id, updatedOn }) => {
+export const WalletCard = ({ label, value, icon, loading, id, updatedOn, onClick }) => {
     return (
-      <div className={`cursor-pointer bg-white p-4 rounded-xl shadow-md w-1/2`}>
+      <div onClick={onClick} className={`cursor-pointer bg-white p-4 rounded-xl shadow-md w-1/2`}>
         <div className="flex items-center justify-between text-black">
           <div className="font-medium">
             <div className="text-base lg:text-lg">

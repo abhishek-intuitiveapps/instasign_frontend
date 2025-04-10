@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Title from "../../components/Title";
 import AccordionItem from "../components/AccordionItem";
 
