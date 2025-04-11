@@ -1,8 +1,8 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
-// import { useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
-// import { WalletCard } from "../../pages/WalletCard";
+import { WalletCard } from "../../pages/WalletCard";
 import env_data from "../../env_data.json";
 const DashboardButton = lazy(() => import("./DashboardButton"));
 const DashboardCard = lazy(() => import("./DashboardCard"));
