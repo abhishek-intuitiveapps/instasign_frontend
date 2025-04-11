@@ -2172,7 +2172,7 @@ export const fetchUrl = async (url, pdfName) => {
       throw new Error("Network response was not ok");
     }
     const blob = await response.blob();
-    saveAs(blob, `${sanitizeFileName(pdfName)}_signed_by_OpenSign™.pdf`);
+    saveAs(blob, `${sanitizeFileName(pdfName)}_signed_by_InstaSign™.pdf`);
   } catch (error) {
     alert("something went wrong, please try again later.");
     console.error("Error downloading the file:", error);

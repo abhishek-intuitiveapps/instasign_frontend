@@ -65,7 +65,7 @@ function DownloadPdfZip(props) {
         const pdf2Blob = await pdf2Response.blob();
         // Add files to ZIP
         zip.file(
-          `${sanitizeFileName(pdfName)}_signed_by_OpenSign™.pdf`,
+          `${sanitizeFileName(pdfName)}_signed_by_InstaSign™.pdf`,
           pdf1Blob
         );
         zip.file("Certificate_signed_by_InstaSign™.pdf", pdf2Blob);
@@ -74,7 +74,7 @@ function DownloadPdfZip(props) {
         const zipBlob = await zip.generateAsync({ type: "blob" });
         saveAs(
           zipBlob,
-          `${sanitizeFileName(pdfName)}_signed_by_OpenSign™.zip`
+          `${sanitizeFileName(pdfName)}_signed_by_InstaSign™.zip`
         );
         setSelectType(1);
         props.setIsDownloadModal(false);

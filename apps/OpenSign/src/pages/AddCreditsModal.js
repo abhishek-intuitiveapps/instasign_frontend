@@ -83,6 +83,7 @@ const AddCreditsModal = ({ show, handleClose }) => {
       alert(response.data.message);
       handleClose();
       setUtrNumber("");
+      window.location.reload(); // Reload the page to reflect changes
     } catch (error) {
       console.error("Error calling API:", error);
       alert("Failed to record payment");
@@ -200,11 +201,18 @@ const AddCreditsModal = ({ show, handleClose }) => {
               placeholder="Enter UTR Number"
               value={utrNumber}
               onChange={(e) => {
-                const value = e.target.value.slice(0, 22); // Limit input to 22 characters
+                let value = e.target.value;
+
+                // Remove special characters: only allow letters and numbers
+                value = value.replace(/[^a-zA-Z0-9]/g, "");
+
+                // Limit to 22 characters
+                value = value.slice(0, 22);
+
                 setUtrNumber(value);
               }}
               className="w-60 p-2 border border-gray-300 rounded mb-2"
-              maxLength={22} // Prevent entering more than 22 characters
+              maxLength={22}
             />
             { (utrNumber.length < 15 || utrNumber.length > 22) && (
               <p className="text-red-500 mb-2">
