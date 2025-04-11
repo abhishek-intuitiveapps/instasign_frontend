@@ -24,30 +24,41 @@ const buttonList = [
 ];
 const GetDashboard = (props) => {
   const { t } = useTranslation();
-  // const [walletDetails, setWalletDetails] = useState(null);
-  // const djangoUrl = env_data.django_url;
-  // const djangoToken = localStorage.getItem("django");
-  // const [userList, setUserList] = useState([]);
-  // const navigate = useNavigate();
+  const [walletDetails, setWalletDetails] = useState(null);
+  const djangoUrl = env_data.django_url;
+  const djangoToken = localStorage.getItem("django");
+  const [userList, setUserList] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    localStorage.setItem("rowsPerPage", rowsPerPage);
+    const fetchData = async () => {
+      setIsLoading(true); // Set loading to true before fetching
+      await fetchWalletDetails();
+      fetchOfflineOrders();
+      setIsLoading(false); // Set loading to false after fetching
+    };
+    fetchData();
+  }, [rowsPerPage]);
 
 
-  // const fetchWalletDetails = async () => {
-  //   try {
-  //     const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
-  //       headers: {
-  //         Authorization: `Bearer ${djangoToken}`,
-  //       },
-  //     });
-  //     if (response.data.status) {
-  //       console.log("Wallet details fetched successfully:", response.data.data);
-  //       setWalletDetails(response.data.data);
-  //     } else {
-  //       console.error("Failed to fetch wallet details:", response.data.message);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching wallet details:", error);
-  //   }
-  // };
+  const fetchWalletDetails = async () => {
+    try {
+      const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
+        headers: {
+          Authorization: `Bearer ${djangoToken}`,
+        },
+      });
+      if (response.data.status) {
+        console.log("Wallet details fetched successfully:", response.data.data);
+        setWalletDetails(response.data.data);
+      } else {
+        console.error("Failed to fetch wallet details:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching wallet details:", error);
+    }
+  };
 
   // async function fetchUserList() {
   //   try {
@@ -186,7 +197,7 @@ const GetDashboard = (props) => {
           ))}
         </div>
       </div> */}
-      {/* {walletDetails && (
+      {walletDetails && (
         <div className="flex space-between gap-x-4 mb-2">
         <WalletCard 
         label="Company Credits" 
@@ -212,7 +223,7 @@ const GetDashboard = (props) => {
         updatedOn={0} // Use updated_at from wallet details
       />
       </div>
-      )} */}
+      )}
       
       <div className="grid grid-cols-12 w-full gap-x-4">
         {props?.dashboard?.columns?.map((col, i) =>
