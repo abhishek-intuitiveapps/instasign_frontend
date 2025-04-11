@@ -20,8 +20,7 @@ const masterKEY = process.env.MASTER_KEY;
 const eSignName = 'InstaSign';
 const eSigncontact = 'cs@instasign.ai';
 const instasignLogo = process.env.INSTASIGN_LOGO || 'https://instasign.ai/static/media/logo.4e1511db837546d02f80.png';
-const logo =
-  "<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' style='padding:20px'/>";
+const logo = instasignLogo;
 // const opurl = ` <a href=www.opensignlabs.com target=_blank>here</a>`;
 const opurl = ` <a href=https://instasign.ai/contact target=_blank>here</a>`;
 
