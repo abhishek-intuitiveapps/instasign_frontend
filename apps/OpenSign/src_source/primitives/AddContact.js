@@ -200,11 +200,23 @@ const AddContact = (props) => {
               type="text"
               id="phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (/^\d{0,10}$/.test(value)) {
+                  setPhone(value);
+                }
+              }}
               disabled={addYourself}
               className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
               placeholder={t("phone-optional")}
+              inputMode="numeric"
+              maxLength={10}
             />
+            {phone.length > 0 && phone.length < 10 && (
+              <p className="text-red-500 text-xs mt-1">
+                {t("phone-must-be-10-digits")}
+              </p>
+            )}
           </div>
 
           <div className="mt-6 flex justify-start gap-2">
