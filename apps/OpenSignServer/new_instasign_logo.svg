@@ -1,0 +1,18 @@
+<svg viewBox="0 0 280 70" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .insta {
+      font-family: Arial, sans-serif; 
+      font-weight: bold; 
+      font-size: 45px;
+      fill: #0084ff;
+    }
+    .sign {
+      font-family: Arial, sans-serif; 
+      font-weight: bold; 
+      font-size: 45px;
+      fill: #002864;
+    }
+  </style>
+  <text x="10" y="50" class="insta">Insta</text>
+  <text x="112" y="50" class="sign">sign</text>
+</svg>

@@ -14,7 +14,15 @@ export const subSetting = [
     pageType: "",
     description: "",
     objectId: "users"
-  }
+  },
+  {
+    icon: "fa-light fa-address-book",
+    title: "Contactbook",
+    target: "_self",
+    pageType: "report",
+    description: "",
+    objectId: "contacts"
+  },
 ];
 
 const sidebarList = [
@@ -149,14 +157,6 @@ const sidebarList = [
         objectId: "zNqBHXHsYH"
       }
     ]
-  },
-  {
-    icon: "fa-light fa-address-book",
-    title: "Contactbook",
-    target: "_self",
-    pageType: "report",
-    description: "",
-    objectId: "contacts"
   },
   {
     icon: "fa-light fa-money-bills",

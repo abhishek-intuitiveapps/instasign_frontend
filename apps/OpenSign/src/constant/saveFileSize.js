@@ -8,7 +8,7 @@ export const SaveFileSize = async (size, imageUrl, tenantId) => {
   //checking server url and save file's size
   const tenantPtr = {
     __type: "Pointer",
-    className: "partners_Tenant",
+    className: "partner s_Tenant",
     objectId: tenantId
   };
   const _tenantPtr = JSON.stringify(tenantPtr);

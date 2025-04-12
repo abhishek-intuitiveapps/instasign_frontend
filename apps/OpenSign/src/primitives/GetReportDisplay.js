@@ -773,7 +773,7 @@ const ReportTable = (props) => {
       `{{sender_name}} has requested you to sign "{{document_title}}"`;
     const body =
       doc?.RequestBody ||
-      `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team OpenSign™</p><br></body> </html>`;
+      `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team InstaSign™</p><br></body> </html>`;
     const res = replaceMailVaribles(subject, body, variables);
     setMail((prev) => ({ ...prev, subject: res.subject, body: res.body }));
     setIsNextStep({ [user.Id]: true });
@@ -1051,56 +1051,12 @@ const ReportTable = (props) => {
     const displaySigners = isShowAllSigners[item.objectId]
       ? signers
       : signers.slice(0, 3);
-    return (
-      <>
-        {displaySigners?.map((x, i) => (
-          <div
-            key={i}
-            className="text-sm font-medium flex flex-row gap-2 items-center"
-          >
-            <button
-              onClick={() => setIsModal({ [`${item.objectId}_${i}`]: true })}
-              className={`${
-                x.Activity === "SIGNED"
-                  ? "op-border-primary op-text-primary"
-                  : x.Activity === "VIEWED"
-                    ? "border-green-400 text-green-400"
-                    : "border-black text-black"
-              } focus:outline-none border-2 w-[60px] h-[30px] text-[11px] rounded-full`}
-            >
-              {x?.Activity?.toUpperCase() || "-"}
-            </button>
-            <div className="py-2 font-bold text-[12px]">{x?.Email || "-"}</div>
-            {isModal[`${item.objectId}_${i}`] && (
-              <ModalUi
-                isOpen
-                title={t("document-logs")}
-                handleClose={() => setIsModal({})}
-              >
-                <div className="pl-3 first:mt-2 border-t-[1px] border-gray-600 text-[12px] py-2">
-                  <p className="font-bold"> {x?.Email}</p>
-                  <p>Viewed on: {x?.ViewedOn}</p>
-                  <p>Signed on: {x?.SignedOn}</p>
-                </div>
-              </ModalUi>
-            )}
-          </div>
-        ))}
-        {/* Show More / Hide button */}
-        {signers?.length > 3 && (
-          <button
-            onClick={() =>
-              setIsShowAllSigners({
-                [item.objectId]: !isShowAllSigners[item.objectId]
-              })
-            }
-            className="ml-2 text-xs font-medium text-blue-500 underline focus:outline-none"
-          >
-            {isShowAllSigners[item.objectId] ? "Hide" : "Show More"}
-          </button>
-        )}
-      </>
-    );
+    
+    return {
+      signers: displaySigners,
+      totalSigners: signers.length,
+      itemId: item.objectId
+    };
   };
 
   // `handleImportBtn` is trigger when user click on upload icon from contactbook
@@ -1554,6 +1510,9 @@ const ReportTable = (props) => {
                 {props.heading?.map((item, index) => (
                   <React.Fragment key={index}>
                     <th className="p-2">{t(`report-heading.${item}`)}</th>
+                    {item === "Signers" && ["In-progress documents", "Need your sign"].includes(props.ReportName) && (
+                      <th className="p-2">{t("Status")}</th>
+                    )}
                   </React.Fragment>
                 ))}
                 {props.actions?.length > 0 && (
@@ -1686,11 +1645,66 @@ const ReportTable = (props) => {
                         ["In-progress documents", "Need your sign"].includes(
                           props.ReportName
                         ) ? (
-                          <td className="px-1 py-2">
-                            {!item?.IsSignyourself && item?.Placeholders && (
-                              <>{formatStatusRow(item)}</>
-                            )}
-                          </td>
+                          <>
+                            <td className="px-1 py-2">
+                              {!item?.IsSignyourself && item?.Placeholders && (
+                                <div className="flex flex-col gap-2">
+                                  {formatStatusRow(item).signers.map((x, i) => (
+                                    <div key={i} className="py-2 font-bold text-[12px]">
+                                      {x?.Email || "-"}
+                                    </div>
+                                  ))}
+                                  {formatStatusRow(item).totalSigners > 3 && (
+                                    <button
+                                      onClick={() =>
+                                        setIsShowAllSigners({
+                                          [item.objectId]: !isShowAllSigners[item.objectId]
+                                        })
+                                      }
+                                      className="ml-2 text-xs font-medium text-blue-500 underline focus:outline-none"
+                                    >
+                                      {isShowAllSigners[item.objectId] ? "Hide" : "Show More"}
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-1 py-2">
+                              {!item?.IsSignyourself && item?.Placeholders && (
+                                <div className="flex flex-col gap-2">
+                                  {formatStatusRow(item).signers.map((x, i) => (
+                                    <div key={i} className="flex items-center">
+                                      <button
+                                        onClick={() => setIsModal({ [`${item.objectId}_${i}`]: true })}
+                                        className={`${
+                                          x.Activity === "SIGNED"
+                                            ? "op-border-primary op-text-primary"
+                                            : x.Activity === "VIEWED"
+                                              ? "border-green-400 text-green-400"
+                                              : "border-black text-black"
+                                        } focus:outline-none border-2 w-[60px] h-[30px] text-[11px] rounded-full`}
+                                      >
+                                        {x?.Activity?.toUpperCase() || "-"}
+                                      </button>
+                                      {isModal[`${item.objectId}_${i}`] && (
+                                        <ModalUi
+                                          isOpen
+                                          title={t("document-logs")}
+                                          handleClose={() => setIsModal({})}
+                                        >
+                                          <div className="pl-3 first:mt-2 border-t-[1px] border-gray-600 text-[12px] py-2">
+                                            <p className="font-bold"> {x?.Email}</p>
+                                            <p>Viewed on: {x?.ViewedOn}</p>
+                                            <p>Signed on: {x?.SignedOn}</p>
+                                          </div>
+                                        </ModalUi>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                          </>
                         ) : (
                           <td className="p-2 text-center">
                             {!item?.IsSignyourself && item?.Placeholders ? (
