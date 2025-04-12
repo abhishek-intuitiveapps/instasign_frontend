@@ -613,6 +613,18 @@ function PdfRequestFiles(
   };
   //function for embed signature or image url in pdf
   async function embedWidgetsData() {
+    // Check if KYC is required but not completed
+    if (pdfDetails?.[0]?.KycRequired && kycdone !== 'true') {
+      // Only open the KYC modal and return without further processing
+      setIsKycModalOpen(true);
+      // Show alert to inform user they need to complete KYC verification first
+      setIsAlert({
+        isShow: true,
+        alertMessage: "Please complete the KYC verification before proceeding."
+      });
+      return;
+    }
+    
     //for emailVerified data checking first in localstorage
     const localuser = localStorage.getItem(
       `Parse/${localStorage.getItem("parseAppId")}/currentUser`
@@ -1989,21 +2001,12 @@ function PdfRequestFiles(
                   kycRequired={pdfDetails?.[0]?.KycRequired}
                 />
               )}
-            <Tour
-              showNumber={false}
-              showNavigation={false}
-              showNavigationNumber={false}
-              onRequestClose={handleCloseAgreeTour}
-              steps={AgreementTour}
-              isOpen={isAgreeTour}
-              rounded={5}
-              closeWithMask={false}
-            />
 
             {isKycModalOpen && pdfDetails?.[0]?.KycRequired && kycdone !== 'true' && (
               <ModalUi 
                 isOpen={isKycModalOpen} 
                 handleClose={() => {
+                  // Allow closing the modal regardless of KYC status
                   setIsKycModalOpen(false);
                 }} 
                 showClose={true}
@@ -2022,6 +2025,17 @@ function PdfRequestFiles(
                 </div>
               </ModalUi>
             )}
+
+            <Tour
+              showNumber={false}
+              showNavigation={false}
+              showNavigationNumber={false}
+              onRequestClose={handleCloseAgreeTour}
+              steps={AgreementTour}
+              isOpen={isAgreeTour}
+              rounded={5}
+              closeWithMask={false}
+            />
 
             {isUiLoading && (
               <div className="absolute h-[100vh] w-full flex flex-col justify-center items-center z-[999] bg-[#e6f2f2] bg-opacity-80">
