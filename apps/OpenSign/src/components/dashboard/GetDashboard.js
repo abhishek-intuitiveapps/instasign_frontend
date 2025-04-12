@@ -194,7 +194,6 @@ const GetDashboard = (props) => {
       
       <div className="grid grid-cols-12 w-full gap-x-4">
         {walletDetails && paymentMode === false && (
-          <div className="grid grid-cols-12 w-full gap-x-4">
             <WalletCard 
               label="Company Credits" 
               onClick={() => {
@@ -206,7 +205,6 @@ const GetDashboard = (props) => {
               id={walletDetails[0].wallet_id} // Use wallet_id from wallet details
               updatedOn={walletDetails[0].updated_at} // Use updated_at from wallet details
             />
-          </div>
         )}
         {djangoUser?.is_main_admin && (<WalletCard 
           label="Users" 
