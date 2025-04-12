@@ -4,6 +4,7 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { WalletCard } from "../../pages/WalletCard";
 import env_data from "../../env_data.json";
+import { useSelector } from "react-redux";
 const DashboardButton = lazy(() => import("./DashboardButton"));
 const DashboardCard = lazy(() => import("./DashboardCard"));
 const DashboardReport = lazy(() => import("./DashboardReport"));
@@ -29,6 +30,8 @@ const GetDashboard = (props) => {
   const djangoToken = localStorage.getItem("django");
   const [userList, setUserList] = useState([]);
   const navigate = useNavigate();
+  const paymentMode = useSelector((state) => state.payment.mode);
+  const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
 
 
   const fetchWalletDetails = async () => {
@@ -187,35 +190,35 @@ const GetDashboard = (props) => {
           ))}
         </div>
       </div> */}
-      {walletDetails && (
-        <div className="grid grid-cols-12 w-full gap-x-4">
-        <WalletCard 
-        label="Company Credits" 
-        onClick={() => {
-          navigate("/wallet");
-        }}
-        value={walletDetails[0].available_allotment} // Use available_allotment from wallet details
-        icon="fa-light fa-money-bill-wave" 
-        loading={false} 
-        id={walletDetails[0].wallet_id} // Use wallet_id from wallet details
-        updatedOn={walletDetails[0].updated_at} // Use updated_at from wallet details
-      />
-     
-        <WalletCard 
-        label="Users" 
-        onClick={() => {
-          navigate("/users");
-        }}
-        value={userList.length} // Use available_allotment from wallet details
-        icon="fa-light fa-users fa-fw" 
-        loading={false} 
-        id={0} // Use wallet_id from wallet details
-        updatedOn={0} // Use updated_at from wallet details
-      />
-      </div>
-      )}
+      
       
       <div className="grid grid-cols-12 w-full gap-x-4">
+        {walletDetails && paymentMode === false && (
+          <div className="grid grid-cols-12 w-full gap-x-4">
+            <WalletCard 
+              label="Company Credits" 
+              onClick={() => {
+                navigate("/wallet");
+              }}
+              value={walletDetails[0].available_allotment} // Use available_allotment from wallet details
+              icon="fa-light fa-money-bill-wave" 
+              loading={false} 
+              id={walletDetails[0].wallet_id} // Use wallet_id from wallet details
+              updatedOn={walletDetails[0].updated_at} // Use updated_at from wallet details
+            />
+          </div>
+        )}
+        {djangoUser?.is_main_admin && (<WalletCard 
+          label="Users" 
+          onClick={() => {
+            navigate("/users");
+          }}
+          value={userList.length} // Use available_allotment from wallet details
+          icon="fa-light fa-users fa-fw" 
+          loading={false} 
+          id={0} // Use wallet_id from wallet details
+          updatedOn={0} // Use updated_at from wallet details
+        />)}
         {props?.dashboard?.columns?.map((col, i) =>
           col.widget.data && col.widget.data.tourSection ? (
             <div key={i} className={col?.colsize}>

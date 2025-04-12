@@ -10,6 +10,9 @@ import {
   emailRegex,
 } from "../constant/const";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import env_data from "../env_data.json"
+
 function generatePassword(length) {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -35,6 +38,8 @@ const AddUser = (props) => {
   const [isFormLoader, setIsFormLoader] = useState(false);
   const [teamList, setTeamList] = useState([]);
   const role = ["OrgAdmin", "Editor", "User"];
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL || env_data.django_url;
+  const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
   useEffect(() => {
     getTeamList();
     // eslint-disable-next-line
@@ -81,6 +86,30 @@ const AddUser = (props) => {
         setTimeout(() => props.setIsAlert({ type: "success", msg: "" }), 1000);
       } else {
         try {
+          // Split the name into first and last name for the Django API
+          const nameParts = formdata.name.split(" ");
+          const firstName = nameParts[0] || "";
+          const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+          
+          // Call Django register API
+          
+          const response = await axios.post(`${djangoUrl}/base/api/v1/register/`, {
+            first_name: firstName,
+            last_name: lastName,
+            email: formdata.email,
+            phone_number: formdata.phone || "",
+            password: formdata.password,
+            country: djangoUser.country, // You might want to add this to your form
+            company_name: localUser?.Company || "",
+            user_type: formdata.role
+          }, {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+
+          console.log("Registration Process :", response.data);
+
           const extUser = new Parse.Object("contracts_Users");
           extUser.set("Name", formdata.name);
           if (formdata.phone) {
