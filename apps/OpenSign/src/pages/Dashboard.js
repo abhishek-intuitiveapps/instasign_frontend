@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { saveTourSteps } from "../redux/reducers/TourStepsReducer";
 import dashboardJson from "../json/dashboardJson";
 import Loader from "../primitives/Loader";
-import ModalUi from "../primitives/ModalUi";
+// import ModalUi from "../primitives/ModalUi";
 import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
@@ -16,8 +16,8 @@ const Dashboard = () => {
   const { id } = useParams();
   const [dashboard, setdashboard] = useState({});
   const [loading, setloading] = useState(true);
-  const [activationModal, setActivationModal] = useState(true);
-  const [otpScreen, setOtpScreen] = useState(false);
+  // const [activationModal, setActivationModal] = useState(true);
+  // const [otpScreen, setOtpScreen] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("accesstoken")) {
@@ -58,18 +58,18 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    // Handle logout functionality here
-    console.log("Logout clicked");
-  };
+  // const handleLogout = () => {
+  //   // Handle logout functionality here
+  //   console.log("Logout clicked");
+  // };
 
-  const handleActivateAccount = () => {
-    setOtpScreen(true);
-  };
+  // const handleActivateAccount = () => {
+  //   setOtpScreen(true);
+  // };
 
-  const handleResendOTP = () => {
-    console.log("Resend OTP clicked");
-  };
+  // const handleResendOTP = () => {
+  //   console.log("Resend OTP clicked");
+  // };
 
   return (
     <React.Fragment>
@@ -82,7 +82,7 @@ const Dashboard = () => {
         <GetDashboard dashboard={dashboard} />
       )}
 
-      <ModalUi
+      {/* <ModalUi
         isOpen={activationModal}
         title="Activate your account"
         handleClose={() => setActivationModal(false)}
@@ -90,7 +90,7 @@ const Dashboard = () => {
       >
         {!otpScreen ? (
           <div className="p-5">
-            <h2 className="text-lg font-medium mb-4">Welcome to InstaSign!</h2>
+            <h2 className="text-lg font-medium mb-4">Welcome to DeepHire!</h2>
             <p className="mb-8">
               To access your account, please activate your account. If you do not see an activation email in your inbox, please check your spam or junk folder.
             </p>
@@ -155,7 +155,7 @@ const Dashboard = () => {
             </div>
           </div>
         )}
-      </ModalUi>
+      </ModalUi> */}
     </React.Fragment>
   );
 };
