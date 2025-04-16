@@ -323,7 +323,7 @@ const DashboardCard = (props) => {
           : "cursor-default"
       }`}
     >
-      <div className="flex items-center justify-start gap-5 text-white">
+      <div className={`flex items-center justify-start gap-5 ${props.isHovered ? 'text-white' : 'text-black'}`}>
         <span className="rounded-full bg-base-300 bg-opacity-20 w-[60px] h-[60px] self-start flex justify-center items-center">
           <i
             className={`${
@@ -344,9 +344,8 @@ const DashboardCard = (props) => {
       <div className="text-xs absolute top-3 right-2">
         <Tooltip
           id={props.Label}
-          iconColor={"white"}
+          iconColor={props.isHovered ? "white" : "black"}
           message={t(`tour-mssg.${props.Label}`)}
-          // {props?.Data?.tourMessage}
         />
       </div>
     </div>

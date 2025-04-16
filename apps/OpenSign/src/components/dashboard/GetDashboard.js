@@ -32,7 +32,9 @@ const GetDashboard = (props) => {
   const navigate = useNavigate();
   const paymentMode = useSelector((state) => state.payment.mode);
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
-
+  const [hoveredCards, setHoveredCards] = useState({});
+  const [isAdmin, setIsAdmin] = useState(false);
+  
 
   const fetchWalletDetails = async () => {
     try {
@@ -97,14 +99,14 @@ const GetDashboard = (props) => {
       Data={{ Redirect_type: redirectType, Redirect_id: redirectId }}
     />
   );
-  const renderSwitchWithTour = (col) => {
+  const renderSwitchWithTour = (col, index) => {
     switch (col.widget.type) {
       case "Card":
         return (
           <div
-            className={`${
-              col?.widget?.bgColor ? col.widget.bgColor : "bg-[#2ed8b6]"
-            } op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md`}
+            className={`${hoveredCards[index] ? 'op-bg-primary' : 'bg-white'} op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md transition-colors duration-300`}
+            onMouseEnter={() => setHoveredCards(prev => ({...prev, [index]: true}))}
+            onMouseLeave={() => setHoveredCards(prev => ({...prev, [index]: false}))}
             data-tut={col.widget.data.tourSection}
           >
             <Suspense
@@ -120,6 +122,7 @@ const GetDashboard = (props) => {
                 Format={col.widget.format && col.widget.format}
                 Data={col.widget.data}
                 FilterData={col.widget.filter}
+                isHovered={hoveredCards[index]}
               />
             </Suspense>
           </div>
@@ -139,14 +142,14 @@ const GetDashboard = (props) => {
         return <></>;
     }
   };
-  const renderSwitch = (col) => {
+  const renderSwitch = (col, index) => {
     switch (col.widget.type) {
       case "Card":
         return (
           <div
-            className={`${
-              col?.widget?.bgColor ? col.widget.bgColor : "bg-[#2ed8b6]"
-            } op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md"`}
+            className={`${hoveredCards[`non-tour-${index}`] ? 'op-bg-primary' : 'bg-white'} op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md transition-colors duration-300`}
+            onMouseEnter={() => setHoveredCards(prev => ({...prev, [`non-tour-${index}`]: true}))}
+            onMouseLeave={() => setHoveredCards(prev => ({...prev, [`non-tour-${index}`]: false}))}
           >
             <Suspense fallback={<div>please wait</div>}>
               <DashboardCard
@@ -155,6 +158,7 @@ const GetDashboard = (props) => {
                 Format={col.widget.format && col.widget.format}
                 Data={col.widget.data}
                 FilterData={col.widget.filter}
+                isHovered={hoveredCards[`non-tour-${index}`]}
               />
             </Suspense>
           </div>
@@ -220,11 +224,11 @@ const GetDashboard = (props) => {
         {props?.dashboard?.columns?.map((col, i) =>
           col.widget.data && col.widget.data.tourSection ? (
             <div key={i} className={col?.colsize}>
-              {renderSwitchWithTour(col)}
+              {renderSwitchWithTour(col, i)}
             </div>
           ) : (
             <div key={i} className={col?.colsize}>
-              {renderSwitch(col)}
+              {renderSwitch(col, i)}
             </div>
           )
         )}

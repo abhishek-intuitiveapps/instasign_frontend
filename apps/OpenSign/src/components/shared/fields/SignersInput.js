@@ -148,7 +148,7 @@ const SignersInput = (props) => {
         {props.label ? props.label : t("signers")}
         {props.required && <span className="text-red-500 text-[13px]">*</span>}
         <span
-          className={`z-[${props?.helptextZindex ? props.helptextZindex : 30}] absolute ml-1 text-xs`}
+          className={`z-[${props?.helptextZindex ? props.helptextZindex : 30}] absolute ml-1 mt-1 text-xs`}
         >
           <Tooltip
             id={`${props.label ? props.label : "signers"}-tooltip`}

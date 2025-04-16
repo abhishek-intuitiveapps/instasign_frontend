@@ -1376,10 +1376,10 @@ const ReportTable = (props) => {
           </>
         )}
         <div className="flex flex-row items-center justify-between my-2 mx-3 text-[20px] md:text-[23px]">
-          <div className="font-light">
-            {t(`report-name.${props.ReportName}`)}
+          <div className="flex items-center gap-2 font-light">
+            <span>{t(`report-name.${props.ReportName}`)}</span>
             {props.report_help && (
-              <span className="text-xs md:text-[13px] font-normal ml-[4px]"> {/* Increased margin from ml-[2px] to ml-[4px] */}
+              <span className="flex items-center justify-center text-xs md:text-[13px] font-normal">
                 <Tooltip message={t(`report-help.${props.ReportName}`)} />
               </span>
             )}
@@ -1529,9 +1529,9 @@ const ReportTable = (props) => {
                     props.ReportName === "Contactbook" ? (
                       <tr className="border-y-[1px]" key={index}>
                         {props.heading.includes("Sr.No") && (
-                          <th className="p-2">{startIndex + index + 1}</th>
+                          <th className="p-2 text-center">{startIndex + index + 1}</th>
                         )}
-                        <td className="px-4 py-2 font-semibold">
+                        <td className="px-4 py-2 font-semibold text-center">
                           {item?.Name}{" "}
                         </td>
                         <td className="p-2 text-center">
@@ -1540,8 +1540,8 @@ const ReportTable = (props) => {
                         <td className="p-2 text-center">
                           {item?.Phone || "-"}
                         </td>
-                        <td className="px-3 py-2">
-                          <div className={`text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-start items-center`}> {/* Apply red background if trash icon */}
+                        <td className="px-3 py-2 text-center">
+                          <div className={`text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-center items-center`}> {/* Changed justify-start to justify-center */}
                             {props.actions?.length > 0 &&
                               props.actions.map((act, index) => (
                                 <span
@@ -1595,14 +1595,14 @@ const ReportTable = (props) => {
                         key={index}
                       >
                         {props.heading.includes("Sr.No") && (
-                          <th className="px-2 py-2">
+                          <th className="px-2 py-2 text-center">
                             {startIndex + index + 1}
                           </th>
                         )}
-                        <td className="p-2 min-w-56 max-w-56">
-                          <div className="font-semibold">{item?.Name}</div>
+                        <td className="p-2 min-w-56 max-w-56 text-left">
+                          <div className="font-semibold text-left">{item?.Name}</div>
                           {item?.ExpiryDate?.iso && (
-                            <div className="text-gray-500">
+                            <div className="text-gray-500 text-left">
                               Expires {formatDate(item?.ExpiryDate?.iso)}
                             </div>
                           )}
@@ -1616,7 +1616,7 @@ const ReportTable = (props) => {
                         )}
                         {props.heading.includes("Note") && (
                           <td className="p-2 text-center">
-                            <p className="truncate w-[100px]">
+                            <p className="truncate w-[100px] text-center mx-auto">
                               {item?.Note || "-"}
                             </p>
                           </td>
@@ -1646,11 +1646,11 @@ const ReportTable = (props) => {
                           props.ReportName
                         ) ? (
                           <>
-                            <td className="px-1 py-2">
+                            <td className="px-1 py-2 text-left">
                               {!item?.IsSignyourself && item?.Placeholders && (
-                                <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-2 items-start"> {/* Changed items-center to items-start */}
                                   {formatStatusRow(item).signers.map((x, i) => (
-                                    <div key={i} className="py-2 font-bold text-[12px]">
+                                    <div key={i} className="py-2 font-bold text-[12px] text-left">
                                       {x?.Email || "-"}
                                     </div>
                                   ))}
@@ -1669,11 +1669,11 @@ const ReportTable = (props) => {
                                 </div>
                               )}
                             </td>
-                            <td className="px-1 py-2">
+                            <td className="px-1 py-2 text-left">
                               {!item?.IsSignyourself && item?.Placeholders && (
-                                <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-2 items-center"> {/* Changed items-start to items-center */}
                                   {formatStatusRow(item).signers.map((x, i) => (
-                                    <div key={i} className="flex items-center">
+                                    <div key={i} className="flex items-center justify-center">
                                       <button
                                         onClick={() => setIsModal({ [`${item.objectId}_${i}`]: true })}
                                         className={`${
@@ -1719,8 +1719,8 @@ const ReportTable = (props) => {
                             )}
                           </td>
                         )}
-                        <td className="px-2 py-2">
-                          <div className="text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-start items-center">
+                        <td className="px-2 py-2 text-center">
+                          <div className="text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-center items-center"> {/* Changed justify-start to justify-center */}
                             {props.actions?.length > 0 &&
                               props.actions.map((act, index) =>
                                 props.ReportName === "Templates" ? (

@@ -111,6 +111,7 @@ const UserList = () => {
         organizationId: extUser.OrganizationId.objectId
       });
       const _userRes = JSON.parse(JSON.stringify(res));
+      console.log("this is user list :",_userRes);
       setUserList(_userRes);
     } catch (err) {
       console.log("Err in fetch userlist", err);

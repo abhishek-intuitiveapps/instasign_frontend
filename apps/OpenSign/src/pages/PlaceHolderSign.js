@@ -1002,17 +1002,53 @@ function PlaceHolderSign() {
       const signersName = getSigner.join(", ");
       setSignersName(signersName);
       setIsSendAlert({ mssg: "sure", alert: true });
+      return; // Exit early if there are unassigned widgets
     }
 
     if (getPrefill && isLabel) {
       setIsSendAlert({ mssg: textWidget, alert: true });
       setUnSignedWidgetId(unfilledTextWidgetId);
-    } else if (isPlaceholderExist && unassignedWidget.length === 0) {
+      return; // Exit early if there are unfilled text widgets
+    } 
+    
+    if (isPlaceholderExist && unassignedWidget.length === 0) {
       const IsSignerNotExist = filterPrefill?.filter((x) => !x.signerObjId);
       if (IsSignerNotExist && IsSignerNotExist?.length > 0) {
         setSignerExistModal(true);
         setSelectWidgetId(IsSignerNotExist[0]?.placeHolder?.[0]?.pos?.[0]?.key);
-      } else {
+        return; // Exit early if there are signers without object IDs
+      }
+      
+      // Extract signer emails and document ID for API call
+      const signerEmails = signersdata
+        .filter((signer) => signer.Role !== "prefill")
+        .map((signer) => signer.Email)
+        .join(",");
+      
+      // Make API call to the endpoint
+      try {
+        const response = await fetch("https://api.dev.instasign.ai/base/api/v1/signed/document/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("django")}`
+          },
+          body: JSON.stringify({
+            signers: signerEmails,
+            document_id: documentId
+          })
+        });
+        
+        if (!response.ok) {
+          console.error('Error response from signed document API:', await response.text());
+        }
+        
+        // Continue with the original functionality regardless of API response
+        saveDocumentDetails();
+        
+      } catch (error) {
+        console.error('Error calling signed document API:', error);
+        // Continue with original functionality even if API call fails
         saveDocumentDetails();
       }
     }

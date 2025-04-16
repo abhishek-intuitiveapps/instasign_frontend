@@ -40,6 +40,8 @@ const AddUser = (props) => {
   const role = ["OrgAdmin", "Editor", "User"];
   const djangoUrl = process.env.REACT_APP_DJANGO_URL || env_data.django_url;
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
+  const djangoToken = localStorage.getItem('django');
+
   useEffect(() => {
     getTeamList();
     // eslint-disable-next-line
@@ -101,9 +103,10 @@ const AddUser = (props) => {
             password: formdata.password,
             country: djangoUser.country, // You might want to add this to your form
             company_name: localUser?.Company || "",
-            user_type: formdata.role
+            user_type: 'user'
           }, {
             headers: {
+              Authorization: `Bearer ${djangoToken}`,
               'Content-Type': 'application/json',
             }
           });

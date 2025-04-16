@@ -2,6 +2,51 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import fs from 'node:fs';
 import fontkit from '@pdf-lib/fontkit';
 import { formatDateTime } from '../../../Utils.js';
+import axios from 'axios';
+
+// Function to get KYC details for signers
+async function getKYCDetails(docId, signerEmails) {
+  try {
+    if (!docId) {
+      console.error('Document ID is required for KYC verification');
+      return {};
+    }
+    
+    // Call the actual KYC API using axios
+    const response = await axios.post('https://api.dev.instasign.ai/base/api/v1/kycee/get/details/', {
+      document_Id: docId,
+      client_secret: "5QkILuGKURaA3ZKqemdXmT8Fogp2IMz1"
+      // Add client secret if needed
+      // clientSecret: 'your-client-secret'
+    });
+    
+    const result = response.data;
+    console.log(result);
+    
+    if (!result.status || !result.data) {
+      console.error('KYC API returned an error or invalid data');
+      return {};
+    }
+    
+    // Create a map of email to verification status
+    const kycStatuses = {};
+    
+    // Process each signer email
+    signerEmails.forEach(email => {
+      // Check if this email exists in the KYC response and has a valid status
+      if (result.data[email] && result.data[email].status === true) {
+        kycStatuses[email] = true;
+      } else {
+        kycStatuses[email] = false;
+      }
+    });
+    
+    return kycStatuses;
+  } catch (error) {
+    console.error('Error fetching KYC details:', error);
+    return {};
+  }
+}
 
 export default async function GenerateCertificate(docDetails) {
   const timezone = docDetails?.ExtUserPtr?.Timezone || '';
@@ -12,8 +57,13 @@ export default async function GenerateCertificate(docDetails) {
   const fontBytes = fs.readFileSync('./font/times.ttf'); //
   pdfDoc.registerFontkit(fontkit);
   const timesRomanFont = await pdfDoc.embedFont(fontBytes, { subset: true });
-  const pngUrl = fs.readFileSync('./logo.png').buffer;
+  const pngUrl = fs.readFileSync('./new_instasign_logo.png').buffer;
   const pngImage = await pdfDoc.embedPng(pngUrl);
+  
+  // Load the verified badge image
+  const verifiedBadgeUrl = fs.readFileSync('./verified-badge.png').buffer;
+  const verifiedBadgeImage = await pdfDoc.embedPng(verifiedBadgeUrl);
+  
   const page = pdfDoc.addPage();
   const { width, height } = page.getSize();
   const startX = 15;
@@ -28,6 +78,7 @@ export default async function GenerateCertificate(docDetails) {
   const timeText = 11;
   const textKeyColor = rgb(0.12, 0.12, 0.12);
   const textValueColor = rgb(0.3, 0.3, 0.3);
+  const verifiedColor = rgb(0.13, 0.55, 0.13); // Green color for verification
   const completedAt = docDetails?.completedAt ? new Date(docDetails?.completedAt) : new Date();
   const completedAtperTimezone = formatDateTime(completedAt, DateFormat, timezone, Is12Hr);
   const completedUTCtime = completedAtperTimezone;
@@ -218,42 +269,42 @@ export default async function GenerateCertificate(docDetails) {
     color: titleColor,
   });
   page.drawText('Name :', {
-    x: 60,
+    x: 30,
     y: 573,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
   });
   page.drawText(ownerName, {
-    x: 105,
+    x: 75,
     y: 573,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
   page.drawText('Email :', {
-    x: 60,
+    x: 30,
     y: 553,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
   });
   page.drawText(ownerEmail, {
-    x: 105,
+    x: 75,
     y: 553,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
   page.drawText('IP address :', {
-    x: 60,
+    x: 30,
     y: 533,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
   });
   page.drawText(`${OriginIp}`, {
-    x: 125,
+    x: 95,
     y: 533,
     size: text,
     font: timesRomanFont,
@@ -275,6 +326,15 @@ export default async function GenerateCertificate(docDetails) {
   let yPosition7 = 398;
   let yPosition8 = 363;
 
+  // Get KYC verification status for all signers
+  const isKycRequired = docDetails?.kycRequired === true;
+  let kycStatuses = {};
+  
+  if (isKycRequired && docDetails?.Signers?.length > 0) {
+    const signerEmails = docDetails.Signers.map(signer => signer.Email || '');
+    kycStatuses = await getKYCDetails(docDetails.objectId, signerEmails);
+  }
+
   auditTrail.slice(0, 3).forEach(async (x, i) => {
     const embedPng = x.Signature ? await pdfDoc.embedPng(x.Signature) : '';
     page.drawText(`Signer ${i + 1}`, {
@@ -284,6 +344,18 @@ export default async function GenerateCertificate(docDetails) {
       font: timesRomanFont,
       color: titleColor,
     });
+    
+    // Add verification badge image only if KYC is required and verified for this signer
+    const signerEmail = x?.Email || '';
+    if (isKycRequired && kycStatuses[signerEmail]) {
+      page.drawImage(verifiedBadgeImage, {
+        x: width - 60,
+        y: yPosition1 - 35,
+        width: 50,
+        height: 50,
+      });
+    }
+    
     page.drawText('Name :', {
       x: 30,
       y: yPosition2,
@@ -462,6 +534,18 @@ export default async function GenerateCertificate(docDetails) {
         font: timesRomanFont,
         color: titleColor,
       });
+      
+      // Add verification badge image only if KYC is required and verified for this signer
+      const signerEmail = x?.Email || '';
+      if (isKycRequired && kycStatuses[signerEmail]) {
+        currentPage.drawImage(verifiedBadgeImage, {
+          x: width - 60,
+          y: yPosition1 - 35,
+          width: 50,
+          height: 50,
+        });
+      }
+      
       currentPage.drawText('Name :', {
         x: 30,
         y: yPosition2,

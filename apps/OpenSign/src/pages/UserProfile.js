@@ -54,6 +54,7 @@ function UserProfile() {
   const [tempPaymentMode, setTempPaymentMode] = useState(paymentMode);
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
   const djangoUrl = env_data.django_url;
+  const djangoToken = localStorage.getItem("django");
 
   useEffect(() => {
     setTempPaymentMode(paymentMode);
@@ -67,7 +68,6 @@ function UserProfile() {
 
   const getDjangoUserDetails = async () => {
     try {
-      const djangoToken = localStorage.getItem("django");
       const response = await axios.get(`${djangoUrl}/base/api/v1/get/user/detail/`, {
         headers: {
           Authorization: `Bearer ${djangoToken}`
@@ -172,6 +172,20 @@ function UserProfile() {
     if (!res) {
       setIsLoader(true);
       try {
+
+        const response = await axios.post(`${djangoUrl}/base/api/v1/update/profile/`, {
+          first_name: name.split(" ")[0], // Assuming first name is the first part of the name
+          last_name: name.split(" ").slice(1).join(" "), // Assuming last name is the rest
+          phone_number: phn || ""
+        },{
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${djangoToken}`
+          }
+        });
+
+        console.log("this is the reponse of update profile api :",response.data);
+
         const userQuery = Parse.Object.extend("_User");
         const query = new Parse.Query(userQuery);
         await query.get(UserProfile.objectId).then((object) => {
