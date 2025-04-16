@@ -100,7 +100,7 @@
       "Declined": "Abgelehnt",
       "Expired": "Abgelaufen"
     },
-    "Contactbook": "Kontaktbuch",
+    "Contacts": "Kontaktbuch",
     "Settings": "Einstellungen",
     "Settings-Children": {
       "My Signature": "Meine Unterschrift",
@@ -126,7 +126,7 @@
     "Recently sent for signatures": "Kürzlich für Signaturen versendet",
     "Recent signature requests": "Kürzliche Signaturanfragen",
     "Drafts": "Entwürfe",
-    "Contactbook": "Kontaktbuch",
+    "Contacts": "Kontaktbuch",
     "Templates": "Vorlagen",
     "Teams": "Teams",
     "Users": "Benutzer"
@@ -182,7 +182,7 @@
     "Completed Documents": "Dies ist eine Liste von Dokumenten, die von allen Parteien unterzeichnet wurden.",
     "Declined Documents": "Dies ist eine Liste von Dokumenten, die von einem der Unterzeichner abgelehnt wurden.",
     "Expired Documents": "Dies ist eine Liste von Dokumenten, deren Ablaufdatum erreicht wurde.",
-    "Contactbook": "Dies ist eine Liste von Kontakten/Unterzeichnern, die Sie hinzugefügt haben. Diese erscheinen als Vorschläge, wenn Sie neue Unterzeichner hinzufügen möchten.",
+    "Contacts": "Dies ist eine Liste von Kontakten/Unterzeichnern, die Sie hinzugefügt haben. Diese erscheinen als Vorschläge, wenn Sie neue Unterzeichner hinzufügen möchten.",
     "Templates": "Dies ist eine Liste von Vorlagen, die Ihnen zur Verfügung stehen, um Dokumente zu erstellen. Sie können die Schaltfläche 'Verwenden' anklicken, um ein neues Dokument mit einer Vorlage zu erstellen, das Dokument zu ändern und Unterzeichner im nächsten Schritt hinzuzufügen."
   },
   "form-name": {

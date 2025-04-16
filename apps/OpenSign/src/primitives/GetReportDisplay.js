@@ -459,7 +459,7 @@ const ReportTable = (props) => {
       const cls = clsObj[props.ReportName] || "contracts_Document";
       const url = serverUrl + `/classes/${cls}/`;
       const body =
-        props.ReportName === "Contactbook"
+        props.ReportName === "Contacts"
           ? { IsDeleted: true }
           : { IsArchive: true };
       const res = await axios.put(url + item.objectId, body, {
@@ -1526,7 +1526,7 @@ const ReportTable = (props) => {
               {props.List?.length > 0 && (
                 <>
                   {currentList.map((item, index) =>
-                    props.ReportName === "Contactbook" ? (
+                    props.ReportName === "Contacts" ? (
                       <tr className="border-y-[1px]" key={index}>
                         {props.heading.includes("Sr.No") && (
                           <th className="p-2 text-center">{startIndex + index + 1}</th>

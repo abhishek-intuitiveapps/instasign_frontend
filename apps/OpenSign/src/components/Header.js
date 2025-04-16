@@ -164,7 +164,7 @@ const Header = ({ showSidebar, setIsMenu }) => {
               >
                 <span className="flex">
                   <i className="fa-light fa-address-book" style={{ width: "24px" }}></i>
-                  <span className="ml-2">{t("Contactbook")}</span>
+                  <span className="ml-2">{t("Contacts")}</span>
                 </span>
               </li>
               <li

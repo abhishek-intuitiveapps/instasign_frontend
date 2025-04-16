@@ -100,7 +100,7 @@
       "Declined": "Declined",
       "Expired": "Expired"
     },
-    "Contactbook": "Contactbook",
+    "Contacts": "Contacts",
     "Settings": "Settings",
     "Settings-Children": {
       "My Signature": "My signature",
@@ -126,7 +126,7 @@
     "Recently sent for signatures": "Recently sent for signatures",
     "Recent signature requests": "Recent signature requests",
     "Drafts": "Drafts",
-    "Contactbook": "Contactbook",
+    "Contacts": "Contacts",
     "Templates": "Templates",
     "Teams": "Teams",
     "Users": "Users"
@@ -182,7 +182,7 @@
     "Completed Documents": "This is a list of documents that have been signed by all parties.",
     "Declined Documents": "This is a list of documents that have been declined by one of the signers.",
     "Expired Documents": "This is a list of documents that have reached their expiration date.",
-    "Contactbook": "This is a list of contacts/signers added by you. These will appear as suggestions when you try to add signers to a new document.",
+    "Contacts": "This is a list of contacts/signers added by you. These will appear as suggestions when you try to add signers to a new document.",
     "Templates": "This is a list of templates that are available to you for creating documents. You can click the 'use' button to create a new document using a template, modify the document & add signers in the next step."
   },
   "form-name": {
