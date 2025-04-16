@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { WalletCard } from "../../pages/WalletCard";
 import env_data from "../../env_data.json";
 import { useSelector } from "react-redux";
+import Parse from "parse";
 const DashboardButton = lazy(() => import("./DashboardButton"));
 const DashboardCard = lazy(() => import("./DashboardCard"));
 const DashboardReport = lazy(() => import("./DashboardReport"));
@@ -56,7 +57,7 @@ const GetDashboard = (props) => {
 
   async function fetchUserList() {
     try {
-      setIsLoader(true);
+      // setIsLoader(true);
       const extUser =
         localStorage.getItem("Extand_Class") &&
         JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
@@ -68,13 +69,15 @@ const GetDashboard = (props) => {
             extUser?.UserRole === "contracts_OrgAdmin")
             ? true
             : false;
-        // setIsAdmin(admin);
+        setIsAdmin(admin);
       }
+      console.log("this is existing user :",extUser);
       const res = await Parse.Cloud.run("getuserlistbyorg", {
         organizationId: extUser.OrganizationId.objectId
       });
       const _userRes = JSON.parse(JSON.stringify(res));
       setUserList(_userRes);
+      console.log("this is userList :",_userRes)
     } catch (err) {
       console.log("Err in fetch userlist", err);
       // setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
@@ -90,7 +93,7 @@ const GetDashboard = (props) => {
     fetchUserList();
   }, []);
 
-  console.log("this is user list", userList);
+  // console.log("this is user list", userList);
 
   const Button = ({ label, redirectId, redirectType, icon }) => (
     <DashboardButton
