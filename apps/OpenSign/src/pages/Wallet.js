@@ -197,6 +197,7 @@ const Wallet = () => {
             <thead className="bg-gray-200 sticky top-0">
               <tr className="text-gray-700">
                 <th className="p-3 text-center border">S.No</th>
+                <th className="p-3 text-center border">Invoice</th>
                 <th className="p-3 text-center border">Date</th>
                 <th className="p-3 text-center border">Amount</th>
                 <th className="p-3 text-center border">User</th>
@@ -219,6 +220,7 @@ const Wallet = () => {
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
                     <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
+                    <td className="p-3 border"><a onClick={() => window.open(item.invoice, "_blank")}>Invoice</a></td>
                     <td className="p-3 border">{item.created_at}</td>
                     <td className="p-3 border">{item.amount}</td>
                     <td className="p-3 border">{item.responsible_person}</td>
