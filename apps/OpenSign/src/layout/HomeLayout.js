@@ -14,7 +14,6 @@ import Loader from "../primitives/Loader";
 import { showHeader } from "../redux/reducers/showHeader";
 import { useTranslation } from "react-i18next";
 import { setPaymentMode } from "../redux/reducers/PaymentReducer";
-import env_data from "../env_data.json";
 
 const HomeLayout = () => {
   const { t, i18n } = useTranslation();
@@ -35,7 +34,7 @@ const HomeLayout = () => {
 
   const tenantId = localStorage.getItem("TenantId");
 
-  const djangoUrl = env_data.django_url;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   useEffect(() => {
     const language = localStorage.getItem("i18nextLng");
