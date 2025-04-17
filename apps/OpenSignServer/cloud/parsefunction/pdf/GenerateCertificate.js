@@ -722,8 +722,8 @@ async function getKYCDetails(docId, signerEmails) {
     
     // Call the actual KYC API using axios
     const response = await axios.post(`${process.env.DJANGO_SERVER_URL}/base/api/v1/kycee/get/details/`, {
-      document_Id: docId,
-      client_secret: process.env.kYCEE_DJANGO_CLIENT_SECRET
+      document_id: docId,
+      client_secret: process.env.KYCEE_DJANGO_CLIENT_SECRET
     });
     
     const result = response.data;
@@ -1048,29 +1048,23 @@ export default async function GenerateCertificate(docDetails) {
   let yPosition8 = 363;
 
   // Get KYC verification status for all signers
-  const isKycRequired = docDetails?.kycRequired === true;
+  const isKycRequired = docDetails?.KycRequired === true;
   console.log("this is docDetails :", docDetails);
   let kycData = {};
   
   if (isKycRequired && docDetails?.Signers?.length > 0) {
     const signerEmails = docDetails.Signers.map(signer => signer.Email || '');
     kycData = await getKYCDetails(docDetails.objectId, signerEmails);
+    console.log("KYC Data Retrieved:", kycData); // Log KYC data
   }
 
   auditTrail.slice(0, 3).forEach(async (x, i) => {
     const embedPng = x.Signature ? await pdfDoc.embedPng(x.Signature) : '';
-    page.drawText(`Signer ${i + 1}`, {
-      x: 30,
-      y: yPosition1,
-      size: subtitle,
-      font: timesRomanFont,
-      color: titleColor,
-    });
-    
-    // Add verification badge and KYC info if available
     const signerEmail = x?.Email || '';
     const isVerified = isKycRequired && kycData[signerEmail]?.verified;
-    
+
+    console.log(`Signer ${i + 1} - Email: ${signerEmail}, Verified: ${isVerified}`); // Log verification status
+
     if (isVerified) {
       // Draw verification badge
       page.drawImage(verifiedBadgeImage, {
@@ -1091,6 +1085,8 @@ export default async function GenerateCertificate(docDetails) {
       
       // If there's a verification image in base64, convert and embed it
       const verificationImage = kycData[signerEmail]?.verificationImage;
+      console.log(`Verification Image for ${signerEmail}:`, verificationImage); // Log verification image
+
       if (verificationImage) {
         try {
           const imageBuffer = base64ToBuffer(verificationImage);
@@ -1312,6 +1308,8 @@ export default async function GenerateCertificate(docDetails) {
         
         // If there's a verification image in base64, convert and embed it
         const verificationImage = kycData[signerEmail]?.verificationImage;
+        console.log(`Verification Image for ${signerEmail}:`, verificationImage); // Log verification image
+
         if (verificationImage) {
           try {
             const imageBuffer = base64ToBuffer(verificationImage);
