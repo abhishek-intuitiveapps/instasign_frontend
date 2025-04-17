@@ -68,12 +68,16 @@ import AgreementSign from "../components/pdf/AgreementSign";
 import WidgetComponent from "../components/pdf/WidgetComponent";
 import PlaceholderCopy from "../components/pdf/PlaceholderCopy";
 import TextFontSetting from "../components/pdf/TextFontSetting";
+import env_data from "../env_data.json";
 
 function PdfRequestFiles(
 ) {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  const kycdone = searchParams.get('kycdone');
+  // Remove this line
+  // const kycdone = searchParams.get('kycdone');
+  // Add a new state variable for KYC status
+  const [kycStatus, setKycStatus] = useState(false);
   const [pdfDetails, setPdfDetails] = useState([]);
   const [signedSigners, setSignedSigners] = useState([]);
   const [unsignedSigners, setUnSignedSigners] = useState([]);
@@ -166,6 +170,9 @@ function PdfRequestFiles(
     signId: ""
   });
   const [showSignPagenumber, setShowSignPagenumber] = useState([]);
+
+  const djangoUrl = env_data.djangoUrl;
+  const djangoToken = localStorage.getItem("django");   
   
   // Add useEffect to log document details
   useEffect(() => {
@@ -613,6 +620,18 @@ function PdfRequestFiles(
   };
   //function for embed signature or image url in pdf
   async function embedWidgetsData() {
+    // Check if KYC is required but not completed
+    if (pdfDetails?.[0]?.KycRequired && kycStatus !== true) {
+      // Only open the KYC modal and return without further processing
+      setIsKycModalOpen(true);
+      // Show alert to inform user they need to complete KYC verification first
+      setIsAlert({
+        isShow: true,
+        alertMessage: "Please complete the KYC verification before proceeding."
+      });
+      return;
+    }
+    
     //for emailVerified data checking first in localstorage
     const localuser = localStorage.getItem(
       `Parse/${localStorage.getItem("parseAppId")}/currentUser`
@@ -1928,8 +1947,8 @@ function PdfRequestFiles(
         verification_type: "instant",
         unique_client_id: documentId,
         client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET,
-        redirect_url: `${currentUrl}?kycdone=true`,
-        fallback_url: `${currentUrl}?kycdone=true`,
+        redirect_url: `${currentUrl}`,
+        fallback_url: `${currentUrl}`,
         verification_application: "instasign",
         verification_product: "uuid",
         type: "prod"
@@ -1939,8 +1958,18 @@ function PdfRequestFiles(
       
       if (response.data && response.data.data && response.data.data.token) {
         window.open(`https://sandbox.kycee.in/?token=${response.data.data.token}&first_name=${firstName}&last_name=${lastName}&email=${currentSignerDetails.Email}&phone_number=${currentSignerDetails.Phone || ''}&kyc_required=true&kyc_done=true`, '_blank');
-        // You might want to add a function to check verification status
-        // startKyceeVerificationCheck();
+        
+        // Add polling mechanism to check KYC status periodically
+        const checkInterval = setInterval(async () => {
+          const kycDone = await checkKycStatus(documentId, currentSignerDetails.Email);
+          if (kycDone) {
+            setIsKycModalOpen(false);
+            clearInterval(checkInterval);
+          }
+        }, 5000); // Check every 5 seconds
+        
+        // Clear interval after 5 minutes (to prevent endless polling)
+        setTimeout(() => clearInterval(checkInterval), 300000);
       }
     } catch (error) {
       console.error("Error during Kycee verification:", error);
@@ -1954,13 +1983,53 @@ function PdfRequestFiles(
   useEffect(() => {
     const currentUrl = window.location.href;
     console.log('Current URL:', currentUrl);
-    console.log('kycdone value:', kycdone);
+    console.log('KYC status:', kycStatus);
     
-    if (kycdone === 'true') {
-      console.log('Closing KYC modal');
+    if (kycStatus === true) {
+      console.log('Closing KYC modal due to verified KYC status');
       setIsKycModalOpen(false);
     }
-  }, [kycdone]);
+  }, [kycStatus]);
+  
+  // Add effect to check KYC status when a document loads and signer is identified
+  useEffect(() => {
+    if (documentId && unsignedSigners.length > 0 && pdfDetails?.[0]?.KycRequired) {
+      const currentSignerDetails = unsignedSigners.find(
+        signer => signer.objectId === signerObjectId || signer.Id === uniqueId
+      );
+      
+      if (currentSignerDetails?.Email) {
+        console.log("Checking KYC status for signer:", currentSignerDetails.Email);
+        checkKycStatus(documentId, currentSignerDetails.Email);
+      }
+    }
+  }, [documentId, unsignedSigners, signerObjectId, uniqueId, pdfDetails]);
+
+  // Add new function to check KYC status via API
+  const checkKycStatus = async (docId, signerEmail) => {
+    try {
+      if (!docId || !signerEmail) {
+        console.error("Document ID or signer email is missing for KYC check");
+        return false;
+      }
+      
+      const response = await axios.post(`${djangoUrl}/base/api/v1/kycee/get/details/`, 
+        {
+          document_id: docId,
+           client_secret: "5QkILuGKURaA3ZKqemdXmT8Fogp2IMz1"
+        }
+      );
+      
+      console.log("KYC status response:", response.data);
+      const kycDone = response.data.data.status === true;
+      setKycStatus(kycDone);
+      return kycDone;
+    } catch (error) {
+      console.error("Error checking KYC status:", error);
+      setKycStatus(false);
+      return false;
+    }
+  };
 
   return (
     <><DndProvider backend={HTML5Backend}>
@@ -1989,21 +2058,12 @@ function PdfRequestFiles(
                   kycRequired={pdfDetails?.[0]?.KycRequired}
                 />
               )}
-            <Tour
-              showNumber={false}
-              showNavigation={false}
-              showNavigationNumber={false}
-              onRequestClose={handleCloseAgreeTour}
-              steps={AgreementTour}
-              isOpen={isAgreeTour}
-              rounded={5}
-              closeWithMask={false}
-            />
 
-            {isKycModalOpen && pdfDetails?.[0]?.KycRequired && kycdone !== 'true' && (
+            {isKycModalOpen && pdfDetails?.[0]?.KycRequired && kycStatus !== true && (
               <ModalUi 
                 isOpen={isKycModalOpen} 
                 handleClose={() => {
+                  // Allow closing the modal regardless of KYC status
                   setIsKycModalOpen(false);
                 }} 
                 showClose={true}
@@ -2022,6 +2082,17 @@ function PdfRequestFiles(
                 </div>
               </ModalUi>
             )}
+
+            <Tour
+              showNumber={false}
+              showNavigation={false}
+              showNavigationNumber={false}
+              onRequestClose={handleCloseAgreeTour}
+              steps={AgreementTour}
+              isOpen={isAgreeTour}
+              rounded={5}
+              closeWithMask={false}
+            />
 
             {isUiLoading && (
               <div className="absolute h-[100vh] w-full flex flex-col justify-center items-center z-[999] bg-[#e6f2f2] bg-opacity-80">

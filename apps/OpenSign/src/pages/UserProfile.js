@@ -54,6 +54,7 @@ function UserProfile() {
   const [tempPaymentMode, setTempPaymentMode] = useState(paymentMode);
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
   const djangoUrl = env_data.django_url;
+  const djangoToken = localStorage.getItem("django");
 
   useEffect(() => {
     setTempPaymentMode(paymentMode);
@@ -67,7 +68,6 @@ function UserProfile() {
 
   const getDjangoUserDetails = async () => {
     try {
-      const djangoToken = localStorage.getItem("django");
       const response = await axios.get(`${djangoUrl}/base/api/v1/get/user/detail/`, {
         headers: {
           Authorization: `Bearer ${djangoToken}`
@@ -172,6 +172,20 @@ function UserProfile() {
     if (!res) {
       setIsLoader(true);
       try {
+
+        const response = await axios.post(`${djangoUrl}/base/api/v1/update/profile/`, {
+          first_name: name.split(" ")[0], // Assuming first name is the first part of the name
+          last_name: name.split(" ").slice(1).join(" "), // Assuming last name is the rest
+          phone_number: phn || ""
+        },{
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${djangoToken}`
+          }
+        });
+
+        console.log("this is the reponse of update profile api :",response.data);
+
         const userQuery = Parse.Object.extend("_User");
         const query = new Parse.Query(userQuery);
         await query.get(UserProfile.objectId).then((object) => {
@@ -584,28 +598,28 @@ function UserProfile() {
                   <span>{getCountryName(djangoUser.country)}</span>
                 </li>
                 {djangoUser?.is_main_admin && (
-                  <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
-                    <span className="font-semibold">Payment Mode:</span>
-                    <div className="flex items-center">
-                      <span className="mr-2">{"Prepaid"}</span>
-                      <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
-                          checked={tempPaymentMode}
-                          onChange={() => {
-                            const newPostpaidStatus = !tempPaymentMode;
-                            setTempPaymentMode(newPostpaidStatus);
-                            console.log("Payment mode changed to:", newPostpaidStatus);
-                          }}
-                          disabled={!editmode}
-                        />
-                        <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
-                      </label>
-                      <span className="ml-2">Postpaid</span>
-                    </div>
-                  </li>
-                )}
+                   <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
+                     <span className="font-semibold">Payment Mode:</span>
+                     <div className="flex items-center">
+                       <span className="mr-2">{"Prepaid"}</span>
+                       <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                         <input
+                           type="checkbox"
+                           className="sr-only peer"
+                           checked={tempPaymentMode}
+                           onChange={() => {
+                             const newPostpaidStatus = !tempPaymentMode;
+                             setTempPaymentMode(newPostpaidStatus);
+                             console.log("Payment mode changed to:", newPostpaidStatus);
+                           }}
+                           disabled={!editmode}
+                         />
+                         <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
+                       </label>
+                       <span className="ml-2">Postpaid</span>
+                     </div>
+                   </li>
+                 )}
               </ul>
             </div>
             <div className="flex justify-center gap-4 pt-4">

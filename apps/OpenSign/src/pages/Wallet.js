@@ -156,7 +156,7 @@ const Wallet = () => {
       <Title title="Wallet" drive={false} /> {/* Set the page title using Title component */}
       
       {/* New Card */}
-      {isLoading ? ( // Conditional rendering based on loading state
+      {/* {isLoading ? ( // Conditional rendering based on loading state
         <div className="flex justify-center items-center" style={{ height: '100%' }}>
           <Loader /> 
         </div>
@@ -171,11 +171,11 @@ const Wallet = () => {
             updatedOn={walletDetails[0].updated_at} // Use updated_at from wallet details
           />
         )
-      )}
+      )} */}
       
     </div>
       {/* <h2 className="text-2xl font-bold text-gray-800 mb-4">Billing - Credits</h2> */}
-      <div className="bg-white mt-3 px-5 py-3.5 rounded-md shadow-md overflow-x-auto" style={{ maxHeight: '80vh' }}>
+      <div className="bg-white p-5 rounded-md shadow-md overflow-hidden" style={{ height: '82vh', maxWidth: '100%' }}>
         <div className="flex justify-between mb-2">
           <h2 className="text-2xl font-bold text-gray-800 ">Credits History</h2>
           <button 
@@ -185,11 +185,19 @@ const Wallet = () => {
             Add Credits
           </button>
         </div>
-        <div className="table-container" style={{ height: 'calc(65vh - 80px)', overflowY: 'auto' }}>
-          <table className="min-w-full border border-gray-300" style={{ borderCollapse: 'collapse', height: isLoading || paginatedData.length === 0 ? '100%' : 'auto' }}>
+        <div className="table-container" style={{ height: 'calc(65vh - 80px)', overflowY: 'auto', overflowX: 'hidden' }}>
+          <table 
+            className="min-w-full border border-gray-300" 
+            style={{
+              borderCollapse: 'collapse', 
+              height: isLoading || paginatedData.length === 0 ? '100%' : 'auto',
+              width: '100%'
+            }}
+          >
             <thead className="bg-gray-200 sticky top-0">
               <tr className="text-gray-700">
                 <th className="p-3 text-center border">S.No</th>
+                <th className="p-3 text-center border">Invoice</th>
                 <th className="p-3 text-center border">Date</th>
                 <th className="p-3 text-center border">Amount</th>
                 <th className="p-3 text-center border">User</th>
@@ -203,19 +211,22 @@ const Wallet = () => {
               {isLoading ? ( // Show loader while loading
                 <tr>
                   <td colSpan="8" className="p-3 text-center" style={{ height: '400px' }}>
-                    <Loader />
+                    <div className="flex justify-center items-center" style={{ height: '100%' }}>
+                      <Loader />
+                    </div>
                   </td>
                 </tr>
               ) : paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
-                    <td className="p-3 text-center border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
-                    <td className="p-3 text-center border">{item.created_at}</td>
-                    <td className="p-3 text-center border">{item.amount}</td>
-                    <td className="p-3 text-center border">{item.responsible_person}</td>
-                    <td className="p-3 text-center border">{item.unit_price}</td>
-                    <td className="p-3 text-center border">{item.utr}</td>
-                    <td className="p-3 text-center border">{item.order_wallet}</td>
+                    <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
+                    <td className="p-3 border"><a onClick={() => window.open(item.invoice, "_blank")}>Invoice</a></td>
+                    <td className="p-3 border">{item.created_at}</td>
+                    <td className="p-3 border">{item.amount}</td>
+                    <td className="p-3 border">{item.responsible_person}</td>
+                    <td className="p-3 border">{item.unit_price}</td>
+                    <td className="p-3 border">{item.utr}</td>
+                    <td className="p-3 border">{item.order_wallet}</td>
                     <td className="p-3 border">
                       <span 
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center ${

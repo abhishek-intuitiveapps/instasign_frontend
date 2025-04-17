@@ -4,6 +4,10 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { WalletCard } from "../../pages/WalletCard";
 import env_data from "../../env_data.json";
+<<<<<<< HEAD
+=======
+import { useSelector } from "react-redux";
+>>>>>>> a8ffdb3c51bd09c15c82e209aee1050720637594
 const DashboardButton = lazy(() => import("./DashboardButton"));
 const DashboardCard = lazy(() => import("./DashboardCard"));
 const DashboardReport = lazy(() => import("./DashboardReport"));
@@ -27,6 +31,7 @@ const GetDashboard = (props) => {
   const [walletDetails, setWalletDetails] = useState(null);
   const djangoUrl = env_data.django_url;
   const djangoToken = localStorage.getItem("django");
+<<<<<<< HEAD
   // const [userList, setUserList] = useState([]);
   const navigate = useNavigate();
  
@@ -41,6 +46,16 @@ const GetDashboard = (props) => {
   }, []);
  
  
+=======
+  const [userList, setUserList] = useState([]);
+  const navigate = useNavigate();
+  const paymentMode = useSelector((state) => state.payment.mode);
+  const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
+  const [hoveredCards, setHoveredCards] = useState({});
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+
+>>>>>>> a8ffdb3c51bd09c15c82e209aee1050720637594
   const fetchWalletDetails = async () => {
     try {
       const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
@@ -58,44 +73,45 @@ const GetDashboard = (props) => {
       console.error("Error fetching wallet details:", error);
     }
   };
- 
-  // async function fetchUserList() {
-  //   try {
-  //     setIsLoader(true);
-  //     const extUser =
-  //       localStorage.getItem("Extand_Class") &&
-  //       JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
- 
-  //     if (extUser) {
-  //       const admin =
-  //         extUser?.UserRole &&
-  //         (extUser?.UserRole === "contracts_Admin" ||
-  //           extUser?.UserRole === "contracts_OrgAdmin")
-  //           ? true
-  //           : false;
-  //       // setIsAdmin(admin);
-  //     }
-  //     const res = await Parse.Cloud.run("getuserlistbyorg", {
-  //       organizationId: extUser.OrganizationId.objectId
-  //     });
-  //     const _userRes = JSON.parse(JSON.stringify(res));
-  //     setUserList(_userRes);
-  //   } catch (err) {
-  //     console.log("Err in fetch userlist", err);
-  //     // setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
-  //   } finally {
-  //     setTimeout(() => setIsAlert({ type: "success", msg: "" }), 1500);
-  //     // setIsLoader(false);
-  //   }
-  // }
- 
-  // useEffect(() => {
-  //   fetchWalletDetails();
-  //   fetchUserList();
-  // }, []);
- 
-  // console.log("this is user list", userList);
- 
+
+  async function fetchUserList() {
+    try {
+      setIsLoader(true);
+      const extUser =
+        localStorage.getItem("Extand_Class") &&
+        JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
+
+      if (extUser) {
+        const admin =
+          extUser?.UserRole &&
+          (extUser?.UserRole === "contracts_Admin" ||
+            extUser?.UserRole === "contracts_OrgAdmin")
+            ? true
+            : false;
+        // setIsAdmin(admin);
+      }
+      const res = await Parse.Cloud.run("getuserlistbyorg", {
+        organizationId: extUser.OrganizationId.objectId
+      });
+      const _userRes = JSON.parse(JSON.stringify(res));
+      setUserList(_userRes);
+    } catch (err) {
+      console.log("Err in fetch userlist", err);
+      // setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
+    }
+    //  finally {
+    //   setTimeout(() => setIsAlert({ type: "success", msg: "" }), 1500);
+    //   setIsLoader(false);
+    // }
+  }
+
+  useEffect(() => {
+    fetchWalletDetails();
+    fetchUserList();
+  }, []);
+
+  console.log("this is user list", userList);
+
   const Button = ({ label, redirectId, redirectType, icon }) => (
     <DashboardButton
       Icon={icon}
@@ -103,14 +119,14 @@ const GetDashboard = (props) => {
       Data={{ Redirect_type: redirectType, Redirect_id: redirectId }}
     />
   );
-  const renderSwitchWithTour = (col) => {
+  const renderSwitchWithTour = (col, index) => {
     switch (col.widget.type) {
       case "Card":
         return (
           <div
-            className={`${
-              col?.widget?.bgColor ? col.widget.bgColor : "bg-[#2ed8b6]"
-            } op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md`}
+            className={`${hoveredCards[index] ? 'op-bg-primary' : 'bg-white'} op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md transition-colors duration-300`}
+            onMouseEnter={() => setHoveredCards(prev => ({...prev, [index]: true}))}
+            onMouseLeave={() => setHoveredCards(prev => ({...prev, [index]: false}))}
             data-tut={col.widget.data.tourSection}
           >
             <Suspense
@@ -126,6 +142,7 @@ const GetDashboard = (props) => {
                 Format={col.widget.format && col.widget.format}
                 Data={col.widget.data}
                 FilterData={col.widget.filter}
+                isHovered={hoveredCards[index]}
               />
             </Suspense>
           </div>
@@ -145,14 +162,14 @@ const GetDashboard = (props) => {
         return <></>;
     }
   };
-  const renderSwitch = (col) => {
+  const renderSwitch = (col, index) => {
     switch (col.widget.type) {
       case "Card":
         return (
           <div
-            className={`${
-              col?.widget?.bgColor ? col.widget.bgColor : "bg-[#2ed8b6]"
-            } op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md"`}
+            className={`${hoveredCards[`non-tour-${index}`] ? 'op-bg-primary' : 'bg-white'} op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md transition-colors duration-300`}
+            onMouseEnter={() => setHoveredCards(prev => ({...prev, [`non-tour-${index}`]: true}))}
+            onMouseLeave={() => setHoveredCards(prev => ({...prev, [`non-tour-${index}`]: false}))}
           >
             <Suspense fallback={<div>please wait</div>}>
               <DashboardCard
@@ -161,6 +178,7 @@ const GetDashboard = (props) => {
                 Format={col.widget.format && col.widget.format}
                 Data={col.widget.data}
                 FilterData={col.widget.filter}
+                isHovered={hoveredCards[`non-tour-${index}`]}
               />
             </Suspense>
           </div>
@@ -196,6 +214,7 @@ const GetDashboard = (props) => {
           ))}
         </div>
       </div> */}
+<<<<<<< HEAD
       {walletDetails && (
         <div className="flex space-between gap-x-4 mb-2">
         <WalletCard
@@ -224,15 +243,43 @@ const GetDashboard = (props) => {
       </div>
       )}
      
+=======
+      
+      
+>>>>>>> a8ffdb3c51bd09c15c82e209aee1050720637594
       <div className="grid grid-cols-12 w-full gap-x-4">
+        {walletDetails && paymentMode === false && (
+            <WalletCard 
+              label="Company Credits" 
+              onClick={() => {
+                navigate("/wallet");
+              }}
+              value={walletDetails[0].available_allotment} // Use available_allotment from wallet details
+              icon="fa-light fa-money-bill-wave" 
+              loading={false} 
+              id={walletDetails[0].wallet_id} // Use wallet_id from wallet details
+              updatedOn={walletDetails[0].updated_at} // Use updated_at from wallet details
+            />
+        )}
+        {djangoUser?.is_main_admin && (<WalletCard 
+          label="Users" 
+          onClick={() => {
+            navigate("/users");
+          }}
+          value={userList.length} // Use available_allotment from wallet details
+          icon="fa-light fa-users fa-fw" 
+          loading={false} 
+          id={0} // Use wallet_id from wallet details
+          updatedOn={0} // Use updated_at from wallet details
+        />)}
         {props?.dashboard?.columns?.map((col, i) =>
           col.widget.data && col.widget.data.tourSection ? (
             <div key={i} className={col?.colsize}>
-              {renderSwitchWithTour(col)}
+              {renderSwitchWithTour(col, i)}
             </div>
           ) : (
             <div key={i} className={col?.colsize}>
-              {renderSwitch(col)}
+              {renderSwitch(col, i)}
             </div>
           )
         )}

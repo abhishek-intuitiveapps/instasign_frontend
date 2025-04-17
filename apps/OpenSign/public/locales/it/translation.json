@@ -100,7 +100,7 @@
       "Declined": "Rifiutati",
       "Expired": "Scaduti"
     },
-    "Contactbook": "Rubrica",
+    "Contacts": "Rubrica",
     "Settings": "Impostazioni",
     "Settings-Children": {
       "My Signature": "La mia firma",
@@ -126,7 +126,7 @@
     "Recently sent for signatures": "Inviati recentemente per firme",
     "Recent signature requests": "Richieste di firma recenti",
     "Drafts": "Bozze",
-    "Contactbook": "Rubrica",
+    "Contacts": "Rubrica",
     "Templates": "Modelli",
     "Teams": "Team",
     "Users": "Utenti"
@@ -182,7 +182,7 @@
     "Completed Documents": "Questa è una lista di documenti firmati da tutte le parti.",
     "Declined Documents": "Questa è una lista di documenti rifiutati da uno dei firmatari.",
     "Expired Documents": "Questa è una lista di documenti che hanno raggiunto la data di scadenza.",
-    "Contactbook": "Questa è una lista di contatti/firmatari aggiunti da te. Appariranno come suggerimenti quando provi ad aggiungere firmatari a un nuovo documento.",
+    "Contacts": "Questa è una lista di contatti/firmatari aggiunti da te. Appariranno come suggerimenti quando provi ad aggiungere firmatari a un nuovo documento.",
     "Templates": "Questa è una lista di modelli disponibili per creare documenti. Puoi fare clic sul pulsante 'Usa' per creare un nuovo documento utilizzando un modello, modificare il documento e aggiungere firmatari nel passaggio successivo."
   },
   "form-name": {

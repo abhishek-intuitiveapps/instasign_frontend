@@ -103,6 +103,138 @@ const Header = ({ showSidebar, setIsMenu }) => {
             />
           </div>
         </div>
+        {/* <div id="profile-menu" className="flex-none gap-2 flex items-center">
+          
+          <FullScreenButton />
+          {width >= 768 && (
+            <div
+              onClick={toggleDropdown}
+              className="cursor-pointer w-[35px] h-[35px] rounded-full ring-[1px] ring-offset-2 ring-gray-400 overflow-hidden"
+            >
+              <img
+                className="w-full h-full object-cover"
+                src={image}
+                alt="img"
+              />
+            </div>
+          )}
+          {width >= 768 && (
+            <div
+              onClick={toggleDropdown}
+              className="cursor-pointer text-base-content text-sm"
+            >
+              {username && username.split(" ")[0]}
+            </div>
+          )}
+          <div className="op-dropdown op-dropdown-end" id="profile-menu">
+            <div
+              tabIndex={0}
+              role="button"
+              onClick={toggleDropdown}
+              className="op-btn op-btn-ghost op-btn-xs w-[10px] h-[20px] hover:bg-transparent"
+            >
+              <i
+                tabIndex={0}
+                role="button"
+                className="fa-light fa-angle-down text-base-content"
+              ></i>
+            </div>
+            <ul
+              tabIndex={0}
+              className={`mt-3 z-[1] p-2 shadow op-menu op-menu-sm op-dropdown-content text-base-content bg-base-100 rounded-box w-52 ${
+                isOpen ? "" : "hidden"
+              }`}
+            >
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate("/profile");
+                }}
+                className="flex"
+              >
+                <span className="flex">
+                  <i className="fa-light fa-user" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("profile")}</span>
+                </span>
+              </li>
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate("/report/contacts");
+                }}
+                className="flex"
+              >
+                <span className="flex">
+                  <i className="fa-light fa-address-book" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("Contacts")}</span>
+                </span>
+              </li>
+              <li
+                onClick={() => {
+                  setIsOpenSettings(!isOpenSettings);
+                }}
+                className="flex justify-between"
+              >
+                <span className="flex">
+                  <i className="fa-light fa-cog" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("Settings")}</span>
+                  <i
+                  className="fa-light fa-angle-down ml-12 text-base-content cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpenSettings(!isOpenSettings);
+                  }}
+                />
+                </span>
+                
+              </li>
+              {isOpenSettings && (
+                <>
+                  <li className="ml-4 flex" onClick={() => navigate("/managesign")}>
+                    <span className="flex">
+                      <i className="fa-light fa-signature" style={{ width: "24px" }}></i>
+                      <span className="ml-2">{t("My Signature")}</span>
+                    </span>
+                  </li>
+                  {userRole === "contracts_Admin" || userRole === "contracts_OrgAdmin" ? (
+                    <>
+                      <li className="ml-4 flex" onClick={() => navigate("/preferences")}>
+                        <span className="flex">
+                          <i className="fa-light fa-sliders-h" style={{ width: "24px" }}></i>
+                          <span className="ml-2">{t("Preferences")}</span>
+                        </span>
+                      </li>
+                      <li className="ml-4 flex" onClick={() => navigate("/users")}>
+                        <span className="flex">
+                          <i className="fa-light fa-users" style={{ width: "24px" }}></i>
+                          <span className="ml-2">{t("Users")}</span>
+                        </span>
+                      </li>
+                    </>
+                  ) : null}
+                </>
+              )}
+              <li
+                onClick={() => {
+                  setIsOpen(false);
+                  navigate("/changepassword");
+                }}
+                className="flex"
+              >
+                <span className="flex">
+                  <i className="fa-light fa-lock" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("change-password")}</span>
+                </span>
+              </li>
+              <li onClick={closeDropdown} className="flex">
+                <span className="flex">
+                  <i className="fa-light fa-arrow-right-from-bracket" style={{ width: "24px" }}></i>
+                  <span className="ml-2">{t("log-out")}</span>
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div> */}
 
         <div className="flex-none gap-2 flex items-center" id="profile-menu">
           {width >= 768 && (

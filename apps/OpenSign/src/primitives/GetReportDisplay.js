@@ -459,7 +459,7 @@ const ReportTable = (props) => {
       const cls = clsObj[props.ReportName] || "contracts_Document";
       const url = serverUrl + `/classes/${cls}/`;
       const body =
-        props.ReportName === "Contactbook"
+        props.ReportName === "Contacts"
           ? { IsDeleted: true }
           : { IsArchive: true };
       const res = await axios.put(url + item.objectId, body, {
@@ -1051,56 +1051,12 @@ const ReportTable = (props) => {
     const displaySigners = isShowAllSigners[item.objectId]
       ? signers
       : signers.slice(0, 3);
-    return (
-      <>
-        {displaySigners?.map((x, i) => (
-          <div
-            key={i}
-            className="text-sm font-medium flex flex-row gap-2 items-center"
-          >
-            <button
-              onClick={() => setIsModal({ [`${item.objectId}_${i}`]: true })}
-              className={`${
-                x.Activity === "SIGNED"
-                  ? "op-border-primary op-text-primary"
-                  : x.Activity === "VIEWED"
-                    ? "border-green-400 text-green-400"
-                    : "border-black text-black"
-              } focus:outline-none border-2 w-[60px] h-[30px] text-[11px] rounded-full`}
-            >
-              {x?.Activity?.toUpperCase() || "-"}
-            </button>
-            <div className="py-2 font-bold text-[12px]">{x?.Email || "-"}</div>
-            {isModal[`${item.objectId}_${i}`] && (
-              <ModalUi
-                isOpen
-                title={t("document-logs")}
-                handleClose={() => setIsModal({})}
-              >
-                <div className="pl-3 first:mt-2 border-t-[1px] border-gray-600 text-[12px] py-2">
-                  <p className="font-bold"> {x?.Email}</p>
-                  <p>Viewed on: {x?.ViewedOn}</p>
-                  <p>Signed on: {x?.SignedOn}</p>
-                </div>
-              </ModalUi>
-            )}
-          </div>
-        ))}
-        {/* Show More / Hide button */}
-        {signers?.length > 3 && (
-          <button
-            onClick={() =>
-              setIsShowAllSigners({
-                [item.objectId]: !isShowAllSigners[item.objectId]
-              })
-            }
-            className="ml-2 text-xs font-medium text-blue-500 underline focus:outline-none"
-          >
-            {isShowAllSigners[item.objectId] ? "Hide" : "Show More"}
-          </button>
-        )}
-      </>
-    );
+    
+    return {
+      signers: displaySigners,
+      totalSigners: signers.length,
+      itemId: item.objectId
+    };
   };
 
   // `handleImportBtn` is trigger when user click on upload icon from contactbook
@@ -1420,10 +1376,10 @@ const ReportTable = (props) => {
           </>
         )}
         <div className="flex flex-row items-center justify-between my-2 mx-3 text-[20px] md:text-[23px]">
-          <div className="font-light">
-            {t(`report-name.${props.ReportName}`)}
+          <div className="flex items-center gap-2 font-light">
+            <span>{t(`report-name.${props.ReportName}`)}</span>
             {props.report_help && (
-              <span className="text-xs md:text-[13px] font-normal ml-[4px]"> {/* Increased margin from ml-[2px] to ml-[4px] */}
+              <span className="flex items-center justify-center text-xs md:text-[13px] font-normal">
                 <Tooltip message={t(`report-help.${props.ReportName}`)} />
               </span>
             )}
@@ -1554,6 +1510,9 @@ const ReportTable = (props) => {
                 {props.heading?.map((item, index) => (
                   <React.Fragment key={index}>
                     <th className="p-2">{t(`report-heading.${item}`)}</th>
+                    {item === "Signers" && ["In-progress documents", "Need your sign"].includes(props.ReportName) && (
+                      <th className="p-2">{t("Status")}</th>
+                    )}
                   </React.Fragment>
                 ))}
                 {props.actions?.length > 0 && (
@@ -1567,12 +1526,12 @@ const ReportTable = (props) => {
               {props.List?.length > 0 && (
                 <>
                   {currentList.map((item, index) =>
-                    props.ReportName === "Contactbook" ? (
+                    props.ReportName === "Contacts" ? (
                       <tr className="border-y-[1px]" key={index}>
                         {props.heading.includes("Sr.No") && (
-                          <th className="p-2">{startIndex + index + 1}</th>
+                          <th className="p-2 text-center">{startIndex + index + 1}</th>
                         )}
-                        <td className="px-4 py-2 font-semibold">
+                        <td className="px-4 py-2 font-semibold text-center">
                           {item?.Name}{" "}
                         </td>
                         <td className="p-2 text-center">
@@ -1581,8 +1540,8 @@ const ReportTable = (props) => {
                         <td className="p-2 text-center">
                           {item?.Phone || "-"}
                         </td>
-                        <td className="px-3 py-2">
-                          <div className={`text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-start items-center`}> {/* Apply red background if trash icon */}
+                        <td className="px-3 py-2 text-center">
+                          <div className={`text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-center items-center`}> {/* Changed justify-start to justify-center */}
                             {props.actions?.length > 0 &&
                               props.actions.map((act, index) => (
                                 <span
@@ -1636,14 +1595,14 @@ const ReportTable = (props) => {
                         key={index}
                       >
                         {props.heading.includes("Sr.No") && (
-                          <th className="px-2 py-2">
+                          <th className="px-2 py-2 text-center">
                             {startIndex + index + 1}
                           </th>
                         )}
-                        <td className="p-2 min-w-56 max-w-56">
-                          <div className="font-semibold">{item?.Name}</div>
+                        <td className="p-2 min-w-56 max-w-56 text-left">
+                          <div className="font-semibold text-left">{item?.Name}</div>
                           {item?.ExpiryDate?.iso && (
-                            <div className="text-gray-500">
+                            <div className="text-gray-500 text-left">
                               Expires {formatDate(item?.ExpiryDate?.iso)}
                             </div>
                           )}
@@ -1657,7 +1616,7 @@ const ReportTable = (props) => {
                         )}
                         {props.heading.includes("Note") && (
                           <td className="p-2 text-center">
-                            <p className="truncate w-[100px]">
+                            <p className="truncate w-[100px] text-center mx-auto">
                               {item?.Note || "-"}
                             </p>
                           </td>
@@ -1686,11 +1645,66 @@ const ReportTable = (props) => {
                         ["In-progress documents", "Need your sign"].includes(
                           props.ReportName
                         ) ? (
-                          <td className="px-1 py-2">
-                            {!item?.IsSignyourself && item?.Placeholders && (
-                              <>{formatStatusRow(item)}</>
-                            )}
-                          </td>
+                          <>
+                            <td className="px-1 py-2 text-left">
+                              {!item?.IsSignyourself && item?.Placeholders && (
+                                <div className="flex flex-col gap-2 items-start"> {/* Changed items-center to items-start */}
+                                  {formatStatusRow(item).signers.map((x, i) => (
+                                    <div key={i} className="py-2 font-bold text-[12px] text-left">
+                                      {x?.Email || "-"}
+                                    </div>
+                                  ))}
+                                  {formatStatusRow(item).totalSigners > 3 && (
+                                    <button
+                                      onClick={() =>
+                                        setIsShowAllSigners({
+                                          [item.objectId]: !isShowAllSigners[item.objectId]
+                                        })
+                                      }
+                                      className="ml-2 text-xs font-medium text-blue-500 underline focus:outline-none"
+                                    >
+                                      {isShowAllSigners[item.objectId] ? "Hide" : "Show More"}
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-1 py-2 text-left">
+                              {!item?.IsSignyourself && item?.Placeholders && (
+                                <div className="flex flex-col gap-2 items-center"> {/* Changed items-start to items-center */}
+                                  {formatStatusRow(item).signers.map((x, i) => (
+                                    <div key={i} className="flex items-center justify-center">
+                                      <button
+                                        onClick={() => setIsModal({ [`${item.objectId}_${i}`]: true })}
+                                        className={`${
+                                          x.Activity === "SIGNED"
+                                            ? "op-border-primary op-text-primary"
+                                            : x.Activity === "VIEWED"
+                                              ? "border-green-400 text-green-400"
+                                              : "border-black text-black"
+                                        } focus:outline-none border-2 w-[60px] h-[30px] text-[11px] rounded-full`}
+                                      >
+                                        {x?.Activity?.toUpperCase() || "-"}
+                                      </button>
+                                      {isModal[`${item.objectId}_${i}`] && (
+                                        <ModalUi
+                                          isOpen
+                                          title={t("document-logs")}
+                                          handleClose={() => setIsModal({})}
+                                        >
+                                          <div className="pl-3 first:mt-2 border-t-[1px] border-gray-600 text-[12px] py-2">
+                                            <p className="font-bold"> {x?.Email}</p>
+                                            <p>Viewed on: {x?.ViewedOn}</p>
+                                            <p>Signed on: {x?.SignedOn}</p>
+                                          </div>
+                                        </ModalUi>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                          </>
                         ) : (
                           <td className="p-2 text-center">
                             {!item?.IsSignyourself && item?.Placeholders ? (
@@ -1705,8 +1719,8 @@ const ReportTable = (props) => {
                             )}
                           </td>
                         )}
-                        <td className="px-2 py-2">
-                          <div className="text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-start items-center">
+                        <td className="px-2 py-2 text-center">
+                          <div className="text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-center items-center"> {/* Changed justify-start to justify-center */}
                             {props.actions?.length > 0 &&
                               props.actions.map((act, index) =>
                                 props.ReportName === "Templates" ? (

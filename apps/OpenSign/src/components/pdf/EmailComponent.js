@@ -52,8 +52,24 @@ function EmailComponent({
     }
     for (let i = 0; i < emailList.length; i++) {
       try {
-        const imgPng =
-          "https://qikinnovation.ams3.digitaloceanspaces.com/logo.png";
+        const imgPng = `<svg viewBox="0 0 280 70" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .insta {
+      font-family: Arial, sans-serif; 
+      font-weight: bold; 
+      font-size: 45px;
+      fill: #0084ff;
+    }
+    .sign {
+      font-family: Arial, sans-serif; 
+      font-weight: bold; 
+      font-size: 45px;
+      fill: #002864;
+    }
+  </style>
+  <text x="10" y="50" class="insta">Insta</text>
+  <text x="112" y="50" class="sign">sign</text>
+</svg>`;
 
         let url = `${localStorage.getItem("baseUrl")}functions/sendmailv3`;
         const headers = {
@@ -61,7 +77,7 @@ function EmailComponent({
           "X-Parse-Application-Id": localStorage.getItem("parseAppId"),
           sessionToken: localStorage.getItem("accesstoken")
         };
-        const openSignUrl = "https://www.opensignlabs.com/contact";
+        const openSignUrl = "https://instasign.ai/contact";
         const themeBGcolor = themeColor;
         let params = {
           extUserId: extUserId,

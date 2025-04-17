@@ -49,6 +49,12 @@ const HomeLayout = () => {
   const getDjangoUserDetails = async () => {
     try {
       const djangoToken = localStorage.getItem("django");
+      if (!djangoToken) {
+        console.log("No Django token found, logging out.");
+        handleLoginBtn();
+        return;
+      }
+
       const response = await axios.get(`${djangoUrl}/base/api/v1/get/user/detail/`, {
         headers: {
           Authorization: `Bearer ${djangoToken}`
@@ -62,10 +68,13 @@ const HomeLayout = () => {
       } else if (userData.payment_mode === 'post_paid') {
         dispatch(setPaymentMode(true)); // Set to true for Postpaid
       }
-      // dispatch(setPaymentMode(userData.payment_mode))
       console.log("User data fetched successfully:", userData);
     } catch (error) {
       console.log("Error fetching user details:", error.message);
+      if (error.response && error.response.status === 401) {
+        console.log("Django token expired, logging out.");
+        handleLoginBtn();
+      }
     }
   }
 

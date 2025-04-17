@@ -161,15 +161,15 @@ const BillingPage = () => {
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
                     <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
-                    <td className="p-3 border">{item.date}</td>
+                    <td className="p-3 border">{item.transaction_date}</td>
                     <td className="p-3 border">{item.amount}</td>
-                    <td className="p-3 border">{item.transactionId}</td>
+                    <td className="p-3 border">{item.transaction_id}</td>
                     <td className="p-3 border">
                       <span 
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center ${
                           item.status.toLowerCase() === "pending" ? "bg-blue-100 text-blue-800" : 
                           item.status.toLowerCase() === "failed" ? "bg-red-100 text-red-800" : 
-                          item.status.toLowerCase() === "approved" ? "bg-green-100 text-green-800" : 
+                          item.status.toLowerCase() === "success" ? "bg-green-100 text-green-800" : 
                           "bg-gray-100 text-gray-800"
                         }`}
                       >

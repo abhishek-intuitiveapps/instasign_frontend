@@ -1,30 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 
 
 export const WalletCard = ({ label, value, icon, loading, id, updatedOn, onClick }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    
     return (
-      <div onClick={onClick} className={`cursor-pointer bg-white p-4 rounded-xl shadow-md w-1/2`}>
-        <div className="flex items-center justify-between text-black">
-          <div className="font-medium">
-            <div className="text-base lg:text-lg">
-              {label}
-            </div>
-            <div className="text-3xl font-bold">
-              {loading ? <div className="loader-01"></div> : value}
-            </div>
-          </div>
-          <div className="flex flex-col items-end">
-            <span className="rounded-full bg-base-300 bg-opacity-20 w-[60px] h-[60px] flex justify-center items-center">
-              <i className={`${icon} text-[25px] lg:text-[30px]`}></i>
-            </span>
-            <div className="text-xs font-semibold text-gray-600">
-              Walled ID: {id}
-            </div>
-            <div className="text-xs font-semibold text-gray-600">
-              Updated on: {updatedOn}
+      // <div  className={`cursor-pointer bg-white p-4 rounded-xl shadow-md w-1/2`}>
+        <div onClick={onClick} className="col-span-12 md:col-span-6 lg:col-span-6">
+          <div 
+            className={`${isHovered ? 'op-bg-primary' : 'bg-white'} op-card w-full h-[140px] px-3 pt-4 mb-3 shadow-md transition-colors duration-300`} 
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            data-tut="tourcard1"
+          >
+            <div className="cursor-pointer">
+              <div className={`flex items-center justify-start gap-5 ${isHovered ? 'text-white' : 'text-black'}`}>
+                <span className="rounded-full bg-base-300 bg-opacity-20 w-[60px] h-[60px] self-start flex justify-center items-center">
+                  <i className={`${icon} text-[25px] lg:text-[30px]`}></i>
+                </span>
+                <div className="font-medium">
+                  <div className="text-base lg:text-lg">{label}</div>
+                  <div className="text-2xl font-light">{value}</div>
+                </div>
+              </div>
+              <div className="text-xs absolute top-3 right-2">
+                <a data-tooltip-id="Need your Signature" data-tooltip-content="Clicking on this card will take you to the list of users present in your organization." className="z-50">
+                  <sup>
+                    <i className="fa-light fa-question rounded-full border-[1px] py-[1.5px] px-[4px] text-[13px]" 
+                       style={{ 
+                         borderColor: isHovered ? 'white' : 'black', 
+                         color: isHovered ? 'white' : 'black' 
+                       }}></i>
+                  </sup>
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      // </div>
     );
   };

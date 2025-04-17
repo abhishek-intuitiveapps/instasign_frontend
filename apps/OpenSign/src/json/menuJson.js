@@ -17,7 +17,7 @@ export const subSetting = [
   },
   {
     icon: "fa-light fa-address-book",
-    title: "Contactbook",
+    title: "Contacts",
     target: "_self",
     pageType: "report",
     description: "",

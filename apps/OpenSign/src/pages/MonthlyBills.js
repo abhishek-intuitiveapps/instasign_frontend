@@ -409,9 +409,10 @@ const MonthlyBills = () => {
                 <th className="p-3 text-center border">S.No</th>
                 <th className="p-3 text-center border">Attachment</th>
                 <th className="p-3 text-center border">Month</th>
-                <th className="p-3 text-center border">Amount</th>
-                <th className="p-3 text-center border">Raised On</th>
-                <th className="p-3 text-center border">Status</th>
+                <th className="p-3 text-center border">Total Documents</th>
+                <th className="p-3 text-center border">Subtotal Amount</th>
+                <th className="p-3 text-center border">Billing Amount</th>
+                {/* <th className="p-3 text-center border">Status</th> */}
               </tr>
             </thead>
             <tbody>
@@ -430,17 +431,16 @@ const MonthlyBills = () => {
                     <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
                     <td className="p-2 border">
                       <a href={item.pdf_attachment_url} target="_blank" rel="noopener noreferrer">
-                        <button 
-                          className="op-btn op-btn-primary text-sm text-white w-40 h-8"
-                        >
-                          Download
+                        <button className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors">
+                          <i className="fa-light fa-file-pdf text-[#002864] text-xl"></i>
                         </button>
                       </a>
                     </td>
                     <td className="p-3 border">{item.month}</td>
-                    <td className="p-3 border">{item.amount}</td>
-                    <td className="p-3 border">{item.raised_on}</td>
-                    <td className="p-3 border">
+                    <td className="p-3 border">{item.total_documents}</td>
+                    <td className="p-3 border">{item.subtotal_amount}</td>
+                    <td className="p-3 border">{item.billing_amount}</td>
+                    {/* <td className="p-3 border">
                       <span 
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center ${
                           item.status.toLowerCase() === "pending" ? "bg-blue-100 text-blue-800" : 
@@ -451,7 +451,7 @@ const MonthlyBills = () => {
                       >
                         {item.status}
                       </span>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               ) : (

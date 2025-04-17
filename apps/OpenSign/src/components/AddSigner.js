@@ -274,7 +274,13 @@ const AddSigner = (props) => {
               type="text"
               id="phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Check if the value is a positive integer
+                if (/^\d*$/.test(value)) {
+                  setPhone(value);
+                }
+              }}
               disabled={addYourself}
               required
               onInvalid={(e) => e.target.setCustomValidity(t("input-required"))}

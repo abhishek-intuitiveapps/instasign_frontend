@@ -3,16 +3,34 @@ import Parse from "parse";
 import { Navigate } from "react-router";
 import Title from "../components/Title";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import env_data from "../env_data.json";
 
 function ChangePassword() {
   const { t } = useTranslation();
   const [currentpassword, setCurrentPassword] = useState("");
   const [newpassword, setnewpassword] = useState("");
   const [confirmpassword, setconfirmpassword] = useState("");
+  const djangoToken = localStorage.getItem('django');
+  const djangoUrl = env_data.django_url;
+  
   const handleSubmit = async (evt) => {
     evt.preventDefault();
     try {
       if (newpassword === confirmpassword) {
+
+        const response = await axios.post(`${djangoUrl}/base/api/v1/change/password/`, {
+          "old_password": currentpassword,
+            "new_password": newpassword
+        }, {
+          headers: {
+            Authorization: `Bearer ${djangoToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log("this is the result of change password api :",response.data);
+
         Parse.User.logIn(localStorage.getItem("userEmail"), currentpassword)
           .then(async (user) => {
             if (user) {

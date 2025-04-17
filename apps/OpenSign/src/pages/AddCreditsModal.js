@@ -83,7 +83,11 @@ const AddCreditsModal = ({ show, handleClose }) => {
       alert(response.data.message);
       handleClose();
       setUtrNumber("");
+<<<<<<< HEAD
       window.location.reload(); // Reload the page to reflect changes
+=======
+      window.location.reload();
+>>>>>>> a8ffdb3c51bd09c15c82e209aee1050720637594
     } catch (error) {
       console.error("Error calling API:", error);
       alert("Failed to record payment");
@@ -201,14 +205,13 @@ const AddCreditsModal = ({ show, handleClose }) => {
               placeholder="Enter UTR Number"
               value={utrNumber}
               onChange={(e) => {
-                let value = e.target.value;
-
-                // Remove special characters: only allow letters and numbers
-                value = value.replace(/[^a-zA-Z0-9]/g, "");
-
-                // Limit to 22 characters
-                value = value.slice(0, 22);
-
+                 let value = e.target.value;
+ 
+                 // Remove special characters: only allow letters and numbers
+                 value = value.replace(/[^a-zA-Z0-9]/g, "");
+ 
+                 // Limit to 22 characters
+                 value = value.slice(0, 22);
                 setUtrNumber(value);
               }}
               className="w-60 p-2 border border-gray-300 rounded mb-2"

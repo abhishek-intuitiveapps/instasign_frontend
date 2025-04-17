@@ -1,4 +1,4 @@
-import logo from "../assets/images/logo.png";
+import logo from "../assets/images/new_instasign_logo.svg";
 import fev_icon from "../assets/images/fev_icon.png"
 
 export function serverUrl_fn() {

@@ -1783,7 +1783,7 @@ export const multiSignEmbed = async (widgets, pdfDoc, signyourself, scale) => {
   } else {
     return {
       error:
-        "This pdf is not compatible with opensign please contact <support@opensignlabs.com>"
+        "This pdf is not compatible with InstaSign please contact <support@instasign.ai>"
     };
   }
 };
