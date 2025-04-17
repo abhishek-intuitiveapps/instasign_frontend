@@ -83,11 +83,7 @@ const AddCreditsModal = ({ show, handleClose }) => {
       alert(response.data.message);
       handleClose();
       setUtrNumber("");
-<<<<<<< HEAD
-      window.location.reload(); // Reload the page to reflect changes
-=======
       window.location.reload();
->>>>>>> a8ffdb3c51bd09c15c82e209aee1050720637594
     } catch (error) {
       console.error("Error calling API:", error);
       alert("Failed to record payment");
