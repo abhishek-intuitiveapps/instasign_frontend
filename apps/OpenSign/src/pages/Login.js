@@ -23,7 +23,7 @@ import {
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 // import SelectLanguage from "../components/pdf/SelectLanguage";
-
+// import env_data from "../env_data.json";
 
 
 function Login() {
@@ -32,6 +32,7 @@ function Login() {
   const location = useLocation();
   const dispatch = useDispatch();
   const { width } = useWindowSize();
+  const djangoURL = process.env.REACT_APP_DJANGO_URL
   const [state, setState] = useState({
     email: "",
     alertType: "success",
@@ -100,7 +101,7 @@ function Login() {
       if (email && password) {
         try {
           // Send Axios request to get access and refresh tokens
-          const response = await axios.post(`${env_data.django_url}/base/api/token/`, {
+          const response = await axios.post(`${djangoURL}/base/api/token/`, {
             email: state.email,
             password: state.password
           });
