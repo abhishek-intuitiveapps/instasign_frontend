@@ -1,8 +1,49 @@
+
+
 // import { PDFDocument, rgb } from 'pdf-lib';
 // import fs from 'node:fs';
 // import fontkit from '@pdf-lib/fontkit';
 // import { formatDateTime } from '../../../Utils.js';
 // import axios from 'axios';
+
+// // Function to convert base64 to binary buffer
+// // function base64ToBuffer(base64String) {
+// //   try {
+// //     // Check if the string contains a data URL prefix
+// //     const base64Data = base64String.includes('base64,') 
+// //       ? base64String.split('base64,')[1] 
+// //       : base64String;
+
+// //     // Convert base64 to binary buffer
+// //     return Buffer.from(base64Data, 'base64');
+// //   } catch (error) {
+// //     console.error('Error converting base64 to buffer:', error);
+// //     return null;
+// //   }
+// // }
+
+// function base64ToBuffer(base64Input) {
+//   try {
+//     // Check if the input is empty
+//     if (!base64Input.trim()) {
+//       console.error('Please enter a Base64 string');
+//       return '';
+//     }
+    
+//     // Handle different base64 formats (with or without data URI prefix)
+//     let base64String = base64Input.trim();
+//     if (!base64String.startsWith('data:image')) {
+//       // If it doesn't have the data prefix, add it
+//       base64String = `data:image/png;base64,${base64String.replace(/^data:image\/png;base64,/, '')}`;
+//     }
+    
+//     return base64String; // Return the complete data URL
+//   } catch (err) {
+//     console.error('Invalid Base64 string:', err);
+//     return '';
+//   }
+// }
+
 
 // // Function to get KYC details for signers
 // async function getKYCDetails(docId, signerEmails) {
@@ -14,34 +55,47 @@
     
 //     // Call the actual KYC API using axios
 //     const response = await axios.post(`${process.env.DJANGO_SERVER_URL}/base/api/v1/kycee/get/details/`, {
-//       document_Id: docId,
-//       client_secret: process.env.kYCEE_DJANGO_CLIENT_SECRET
-//       // Add client secret if needed
-//       // clientSecret: 'your-client-secret'
+//       document_id: docId,
+//       client_secret: process.env.KYCEE_DJANGO_CLIENT_SECRET
 //     });
     
 //     const result = response.data;
 //     console.log(result);
     
-//     if (!result.status || !result.data) {
-//       console.error('KYC API returned an error or invalid data');
+//     if (!result.status) {
+//       console.error('KYC API returned an error');
 //       return {};
 //     }
     
-//     // Create a map of email to verification status
-//     const kycStatuses = {};
+//     // Create a map of email to verification status and details
+//     const kycData = {};
     
-//     // Process each signer email
+//     // Process response data according to the new format
+//     if (result.data && Array.isArray(result.data)) {
+//       result.data.forEach(entry => {
+//         const email = entry.signer_email;
+//         if (email && entry.status === true) {
+//           kycData[email] = {
+//             verified: true,
+//             details: entry.kycee_data || {},
+//             verificationImage: entry.kycee_data?.verification_image || null
+//           };
+//         }
+//       });
+//     }
+    
+//     // Ensure all requested emails have an entry
 //     signerEmails.forEach(email => {
-//       // Check if this email exists in the KYC response and has a valid status
-//       if (result.data[email] && result.data[email].status === true) {
-//         kycStatuses[email] = true;
-//       } else {
-//         kycStatuses[email] = false;
+//       if (!kycData[email]) {
+//         kycData[email] = {
+//           verified: false,
+//           details: {},
+//           verificationImage: null
+//         };
 //       }
 //     });
     
-//     return kycStatuses;
+//     return kycData;
 //   } catch (error) {
 //     console.error('Error fetching KYC details:', error);
 //     return {};
@@ -327,33 +381,65 @@
 //   let yPosition8 = 363;
 
 //   // Get KYC verification status for all signers
-//   const isKycRequired = docDetails?.kycRequired === true;
-//   let kycStatuses = {};
+//   const isKycRequired = docDetails?.KycRequired === true;
+//   console.log("this is docDetails :", docDetails);
+//   let kycData = {};
   
 //   if (isKycRequired && docDetails?.Signers?.length > 0) {
 //     const signerEmails = docDetails.Signers.map(signer => signer.Email || '');
-//     kycStatuses = await getKYCDetails(docDetails.objectId, signerEmails);
+//     kycData = await getKYCDetails(docDetails.objectId, signerEmails);
+//     console.log("KYC Data Retrieved:", kycData); // Log KYC data
 //   }
 
 //   auditTrail.slice(0, 3).forEach(async (x, i) => {
 //     const embedPng = x.Signature ? await pdfDoc.embedPng(x.Signature) : '';
-//     page.drawText(`Signer ${i + 1}`, {
-//       x: 30,
-//       y: yPosition1,
-//       size: subtitle,
-//       font: timesRomanFont,
-//       color: titleColor,
-//     });
-    
-//     // Add verification badge image only if KYC is required and verified for this signer
 //     const signerEmail = x?.Email || '';
-//     if (isKycRequired && kycStatuses[signerEmail]) {
+//     const isVerified = isKycRequired && kycData[signerEmail]?.verified;
+
+//     console.log(`Signer ${i + 1} - Email: ${signerEmail}, Verified: ${isVerified}`); // Log verification status
+
+//     if (isVerified) {
+//       // Draw verification badge
 //       page.drawImage(verifiedBadgeImage, {
 //         x: width - 60,
 //         y: yPosition1 - 35,
-//         width: 50,
-//         height: 50,
+//         width: 40,
+//         height: 40,
 //       });
+      
+//       // Add KYC Verified text
+//       page.drawText('KYC Verified', {
+//         x: width - 140,
+//         y: yPosition1 - 15,
+//         size: 12,
+//         font: timesRomanFont,
+//         color: verifiedColor,
+//       });
+      
+//       // If there's a verification image in base64, convert and embed it
+//       const verificationImage = kycData[signerEmail]?.verificationImage;
+//       console.log(`Verification Image for ${signerEmail}:`, verificationImage); // Log verification image
+
+//       if (verificationImage) {
+//         try {
+//           const imageBuffer = base64ToBuffer(verificationImage);
+//           if (imageBuffer) {
+//             const embeddedImage = await pdfDoc.embedPng(imageBuffer);
+//             console.log('Embedded Image:', embeddedImage); // Log the embedded image
+//             // Add verification image if available (small thumbnail)
+//             page.drawImage(embeddedImage, {
+//               x: width - 100,
+//               y: yPosition1 - 35,
+//               width: 30,
+//               height: 30,
+//             });
+//           } else {
+//             console.error('Image buffer is null or undefined');
+//           }
+//         } catch (error) {
+//           console.error('Error embedding verification image:', error);
+//         }
+//       }
 //     }
     
 //     page.drawText('Name :', {
@@ -521,7 +607,6 @@
 //         yPosition3 = yPosition2 - 20;
 //         yPosition4 = yPosition3 - 20;
 //         yPosition5 = yPosition4 - 20;
-//         yPosition5 = yPosition4 - 20;
 //         yPosition6 = yPosition5 - 20;
 //         yPosition7 = yPosition6 - 20;
 //         yPosition8 = currentPage.getHeight() - 190;
@@ -535,15 +620,53 @@
 //         color: titleColor,
 //       });
       
-//       // Add verification badge image only if KYC is required and verified for this signer
+//       // Add verification badge and KYC info if available for additional pages
 //       const signerEmail = x?.Email || '';
-//       if (isKycRequired && kycStatuses[signerEmail]) {
+//       const isVerified = isKycRequired && kycData[signerEmail]?.verified;
+      
+//       if (isVerified) {
+//         // Draw verification badge
 //         currentPage.drawImage(verifiedBadgeImage, {
 //           x: width - 60,
 //           y: yPosition1 - 35,
-//           width: 50,
-//           height: 50,
+//           width: 40,
+//           height: 40,
 //         });
+        
+//         // Add KYC Verified text
+//         currentPage.drawText('KYC Verified', {
+//           x: width - 140,
+//           y: yPosition1 - 15,
+//           size: 12,
+//           font: timesRomanFont,
+//           color: verifiedColor,
+//         });
+        
+//         // If there's a verification image in base64, convert and embed it
+//         const verificationImage = kycData[signerEmail]?.verificationImage;
+//         console.log(`Verification Image for ${signerEmail}:`, verificationImage); // Log verification image
+
+//         if (verificationImage) {
+//           try {
+//             console.log('Verification Image:', verificationImage); // Log the Base64 string
+//             const imageBuffer = base64ToBuffer(verificationImage);
+//             if (imageBuffer) {
+//               const embeddedImage = await pdfDoc.embedPng(imageBuffer);
+//               console.log('Embedded Image:', embeddedImage); // Log the embedded image
+//               // Add verification image if available (small thumbnail)
+//               currentPage.drawImage(embeddedImage, {
+//                 x: width - 100,
+//                 y: yPosition1 - 35,
+//                 width: 30,
+//                 height: 30,
+//               });
+//             } else {
+//               console.error('Image buffer is null or undefined');
+//             }
+//           } catch (error) {
+//             console.error('Error embedding verification image:', error);
+//           }
+//         }
 //       }
       
 //       currentPage.drawText('Name :', {
@@ -689,25 +812,27 @@
 //   return pdfBytes;
 // }
 
-
 import { PDFDocument, rgb } from 'pdf-lib';
 import fs from 'node:fs';
 import fontkit from '@pdf-lib/fontkit';
 import { formatDateTime } from '../../../Utils.js';
 import axios from 'axios';
 
-// Function to convert base64 to binary buffer
-function base64ToBuffer(base64String) {
+function base64ToBuffer(base64Input) {
   try {
-    // Remove data URL prefix if present (e.g., "data:image/jpeg;base64,")
-    const base64Data = base64String.includes('base64,') 
-      ? base64String.split('base64,')[1] 
-      : base64String;
-      
-    // Convert base64 to binary buffer
-    return Buffer.from(base64Data, 'base64');
-  } catch (error) {
-    console.error('Error converting base64 to buffer:', error);
+    // Check if the input is empty
+    if (!base64Input || !base64Input.trim()) {
+      console.error('Please enter a Base64 string');
+      return null;
+    }
+
+    // Remove data URL prefix if present (e.g., 'data:image/png;base64,')
+    const base64String = base64Input.replace(/^data:image\/[a-z]+;base64,/, '');
+
+    // Convert base64 string to binary buffer
+    return Buffer.from(base64String, 'base64');
+  } catch (err) {
+    console.error('Invalid Base64 string:', err);
     return null;
   }
 }
@@ -775,7 +900,7 @@ export default async function GenerateCertificate(docDetails) {
   const DateFormat = docDetails?.ExtUserPtr?.DateFormat || 'MM/DD/YYYY';
   const pdfDoc = await PDFDocument.create();
   // `fontBytes` is used to embed custom font in pdf
-  const fontBytes = fs.readFileSync('./font/times.ttf'); //
+  const fontBytes = fs.readFileSync('./font/times.ttf');
   pdfDoc.registerFontkit(fontkit);
   const timesRomanFont = await pdfDoc.embedFont(fontBytes, { subset: true });
   const pngUrl = fs.readFileSync('./new_instasign_logo.png').buffer;
@@ -790,8 +915,8 @@ export default async function GenerateCertificate(docDetails) {
   const startX = 15;
   const startY = 15;
   const borderColor = rgb(0.12, 0.12, 0.12);
-  const titleColor = rgb(0, 0.2, 0.4); //rgb(0, 0.53, 0.71);
-  const titleUnderline = rgb(0, 0.2, 0.4); // rgb(0.12, 0.12, 0.12);
+  const titleColor = rgb(0, 0.2, 0.4);
+  const titleUnderline = rgb(0, 0.2, 0.4);
   const title = 25;
   const subtitle = 16;
   const text = 13;
@@ -859,7 +984,7 @@ export default async function GenerateCertificate(docDetails) {
   });
 
   page.drawText(generatedOn, {
-    x: Math.max(startX, maxX), // Adjusts dynamically 320
+    x: Math.max(startX, maxX),
     y: 810,
     size: 12,
     font: timesRomanFont,
@@ -1055,15 +1180,16 @@ export default async function GenerateCertificate(docDetails) {
   if (isKycRequired && docDetails?.Signers?.length > 0) {
     const signerEmails = docDetails.Signers.map(signer => signer.Email || '');
     kycData = await getKYCDetails(docDetails.objectId, signerEmails);
-    console.log("KYC Data Retrieved:", kycData); // Log KYC data
+    console.log("KYC Data Retrieved:", kycData);
   }
 
-  auditTrail.slice(0, 3).forEach(async (x, i) => {
+  // Process first 3 signers
+  for (const [i, x] of auditTrail.slice(0, 3).entries()) {
     const embedPng = x.Signature ? await pdfDoc.embedPng(x.Signature) : '';
     const signerEmail = x?.Email || '';
     const isVerified = isKycRequired && kycData[signerEmail]?.verified;
 
-    console.log(`Signer ${i + 1} - Email: ${signerEmail}, Verified: ${isVerified}`); // Log verification status
+    console.log(`Signer ${i + 1} - Email: ${signerEmail}, Verified: ${isVerified}`);
 
     if (isVerified) {
       // Draw verification badge
@@ -1085,23 +1211,31 @@ export default async function GenerateCertificate(docDetails) {
       
       // If there's a verification image in base64, convert and embed it
       const verificationImage = kycData[signerEmail]?.verificationImage;
-      console.log(`Verification Image for ${signerEmail}:`, verificationImage); // Log verification image
+      console.log(`Verification Image for ${signerEmail}:`, verificationImage?.slice(0, 50));
 
       if (verificationImage) {
         try {
           const imageBuffer = base64ToBuffer(verificationImage);
+          console.log(`Image Buffer Length for ${signerEmail}:`, imageBuffer?.length);
           if (imageBuffer) {
-            const embeddedImage = await pdfDoc.embedPng(imageBuffer);
-            // Add verification image if available (small thumbnail)
+            let embeddedImage;
+            if (verificationImage.includes('data:image/jpeg;base64,')) {
+              embeddedImage = await pdfDoc.embedJpg(imageBuffer);
+            } else {
+              embeddedImage = await pdfDoc.embedPng(imageBuffer);
+            }
+            console.log('Embedded Image:', embeddedImage);
             page.drawImage(embeddedImage, {
               x: width - 100,
               y: yPosition1 - 35,
               width: 30,
               height: 30,
             });
+          } else {
+            console.error(`No valid image buffer for ${signerEmail}`);
           }
         } catch (error) {
-          console.error('Error embedding verification image:', error);
+          console.error(`Error embedding verification image for ${signerEmail}:`, error);
         }
       }
     }
@@ -1242,12 +1376,12 @@ export default async function GenerateCertificate(docDetails) {
     yPosition6 = yPosition5 - 20;
     yPosition7 = yPosition6 - 20;
     yPosition8 = yPosition8 - 174;
-  });
+  }
 
   if (auditTrail.length > 3) {
     let currentPageIndex = 1;
     let currentPage = page;
-    auditTrail.slice(3).forEach(async (x, i) => {
+    for (const [i, x] of auditTrail.slice(3).entries()) {
       const embedPng = x.Signature ? await pdfDoc.embedPng(x.Signature) : '';
 
       // Calculate remaining space on current page
@@ -1255,7 +1389,6 @@ export default async function GenerateCertificate(docDetails) {
 
       // If there's not enough space for the next entry, create a new page
       if (remainingSpace < 90) {
-        // Adjust the value as needed
         currentPageIndex++;
         currentPage = pdfDoc.addPage();
         currentPage.drawRectangle({
@@ -1284,12 +1417,11 @@ export default async function GenerateCertificate(docDetails) {
         color: titleColor,
       });
       
-      // Add verification badge and KYC info if available for additional pages
+      // Add verification badge and KYC info if available
       const signerEmail = x?.Email || '';
       const isVerified = isKycRequired && kycData[signerEmail]?.verified;
       
       if (isVerified) {
-        // Draw verification badge
         currentPage.drawImage(verifiedBadgeImage, {
           x: width - 60,
           y: yPosition1 - 35,
@@ -1297,7 +1429,6 @@ export default async function GenerateCertificate(docDetails) {
           height: 40,
         });
         
-        // Add KYC Verified text
         currentPage.drawText('KYC Verified', {
           x: width - 140,
           y: yPosition1 - 15,
@@ -1306,25 +1437,32 @@ export default async function GenerateCertificate(docDetails) {
           color: verifiedColor,
         });
         
-        // If there's a verification image in base64, convert and embed it
         const verificationImage = kycData[signerEmail]?.verificationImage;
-        console.log(`Verification Image for ${signerEmail}:`, verificationImage); // Log verification image
+        console.log(`Verification Image for ${signerEmail}:`, verificationImage?.slice(0, 50));
 
         if (verificationImage) {
           try {
             const imageBuffer = base64ToBuffer(verificationImage);
+            console.log(`Image Buffer Length for ${signerEmail}:`, imageBuffer?.length);
             if (imageBuffer) {
-              const embeddedImage = await pdfDoc.embedPng(imageBuffer);
-              // Add verification image if available (small thumbnail)
+              let embeddedImage;
+              if (verificationImage.includes('data:image/jpeg;base64,')) {
+                embeddedImage = await pdfDoc.embedJpg(imageBuffer);
+              } else {
+                embeddedImage = await pdfDoc.embedPng(imageBuffer);
+              }
+              console.log('Embedded Image:', embeddedImage);
               currentPage.drawImage(embeddedImage, {
                 x: width - 100,
                 y: yPosition1 - 35,
                 width: 30,
                 height: 30,
               });
+            } else {
+              console.error(`No valid image buffer for ${signerEmail}`);
             }
           } catch (error) {
-            console.error('Error embedding verification image:', error);
+            console.error(`Error embedding verification image for ${signerEmail}:`, error);
           }
         }
       }
@@ -1465,7 +1603,7 @@ export default async function GenerateCertificate(docDetails) {
       yPosition6 = yPosition5 - 20;
       yPosition7 = yPosition6 - 20;
       yPosition8 = yPosition8 - 174;
-    });
+    }
   }
 
   const pdfBytes = await pdfDoc.save();
