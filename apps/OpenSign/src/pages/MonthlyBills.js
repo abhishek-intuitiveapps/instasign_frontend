@@ -371,6 +371,22 @@ const MonthlyBills = () => {
   //     "status": "Failed"
   //   }
   // ]
+
+  const downloadInvoice = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'invoice.pdf'; // You can customize the filename here
+      link.click();
+      window.URL.revokeObjectURL(link.href); // Clean up the URL object
+    } catch (error) {
+      console.error('Error downloading the invoice:', error);
+    }
+  };
   
   
 
@@ -407,7 +423,7 @@ const MonthlyBills = () => {
             <thead className="bg-gray-200 sticky top-0 z-10">
               <tr className="text-gray-700">
                 <th className="p-3 text-center border">S.No</th>
-                <th className="p-3 text-center border">Attachment</th>
+                <th className="p-3 text-center border">Invoice</th>
                 <th className="p-3 text-center border">Month</th>
                 <th className="p-3 text-center border">Total Documents</th>
                 <th className="p-3 text-center border">Subtotal Amount</th>
@@ -429,12 +445,17 @@ const MonthlyBills = () => {
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
                     <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
-                    <td className="p-2 border">
-                      <a href={item.pdf_attachment_url} target="_blank" rel="noopener noreferrer">
-                        <button className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors">
+                    <td className="p-3 border">
+                      {item.invoice ? (
+                        <button 
+                          className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors"
+                          onClick={() => downloadInvoice(item.invoice)}
+                        >
                           <i className="fa-light fa-file-pdf text-[#002864] text-xl"></i>
                         </button>
-                      </a>
+                      ) : (
+                        <span>Not yet generated</span>
+                      )}
                     </td>
                     <td className="p-3 border">{item.month}</td>
                     <td className="p-3 border">{item.total_documents}</td>

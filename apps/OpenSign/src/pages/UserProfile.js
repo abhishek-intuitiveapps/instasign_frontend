@@ -487,7 +487,7 @@ function UserProfile() {
                   }`}
                 >
                   <span className="font-semibold">{t("company")}:</span>{" "}
-                  {editmode ? (
+                  {/* {editmode ? (
                     <input
                       type="text"
                       value={company}
@@ -496,7 +496,8 @@ function UserProfile() {
                     />
                   ) : (
                     <span>{extendUser?.[0].Company}</span>
-                  )}
+                  )} */}
+                  <span>{extendUser?.[0].Company}</span>
                 </li>
                 {/* <li
                   className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${

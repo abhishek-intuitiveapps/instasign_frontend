@@ -145,6 +145,21 @@ const Wallet = () => {
   //   }
   // };
 
+  const downloadInvoice = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'invoice.pdf'; // You can customize the filename here
+      link.click();
+      window.URL.revokeObjectURL(link.href); // Clean up the URL object
+    } catch (error) {
+      console.error('Error downloading the invoice:', error);
+    }
+  };
 
   // Call fetchWalletDetails when the component mounts or at a specific event
 
@@ -220,8 +235,19 @@ const Wallet = () => {
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
                     <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
-                    <td className="p-3 border"><a onClick={() => window.open(item.invoice, "_blank")}>Invoice</a></td>
-                    <td className="p-3 border">{item.created_at}</td>
+                    <td className="p-3 border">
+                      {item.invoice ? (
+                        <button 
+                          className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors"
+                          onClick={() => downloadInvoice(item.invoice)}
+                        >
+                          <i className="fa-light fa-file-pdf text-[#002864] text-xl"></i>
+                        </button>
+                      ) : (
+                        <span>Not yet generated</span>
+                      )}
+                    </td>
+                    <td className="p-3 text-center border">{item.created_at.split('T')[0]}</td>
                     <td className="p-3 border">{item.amount}</td>
                     <td className="p-3 border">{item.responsible_person}</td>
                     <td className="p-3 border">{item.unit_price}</td>
