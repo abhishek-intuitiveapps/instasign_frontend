@@ -5,7 +5,8 @@ import PaginationComponent from "./PaginationComponent"; // Adjust the import pa
 import AddCreditsModal from "./AddCreditsModal";
 import Loader from "../primitives/Loader";
 import Title from "../components/Title";
-import env_data from "../env_data.json";
+
+
 const MonthlyBills = () => {
   const [activeTable, setActiveTable] = useState("transactions");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,7 +19,7 @@ const MonthlyBills = () => {
   const [isLoading, setIsLoading] = useState(false); // Add isLoading state
   const djangoToken = localStorage.getItem('django'); // Commenting out the token retrieval
   const paymentMode = useSelector((state) => state.payment.mode);
-  const djangoUrl = env_data.django_url;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
    // Retrieve rowsPerPage from localStorage or default to 25
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const savedRowsPerPage = localStorage.getItem("rowsPerPage");
@@ -425,9 +426,9 @@ const MonthlyBills = () => {
                 <th className="p-3 text-center border">S.No</th>
                 <th className="p-3 text-center border">Invoice</th>
                 <th className="p-3 text-center border">Month</th>
-                <th className="p-3 text-center border">Total Documents</th>
-                <th className="p-3 text-center border">Subtotal Amount</th>
-                <th className="p-3 text-center border">Billing Amount</th>
+                <th className="p-3 text-center border">Documents</th>
+                <th className="p-3 text-center border">Amount</th>
+                <th className="p-3 text-center border">Taxable Amount</th>
                 {/* <th className="p-3 text-center border">Status</th> */}
               </tr>
             </thead>
@@ -447,12 +448,12 @@ const MonthlyBills = () => {
                     <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
                     <td className="p-3 border">
                       {item.invoice ? (
-                        <button 
-                          className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors"
+                        <span 
+                          className="p-2 cursor-pointer"
                           onClick={() => downloadInvoice(item.invoice)}
                         >
                           <i className="fa-light fa-file-pdf text-[#002864] text-xl"></i>
-                        </button>
+                        </span>
                       ) : (
                         <span>Not yet generated</span>
                       )}

@@ -13,9 +13,9 @@ async function getKYCDetails(docId, signerEmails) {
     }
     
     // Call the actual KYC API using axios
-    const response = await axios.post('https://api.dev.instasign.ai/base/api/v1/kycee/get/details/', {
+    const response = await axios.post(`${process.env.DJANGO_SERVER_URL}/base/api/v1/kycee/get/details/`, {
       document_Id: docId,
-      client_secret: "5QkILuGKURaA3ZKqemdXmT8Fogp2IMz1"
+      client_secret: process.env.kYCEE_DJANGO_CLIENT_SECRET
       // Add client secret if needed
       // clientSecret: 'your-client-secret'
     });

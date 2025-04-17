@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { WalletCard } from "../../pages/WalletCard";
-import env_data from "../../env_data.json";
 import { useSelector } from "react-redux";
 import Parse from "parse";
 const DashboardButton = lazy(() => import("./DashboardButton"));
@@ -27,7 +26,7 @@ const buttonList = [
 const GetDashboard = (props) => {
   const { t } = useTranslation();
   const [walletDetails, setWalletDetails] = useState(null);
-  const djangoUrl = env_data.django_url;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
   const djangoToken = localStorage.getItem("django");
   const [userList, setUserList] = useState([]);
   const navigate = useNavigate();

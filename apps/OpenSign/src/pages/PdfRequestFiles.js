@@ -68,7 +68,6 @@ import AgreementSign from "../components/pdf/AgreementSign";
 import WidgetComponent from "../components/pdf/WidgetComponent";
 import PlaceholderCopy from "../components/pdf/PlaceholderCopy";
 import TextFontSetting from "../components/pdf/TextFontSetting";
-import env_data from "../env_data.json";
 
 function PdfRequestFiles(
 ) {
@@ -171,7 +170,7 @@ function PdfRequestFiles(
   });
   const [showSignPagenumber, setShowSignPagenumber] = useState([]);
 
-  const djangoUrl = env_data.djangoUrl;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
   const djangoToken = localStorage.getItem("django");   
   
   // Add useEffect to log document details
@@ -1948,7 +1947,7 @@ function PdfRequestFiles(
         unique_client_id: documentId,
         client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET,
         redirect_url: `${currentUrl}`,
-        fallback_url: `${currentUrl}`,
+        fallback_url: process.env.REACT_APP_KYCEE_FALLBACK_URL,
         verification_application: "instasign",
         verification_product: "uuid",
         type: "prod"
@@ -2013,13 +2012,11 @@ function PdfRequestFiles(
         return false;
       }
       
-      const response = await axios.post(`${djangoUrl}/base/api/v1/kycee/get/details/`, 
-        {
-          document_id: docId,
-           client_secret: "5QkILuGKURaA3ZKqemdXmT8Fogp2IMz1"
-        }
-      );
-      
+      const response = await axios.post(`${process.env.REACT_APP_DJANGO_URL}/base/api/v1/kycee/get/details/`, {
+        document_id: docId,
+        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET // Use environment variable for security
+      });
+
       console.log("KYC status response:", response.data);
       const kycDone = response.data.data.status === true;
       setKycStatus(kycDone);

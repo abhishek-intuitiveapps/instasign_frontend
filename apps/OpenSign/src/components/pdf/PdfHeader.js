@@ -28,7 +28,7 @@ function Header(props) {
   const mergePdfInputRef = useRef(null);
   const enabledBackBtn = props?.disabledBackBtn === true ? false : true;
   const djangoToken = localStorage.getItem("django");
-  const djangoUrl = env_data.djangoUrl;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
   //function for show decline alert
   const handleDeclinePdfAlert = async () => {
     const currentDecline = { currnt: "Sure", isDeclined: true };
@@ -99,25 +99,27 @@ function Header(props) {
       .map((signer) => signer.Email)
       .join(",");
 
-    try {
-      const response = await axios.post(`${djangoUrl}/base/api/v1/signed/document/`, {
-        signers: signerEmails,
-        document_id: props.documentId
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${djangoToken}`
-        }
-      });
+    console.log("this is pdf details on pdfHeader :",props.pdfDetails);
 
-      if (response.status !== 200) {
-        throw new Error("Failed to send document");
-      }
+    // try {
+    //   const response = await axios.post(`https://api.dev.instasign.ai/base/api/v1/signed/document/`, {
+    //     signers: signerEmails,
+    //     document_id: props.p
+    //   }, {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "Authorization": `Bearer ${djangoToken}`
+    //     }
+    //   });
 
-      console.log("Document sent successfully");
-    } catch (error) {
-      console.error("Error sending document:", error);
-    }
+    //   if (response.status !== 200) {
+    //     throw new Error("Failed to send document");
+    //   }
+
+    //   console.log("Document sent successfully");
+    // } catch (error) {
+    //   console.error("Error sending document:", error);
+    // }
   };
 
   return (

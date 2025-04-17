@@ -68,7 +68,9 @@ import Alert from "../primitives/Alert";
 import AsyncSelect from "react-select/async";
 import AddContact from "../primitives/AddContact";
 import EmptyWalletImage from "../assets/images/empty_wallet.png"; // Add the import for the image
-import env_data from "../env_data.json";
+
+
+
 function PlaceHolderSign() {
   const { t } = useTranslation();
   const editorRef = useRef();
@@ -180,7 +182,7 @@ function PlaceHolderSign() {
   const userEmail = localStorage.getItem('djangoUser')?.email; // Get user email from localStorage
   const token = localStorage.getItem('django'); 
 
-  const djangoUrl = env_data.django_url;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   useEffect(() => {
     if (documentId) {
@@ -1027,20 +1029,18 @@ function PlaceHolderSign() {
       
       // Make API call to the endpoint
       try {
-        const response = await fetch("https://api.dev.instasign.ai/base/api/v1/signed/document/", {
-          method: "POST",
+        const response = await axios.post(`${djangoUrl}/base/api/v1/signed/document/`, {
+          signers: signerEmails,
+          document_id: documentId
+        }, {
           headers: {
             "Content-Type": "application/json",
             "Authorization": `Bearer ${localStorage.getItem("django")}`
-          },
-          body: JSON.stringify({
-            signers: signerEmails,
-            document_id: documentId
-          })
+          }
         });
         
-        if (!response.ok) {
-          console.error('Error response from signed document API:', await response.text());
+        if (response.status !== 200) {
+          console.error('Error response from signed document API:', response.data);
         }
         
         // Continue with the original functionality regardless of API response

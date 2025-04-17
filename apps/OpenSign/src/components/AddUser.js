@@ -11,7 +11,6 @@ import {
 } from "../constant/const";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import env_data from "../env_data.json"
 
 function generatePassword(length) {
   const characters =
@@ -38,7 +37,7 @@ const AddUser = (props) => {
   const [isFormLoader, setIsFormLoader] = useState(false);
   const [teamList, setTeamList] = useState([]);
   const role = ["OrgAdmin", "Editor", "User"];
-  const djangoUrl = process.env.REACT_APP_DJANGO_URL || env_data.django_url;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
   const djangoToken = localStorage.getItem('django');
 

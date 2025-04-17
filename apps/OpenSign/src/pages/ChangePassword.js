@@ -4,7 +4,7 @@ import { Navigate } from "react-router";
 import Title from "../components/Title";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
-import env_data from "../env_data.json";
+
 
 function ChangePassword() {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ function ChangePassword() {
   const [newpassword, setnewpassword] = useState("");
   const [confirmpassword, setconfirmpassword] = useState("");
   const djangoToken = localStorage.getItem('django');
-  const djangoUrl = env_data.django_url;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
   
   const handleSubmit = async (evt) => {
     evt.preventDefault();

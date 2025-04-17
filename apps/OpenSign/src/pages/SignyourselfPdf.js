@@ -63,7 +63,7 @@ import ModalUi from "../primitives/ModalUi";
 import TourContentWithBtn from "../primitives/TourContentWithBtn";
 import HandleError from "../primitives/HandleError";
 import LoaderWithMsg from "../primitives/LoaderWithMsg";
-import env_data from "../env_data.json";
+
 //For signYourself inProgress section signer can add sign and complete doc sign.
 function SignYourSelf() {
   const { t } = useTranslation();
@@ -147,7 +147,7 @@ function SignYourSelf() {
   // const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   // const paymentMode = useSelector((state) => state.payment.mode);
 
-  const djangoUrl = env_data.django_url;
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   const [saveSignCheckbox, setSaveSignCheckbox] = useState({
     isVisible: false,

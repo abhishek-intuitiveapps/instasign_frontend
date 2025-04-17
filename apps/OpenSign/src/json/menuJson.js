@@ -159,7 +159,7 @@ const sidebarList = [
     ]
   },
   {
-    icon: "fa-light fa-money-bills",
+    icon: "fa-light fa-money-bill",
     title: "Billing",
     target: "_self",
     pageType: null,
