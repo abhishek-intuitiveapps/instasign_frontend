@@ -1022,10 +1022,12 @@ function PlaceHolderSign() {
       }
       
       // Extract signer emails and document ID for API call
-      const signerEmails = signersdata
-        .filter((signer) => signer.Role !== "prefill")
-        .map((signer) => signer.Email)
-        .join(",");
+      // const signerEmails = signersdata
+      //   .filter((signer) => signer.Role !== "prefill")
+      //   .map((signer) => signer.Email)
+      //   .join(",");
+
+        const signerEmails = signersdata.filter((signer) => signer.Role !== "prefill");
       
       // Make API call to the endpoint
       try {

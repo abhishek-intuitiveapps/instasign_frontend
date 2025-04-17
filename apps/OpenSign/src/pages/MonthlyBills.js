@@ -460,8 +460,8 @@ const MonthlyBills = () => {
                     </td>
                     <td className="p-3 border">{item.month}</td>
                     <td className="p-3 border">{item.total_documents}</td>
-                    <td className="p-3 border">{item.subtotal_amount}</td>
-                    <td className="p-3 border">{item.billing_amount}</td>
+                    <td className="p-3 border">{item.subtotal_amount.toFixed(2)}</td>
+                    <td className="p-3 border">{item.billing_amount.toFixed(2)}</td>
                     {/* <td className="p-3 border">
                       <span 
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center ${
