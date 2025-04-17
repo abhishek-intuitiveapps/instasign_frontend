@@ -282,6 +282,7 @@ const AddSigner = (props) => {
                 }
               }}
               disabled={addYourself}
+              maxLength={10}
               required
               onInvalid={(e) => e.target.setCustomValidity(t("input-required"))}
               onInput={(e) => e.target.setCustomValidity("")}

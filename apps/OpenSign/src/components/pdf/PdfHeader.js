@@ -14,7 +14,7 @@ import ModalUi from "../../primitives/ModalUi";
 import Loader from "../../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import { PDFDocument } from "pdf-lib";
-import env_data from "../../env_data.json"
+
 import axios from 'axios';
 
 function Header(props) {

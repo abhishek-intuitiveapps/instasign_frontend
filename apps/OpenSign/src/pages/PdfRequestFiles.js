@@ -2014,7 +2014,7 @@ function PdfRequestFiles(
       
       const response = await axios.post(`${process.env.REACT_APP_DJANGO_URL}/base/api/v1/kycee/get/details/`, {
         document_id: docId,
-        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET // Use environment variable for security
+        client_secret: process.env.REACT_APP_KYCEE_DJANGO_CLIENT_SECRET // Use environment variable for security
       });
 
       console.log("KYC status response:", response.data);

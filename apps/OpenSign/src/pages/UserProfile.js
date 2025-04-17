@@ -98,10 +98,10 @@ function UserProfile() {
         type: "prod"
       };
 
-      const response = await axios.post("https://sandbox.kycee.in/api/v1/external/gateway/create/verification", payload);
+      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v1/external/gateway/create/verification`, payload);
       
       if (response.data && response.data.data && response.data.data.token) {
-        window.open(`https://sandbox.kycee.in/?token=${response.data.data.token}`, '_blank');
+        window.open(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/?token=${response.data.data.token}`, '_blank');
         startKyceeVerificationCheck(); // Start checking after opening the new tab
       }
     } catch (error) {
