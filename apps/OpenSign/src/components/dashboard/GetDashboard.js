@@ -4,10 +4,7 @@ import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { WalletCard } from "../../pages/WalletCard";
 import env_data from "../../env_data.json";
-<<<<<<< HEAD
-=======
 import { useSelector } from "react-redux";
->>>>>>> a8ffdb3c51bd09c15c82e209aee1050720637594
 const DashboardButton = lazy(() => import("./DashboardButton"));
 const DashboardCard = lazy(() => import("./DashboardCard"));
 const DashboardReport = lazy(() => import("./DashboardReport"));
@@ -31,22 +28,6 @@ const GetDashboard = (props) => {
   const [walletDetails, setWalletDetails] = useState(null);
   const djangoUrl = env_data.django_url;
   const djangoToken = localStorage.getItem("django");
-<<<<<<< HEAD
-  // const [userList, setUserList] = useState([]);
-  const navigate = useNavigate();
- 
-  useEffect(() => {
-    // localStorage.setItem("rowsPerPage", rowsPerPage);
-    const fetchData = async () => {
-      // setIsLoading(true); // Set loading to true before fetching
-      await fetchWalletDetails();
-      // setIsLoading(false); // Set loading to false after fetching
-    };
-    fetchData();
-  }, []);
- 
- 
-=======
   const [userList, setUserList] = useState([]);
   const navigate = useNavigate();
   const paymentMode = useSelector((state) => state.payment.mode);
@@ -55,7 +36,6 @@ const GetDashboard = (props) => {
   const [isAdmin, setIsAdmin] = useState(false);
   
 
->>>>>>> a8ffdb3c51bd09c15c82e209aee1050720637594
   const fetchWalletDetails = async () => {
     try {
       const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
@@ -214,39 +194,8 @@ const GetDashboard = (props) => {
           ))}
         </div>
       </div> */}
-<<<<<<< HEAD
-      {walletDetails && (
-        <div className="flex space-between gap-x-4 mb-2">
-        <WalletCard
-        label="Company Credits"
-        onClick={() => {
-          navigate("/wallet");
-        }}
-        value={walletDetails[0].available_allotment} // Use available_allotment from wallet details
-        icon="fa-light fa-money-bill-wave"
-        loading={false}
-        id={walletDetails[0].wallet_id} // Use wallet_id from wallet details
-        updatedOn={walletDetails[0].updated_at} // Use updated_at from wallet details
-      />
-     
-        {/* <WalletCard
-        label="Users"
-        onClick={() => {
-          navigate("/users");
-        }}
-        value={userList.length} // Use available_allotment from wallet details
-        icon="fa-light fa-users fa-fw"
-        loading={false}
-        id={0} // Use wallet_id from wallet details
-        updatedOn={0} // Use updated_at from wallet details
-      /> */}
-      </div>
-      )}
-     
-=======
       
       
->>>>>>> a8ffdb3c51bd09c15c82e209aee1050720637594
       <div className="grid grid-cols-12 w-full gap-x-4">
         {walletDetails && paymentMode === false && (
             <WalletCard 
