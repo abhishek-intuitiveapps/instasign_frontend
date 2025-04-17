@@ -200,7 +200,14 @@ const AddContact = (props) => {
               type="text"
               id="phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              // onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Check if the value is a positive integer
+                if (/^\d*$/.test(value)) {
+                  setPhone(value);
+                }
+              }}
               disabled={addYourself}
               maxLength={10}
               className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"

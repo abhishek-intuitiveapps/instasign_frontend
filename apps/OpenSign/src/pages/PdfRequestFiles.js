@@ -1953,10 +1953,10 @@ function PdfRequestFiles(
         type: "prod"
       };
 
-      const response = await axios.post("https://sandbox.kycee.in/api/v1/external/gateway/create/verification", payload);
+      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v1/external/gateway/create/verification`, payload);
       
       if (response.data && response.data.data && response.data.data.token) {
-        window.open(`https://sandbox.kycee.in/?token=${response.data.data.token}&first_name=${firstName}&last_name=${lastName}&email=${currentSignerDetails.Email}&phone_number=${currentSignerDetails.Phone || ''}&kyc_required=true&kyc_done=true`, '_blank');
+        window.open(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/?token=${response.data.data.token}&first_name=${firstName}&last_name=${lastName}&email=${currentSignerDetails.Email}&phone_number=${currentSignerDetails.Phone || ''}&kyc_required=true&kyc_done=true`, '_blank');
         
         // Add polling mechanism to check KYC status periodically
         const checkInterval = setInterval(async () => {
@@ -2014,7 +2014,7 @@ function PdfRequestFiles(
       
       const response = await axios.post(`${process.env.REACT_APP_DJANGO_URL}/base/api/v1/kycee/get/details/`, {
         document_id: docId,
-        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET // Use environment variable for security
+        client_secret: process.env.REACT_APP_KYCEE_DJANGO_CLIENT_SECRET // Use environment variable for security
       });
 
       console.log("KYC status response:", response.data);
