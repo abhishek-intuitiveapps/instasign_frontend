@@ -827,12 +827,26 @@ function base64ToBuffer(base64Input) {
     }
 
     // Remove data URL prefix if present (e.g., 'data:image/png;base64,')
-    const base64String = base64Input.replace(/^data:image\/[a-z]+;base64,/, '');
+    const base64 = base64Input.replace(/^data:image\/\w+;base64,/, '');
+    
+    // Validate the base64 string
+    const isValid = /^[A-Za-z0-9+/]*={0,2}$/.test(base64);
+    
+    if (!isValid) {
+      console.error('Invalid Base64 string');
+      return null;
+    }
+
+    // Create preview URL
+    const dataUrl = `data:image/png;base64,${base64}`;
+    // Assuming setPreviewUrl is defined in the scope
+    // setPreviewUrl(dataUrl);
 
     // Convert base64 string to binary buffer
-    return Buffer.from(base64String, 'base64');
+    return Buffer.from(base64, 'base64');
+    // return dataUrl;
   } catch (err) {
-    console.error('Invalid Base64 string:', err);
+    console.error('Error processing Base64 string:', err);
     return null;
   }
 }

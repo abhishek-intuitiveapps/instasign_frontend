@@ -635,9 +635,9 @@ function UserProfile() {
                   //  </li>
                   <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all py-2">
                     <span className="font-semibold">{t("Payment Mode")}:</span>
-                    <div className="relative inline-block w-1/3">
+                    <div className="relative inline-block w-1/4">
                       <select
-                        className={`block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-full shadow leading-tight focus:outline-none focus:bg-white focus:border-blue-500 ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        className={`block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 pl-3 pr-8 rounded-full shadow leading-tight focus:outline-none focus:bg-white focus:border-blue-500 ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}
                         value={tempPaymentMode ? 'post_paid' : 'pre_paid'}
                         onChange={(e) => {
                           const selectedMode = e.target.value === 'post_paid';

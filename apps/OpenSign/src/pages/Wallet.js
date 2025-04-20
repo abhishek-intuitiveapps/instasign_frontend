@@ -249,9 +249,9 @@ const Wallet = () => {
                       )}
                     </td>
                     <td className="p-3 text-center border">{item.created_at.split('T')[0]}</td>
-                    <td className="p-3 border">{item.amount.toFixed(2)}</td>
+                    <td className="p-3 border">{item.amount}</td>
                     <td className="p-3 border">{item.responsible_person}</td>
-                    <td className="p-3 border">{item.unit_price.toFixed(2)}</td>
+                    <td className="p-3 border">{item.unit_price}</td>
                     <td className="p-3 border">{item.utr}</td>
                     <td className="p-3 border">{item.order_wallet}</td>
                     <td className="p-3 border">
