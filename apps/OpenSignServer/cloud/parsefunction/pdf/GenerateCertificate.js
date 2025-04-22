@@ -837,11 +837,6 @@ function base64ToBuffer(base64Input) {
       return null;
     }
 
-    // Create preview URL
-    const dataUrl = `data:image/png;base64,${base64}`;
-    // Assuming setPreviewUrl is defined in the scope
-    // setPreviewUrl(dataUrl);
-
     // Convert base64 string to binary buffer
     return Buffer.from(base64, 'base64');
     // return dataUrl;
@@ -1230,20 +1225,15 @@ export default async function GenerateCertificate(docDetails) {
       if (verificationImage) {
         try {
           const imageBuffer = base64ToBuffer(verificationImage);
-          console.log(`Image Buffer Length for ${signerEmail}:`, imageBuffer?.length);
+          console.log(`Image Buffer Length for ${signerEmail}:`, imageBuffer, imageBuffer?.length);
           if (imageBuffer) {
-            let embeddedImage;
-            if (verificationImage.includes('data:image/jpeg;base64,')) {
-              embeddedImage = await pdfDoc.embedJpg(imageBuffer);
-            } else {
-              embeddedImage = await pdfDoc.embedPng(imageBuffer);
-            }
+            let embeddedImage = await pdfDoc.embedJpg(imageBuffer);
             console.log('Embedded Image:', embeddedImage);
             page.drawImage(embeddedImage, {
               x: width - 100,
-              y: yPosition1 - 35,
-              width: 30,
-              height: 30,
+              y: yPosition1 - 125,
+              width: 60,
+              height: 60,
             });
           } else {
             console.error(`No valid image buffer for ${signerEmail}`);
@@ -1457,20 +1447,15 @@ export default async function GenerateCertificate(docDetails) {
         if (verificationImage) {
           try {
             const imageBuffer = base64ToBuffer(verificationImage);
-            console.log(`Image Buffer Length for ${signerEmail}:`, imageBuffer?.length);
+            console.log(`Image Buffer Length for ${signerEmail}:`, imageBuffer, imageBuffer?.length);
             if (imageBuffer) {
-              let embeddedImage;
-              if (verificationImage.includes('data:image/jpeg;base64,')) {
-                embeddedImage = await pdfDoc.embedJpg(imageBuffer);
-              } else {
-                embeddedImage = await pdfDoc.embedPng(imageBuffer);
-              }
+              let embeddedImage = await pdfDoc.embedJpg(imageBuffer);
               console.log('Embedded Image:', embeddedImage);
               currentPage.drawImage(embeddedImage, {
                 x: width - 100,
-                y: yPosition1 - 35,
-                width: 30,
-                height: 30,
+                y: yPosition1 - 125,
+                width: 60,
+                height: 60,
               });
             } else {
               console.error(`No valid image buffer for ${signerEmail}`);

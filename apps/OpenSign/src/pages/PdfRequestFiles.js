@@ -2050,7 +2050,8 @@ function PdfRequestFiles(
               !isExpired &&
               !alreadySign &&
               !isCompleted?.isCertificate &&
-              !isDecline?.isDeclined && (
+              !isDecline?.isDeclined &&
+              kycStatus !== true && ( // Added condition to check kycStatus
                 <AgreementSign
                   setIsAgree={setIsAgree}
                   setIsAgreeTour={setIsAgreeTour}
@@ -2090,7 +2091,7 @@ function PdfRequestFiles(
               showNavigationNumber={false}
               onRequestClose={handleCloseAgreeTour}
               steps={AgreementTour}
-              isOpen={isAgreeTour}
+              isOpen={isAgreeTour && !isKycModalOpen} // Added condition to check if KYC modal is open
               rounded={5}
               closeWithMask={false}
             />
