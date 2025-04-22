@@ -598,27 +598,62 @@ function UserProfile() {
                   <span>{getCountryName(djangoUser.country)}</span>
                 </li>
                 {djangoUser?.is_main_admin && (
-                   <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
-                     <span className="font-semibold">Payment Mode:</span>
-                     <div className="flex items-center">
-                       <span className="mr-2">{"Prepaid"}</span>
-                       <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                         <input
-                           type="checkbox"
-                           className="sr-only peer"
-                           checked={tempPaymentMode}
-                           onChange={() => {
-                             const newPostpaidStatus = !tempPaymentMode;
-                             setTempPaymentMode(newPostpaidStatus);
-                             console.log("Payment mode changed to:", newPostpaidStatus);
-                           }}
-                           disabled={!editmode}
-                         />
-                         <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
-                       </label>
-                       <span className="ml-2">Postpaid</span>
-                     </div>
-                   </li>
+                  //  <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
+                  //    <span className="font-semibold">Payment Mode:</span>
+                  //    <div className="flex items-center">
+                  //      <span className="mr-2">{"Prepaid"}</span>
+                  //      <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  //        <input
+                  //          type="checkbox"
+                  //          className="sr-only peer"
+                  //          checked={tempPaymentMode}
+                  //          onChange={() => {
+                  //            const newPostpaidStatus = !tempPaymentMode;
+                  //            setTempPaymentMode(newPostpaidStatus);
+                  //            console.log("Payment mode changed to:", newPostpaidStatus);
+                  //          }}
+                  //          disabled={!editmode}
+                  //        />
+                  //        <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
+                  //      </label>
+                  //      <span className="ml-2">Postpaid</span>
+                  //    </div>
+
+                  //     <select
+                  //      className={`ml-2 op-input op-input-bordered op-input-sm ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  //      value={tempPaymentMode ? 'post_paid' : 'pre_paid'}
+                  //      onChange={(e) => {
+                  //        const selectedMode = e.target.value === 'post_paid';
+                  //        setTempPaymentMode(selectedMode);
+                  //        console.log("Payment mode changed to:", selectedMode);
+                  //      }}
+                  //      disabled={!editmode}
+                  //    >
+                  //      <option value="pre_paid">Prepaid</option>
+                  //      <option value="post_paid">Postpaid</option>
+                  //    </select>
+                  //  </li>
+                  <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all py-2">
+                    <span className="font-semibold">{t("Payment Mode")}:</span>
+                    <div className="relative inline-block w-1/5">
+                      <select
+                        className={`block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 pl-3 pr-8 rounded-full shadow leading-tight focus:outline-none focus:bg-white focus:border-blue-500 ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        value={tempPaymentMode ? 'post_paid' : 'pre_paid'}
+                        onChange={(e) => {
+                          const selectedMode = e.target.value === 'post_paid';
+                          setTempPaymentMode(selectedMode);
+                          console.log("Payment mode changed to:", selectedMode);
+                        }}
+                        disabled={!editmode}
+                      >
+                        <option value="pre_paid">Prepaid</option>
+                        <option value="post_paid">Postpaid</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M7 10l5 5 5-5H7z"/></svg>
+                      </div>
+                    </div>
+                  </li>
                  )}
               </ul>
             </div>
