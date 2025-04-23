@@ -393,11 +393,11 @@ function UserProfile() {
           <Loader />
         </div>
       ) : (
-        <div className="flex flex-col items-center w-full relative h-[80vh]">
+        <div className="flex flex-col items-center w-full relative h-auto md:h-[80vh]">
           <div className="bg-base-100 text-base-content flex flex-col justify-between shadow-md rounded-box w-full p-4">
-            <div className="flex flex-row justify-start items-center mb-4">
+            <div className="flex flex-col md:flex-row justify-start items-center mb-4">
               <div className="flex flex-col justify-center items-center mr-8">
-                <div className="w-[250px] h-[250px] overflow-hidden rounded-full">
+                <div className="w-[150px] h-[150px] md:w-[250px] md:h-[250px] overflow-hidden rounded-full">
                   <img
                     className="object-cover w-full h-full"
                     src={Image === "" ? dp : Image}
@@ -417,7 +417,7 @@ function UserProfile() {
                 )}
                 {percentage !== 0 && (
                   <div className="flex items-center gap-x-2 mt-2">
-                    <div className="h-2 rounded-full w-[150px] bg-gray-200">
+                    <div className="h-2 rounded-full w-[100px] md:w-[150px] bg-gray-200">
                       <div
                         className="h-2 rounded-full bg-blue-500"
                         style={{ width: `${percentage}%` }}
@@ -441,7 +441,7 @@ function UserProfile() {
                     <input
                       type="text"
                       value={name}
-                      className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
+                      className="op-input op-input-bordered op-input-sm w-full md:w-[180px] focus:outline-none hover:border-base-content text-sm"
                       onChange={(e) => SetName(e.target.value)}
                     />
                   ) : (
@@ -457,7 +457,7 @@ function UserProfile() {
                   {editmode ? (
                     <input
                       type="text"
-                      className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
+                      className="op-input op-input-bordered op-input-sm w-full md:w-[180px] focus:outline-none hover:border-base-content text-sm"
                       onChange={(e) => SetPhone(e.target.value)}
                       value={Phone}
                     />
@@ -657,13 +657,13 @@ function UserProfile() {
                  )}
               </ul>
             </div>
-            <div className="flex justify-center gap-4 pt-4">
+            <div className="flex justify-center gap-4 pt-4 flex-col md:flex-row">
               <button
                 type="button"
                 onClick={(e) => {
                   editmode ? debouncedHandleSubmit(e) : setEditMode(true);
                 }}
-                className="op-btn text-white op-btn-primary w-[100px]"
+                className="op-btn text-white op-btn-primary w-full md:w-[100px]"
               >
                 {editmode ? t("save") : t("edit")}
               </button>
@@ -672,9 +672,7 @@ function UserProfile() {
                 onClick={() =>
                   editmode ? handleCancel() : navigate("/changepassword")
                 }
-                className={`op-btn ${
-                  editmode ? "op-btn-ghost w-[100px]" : "op-btn-secondary"
-                } ${!editmode ? "bg-[#D6DBE5] text-black border border-gray-300 hover:bg-gray-300" : ""}`}
+                className={`op-btn ${editmode ? "op-btn-ghost w-full md:w-[100px]" : "op-btn-secondary"}`}
               >
                 {editmode ? t("cancel") : t("change-password")}
               </button>

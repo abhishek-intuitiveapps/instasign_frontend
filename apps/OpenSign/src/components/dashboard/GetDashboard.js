@@ -210,6 +210,7 @@ const GetDashboard = (props) => {
               loading={false} 
               id={walletDetails[0].wallet_id} // Use wallet_id from wallet details
               updatedOn={walletDetails[0].updated_at} // Use updated_at from wallet details
+              toolTipMessage={"Clicking on this card will take you to the list of credit history of your wallet."}
             />
         )}
         {djangoUser?.is_main_admin && (<WalletCard 
@@ -222,6 +223,7 @@ const GetDashboard = (props) => {
           loading={false} 
           id={0} // Use wallet_id from wallet details
           updatedOn={0} // Use updated_at from wallet details
+          toolTipMessage={"Clicking on this card will take you to the list of users present in your organization."}
         />)}
         {props?.dashboard?.columns?.map((col, i) =>
           col.widget.data && col.widget.data.tourSection ? (

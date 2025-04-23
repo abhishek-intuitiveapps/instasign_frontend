@@ -411,9 +411,9 @@ const MonthlyBills = () => {
       </div> */}
 
       {/* Table Section */}
-      <div className="bg-white p-5 rounded-md shadow-md overflow-hidden" style={{ height: '80vh' }}>
+      <div className="bg-white px-3 pt-4 rounded-md shadow-md overflow-hidden" style={{ height: '90vh' }}>
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Billing History</h2>
-        <div className="table-container" style={{ height: 'calc(65vh - 80px)', overflowY: 'auto' }}>
+        <div className="table-container" style={{ height: 'calc(73vh - 80px)', overflowY: 'auto' }}>
         <table 
             className="min-w-full border border-gray-300" 
             style={{

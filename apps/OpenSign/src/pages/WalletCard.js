@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 
-export const WalletCard = ({ label, value, icon, loading, id, updatedOn, onClick }) => {
+export const WalletCard = ({ label, value, icon, loading, id, updatedOn, onClick, toolTipMessage }) => {
     const [isHovered, setIsHovered] = useState(false);
     
     return (
@@ -24,7 +24,7 @@ export const WalletCard = ({ label, value, icon, loading, id, updatedOn, onClick
                 </div>
               </div>
               <div className="text-xs absolute top-3 right-2">
-                <a data-tooltip-id="Need your Signature" data-tooltip-content="Clicking on this card will take you to the list of users present in your organization." className="z-50">
+                <a data-tooltip-id="Need your Signature" data-tooltip-content={`${toolTipMessage}`} className="z-50">
                   <sup>
                     <i className="fa-light fa-question rounded-full border-[1px] py-[1.5px] px-[4px] text-[13px]" 
                        style={{ 

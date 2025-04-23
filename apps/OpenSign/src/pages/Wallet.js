@@ -191,7 +191,7 @@ const Wallet = () => {
       
     </div>
       {/* <h2 className="text-2xl font-bold text-gray-800 mb-4">Billing - Credits</h2> */}
-      <div className="bg-white p-5 rounded-md shadow-md overflow-hidden" style={{ height: '82vh', maxWidth: '100%' }}>
+      <div className="bg-white px-3 pt-4 rounded-md shadow-md overflow-hidden" style={{ height: '90vh', maxWidth: '100%' }}>
         <div className="flex justify-between mb-2">
           <h2 className="text-2xl font-bold text-gray-800 ">Credits History</h2>
           <button 
@@ -201,7 +201,7 @@ const Wallet = () => {
             Add Credits
           </button>
         </div>
-        <div className="table-container" style={{ height: 'calc(65vh - 80px)', overflowY: 'auto', overflowX: 'hidden' }}>
+        <div className="table-container" style={{ height: 'calc(73vh - 80px)', overflowY: 'auto', overflowX: 'hidden' }}>
           <table 
             className="min-w-full border border-gray-300" 
             style={{

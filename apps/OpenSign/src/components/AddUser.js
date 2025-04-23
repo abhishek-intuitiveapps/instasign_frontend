@@ -284,6 +284,12 @@ const AddUser = (props) => {
     let { name, value } = event.target;
     if (name === "email") {
       value = value?.toLowerCase()?.replace(/\s/g, "");
+    } else if (name === "phone") {
+      // Validate that the phone value is a positive integer
+      if (!/^\d*$/.test(value) || parseInt(value) <= 0) {
+        alert("Please enter a valid positive integer for phone.");
+        return; // Exit the function if the value is invalid
+      }
     }
     setFormdata((prev) => ({ ...prev, [name]: value }));
   };
@@ -366,14 +372,15 @@ const AddUser = (props) => {
                           className="block text-xs text-gray-700 font-semibold"
                         >
                           {t("phone")}
-                          {/* <span className="text-[red] text-[13px]"> *</span> */}
+                          <span className="text-[red] text-[13px]"> *</span>
                         </label>
                         <input
                           type="text"
                           name="phone"
-                          placeholder={t("phone-optional")}
                           value={formdata.phone}
                           onChange={(e) => handleChange(e)}
+                          required
+                          maxLength={10}
                           className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
                         />
                       </div>
