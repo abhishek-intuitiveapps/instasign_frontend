@@ -207,8 +207,8 @@ async function sendMailProvider(req, plan, monthchange) {
         subject: req.params.subject,
         text: req.params.text || 'mail',
         html: req.params.html || '',
-        bcc: req.params.bcc ? req.params.bcc : undefined,
-        replyTo: replyto ? replyto : undefined,
+        cc: req.params.bcc ? req.params.bcc : undefined,
+        replyTo: process.env.REPLY_TO || replyto ? replyto : undefined,
       };
 
       if (transporterSMTP) {
