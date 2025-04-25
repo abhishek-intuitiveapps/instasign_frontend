@@ -17,6 +17,8 @@ import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import SelectLanguage from "../components/pdf/SelectLanguage";
 import countries from "../json/CountriesJson";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 function SignUp() {
@@ -62,6 +64,13 @@ function SignUp() {
   const [lengthValid, setLengthValid] = useState(false);
   const [caseDigitValid, setCaseDigitValid] = useState(false);
   const [specialCharValid, setSpecialCharValid] = useState(false);
+
+  const [alertMsg, setAlertMsg] = useState("");
+
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   useEffect(() => {
     checkUserExt();
@@ -229,15 +238,20 @@ function SignUp() {
   // Handle change for form fields
   const handleChange = (event) => {
     const { name, value } = event.target;
-    
-    // Capitalize the first letter of the input value, except for the email field
-    const capitalizedValue = name === "email" ? value : value.charAt(0).toUpperCase() + value.slice(1);
 
-    // Check if the field is password or confirmPassword
-    if (name === "password" || name === "confirmPassword") {
-      setFormData({ ...formData, [name]: value }); // Update state for password fields
+    // Validate phone number for positive integers and max length
+    if (name === "phoneNumber") {
+      // Allow only digits and limit length to 10
+      if (/^\d*$/.test(value) && value.length <= 10) {
+        setFormData({ ...formData, [name]: value });
+      }
+    } else if (name === "password" || name === "confirmPassword") {
+      // Update state for password fields
+      setFormData({ ...formData, [name]: value });
     } else {
-      setFormData({ ...formData, [name]: capitalizedValue }); // Update state for other fields
+      // Capitalize the first letter of the input value, except for the email field
+      const capitalizedValue = name === "email" ? value : value.charAt(0).toUpperCase() + value.slice(1);
+      setFormData({ ...formData, [name]: capitalizedValue });
     }
   };
 
@@ -352,13 +366,35 @@ function SignUp() {
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent the default form submission
+    let valid = true; // Flag to track overall validity
+
+    // Reset error messages
+    setEmailError("");
+    setPasswordError("");
+    setConfirmPasswordError("");
+    setPhoneError("");
 
     if (!emailRegex.test(formData.email)) {
-      alert("Please enter a valid email address.");
-      return;
+      setEmailError("Please enter a valid email address.");
+      valid = false;
     }
 
-    if (lengthValid && caseDigitValid && specialCharValid) {
+    if (formData.password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long.");
+      valid = false;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setConfirmPasswordError("Passwords do not match.");
+      valid = false;
+    }
+
+    if (!formData.phoneNumber) {
+      setPhoneError("Phone number is required.");
+      valid = false;
+    }
+
+    if (valid) {
       setState({ ...state, loading: true });
       const userDetails = {
         name: `${formData.firstName} ${formData.lastName}`,
@@ -411,6 +447,7 @@ function SignUp() {
           if (usersignup) {
             // Call handleNavigation with the session token
             await handleNavigation(userRes.getSessionToken());
+            toast.success("Signup successful!");
           } else {
             throw new Error("Failed to create user on Parse.");
           }
@@ -419,12 +456,10 @@ function SignUp() {
         }
       } catch (error) {
         console.log("Error during signup", error);
-        setErrMsg("Error during signup: " + error.message);
+        toast.error("Error during signup: " + error.message);
       } finally {
         setState({ ...state, loading: false });
       }
-    } else {
-      alert("Please ensure your password meets the requirements.");
     }
   };
 
@@ -443,6 +478,7 @@ function SignUp() {
 
   return (
     <>
+      <ToastContainer />
       {state.loading ? (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
           <Loader />
@@ -487,24 +523,27 @@ function SignUp() {
                       id="email"
                       type="email"
                       placeholder="Email"
-                      className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full py-2 px-3 border ${emailError ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       required
                     />
+                    {emailError && <p className="text-red-500 text-sm">{emailError}</p>}
                   </fieldset>
                   <fieldset className="relative">
                     <input
                       id="phoneNumber"
                       type="tel"
                       placeholder="Phone Number"
-                      className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className={`w-full py-2 px-3 border ${phoneError ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                       name="phoneNumber"
+                      maxLength={10}
                       value={formData.phoneNumber}
                       onChange={handleChange}
                       required
                     />
+                    {phoneError && <p className="text-red-500 text-sm">{phoneError}</p>}
                   </fieldset>
                   <fieldset className="relative">
                     <div className="relative w-full max-w-md">
@@ -512,13 +551,14 @@ function SignUp() {
                         id="password"
                         type={state.passwordVisible ? "text" : "password"}
                         placeholder="Password"
-                        className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full py-2 px-3 border ${passwordError ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         name="password"
                         value={formData.password}
                         autoComplete="current-password"
                         onChange={handlePasswordChange}
                         required
                       />
+                      {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
                       <div 
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                         onClick={() => togglePasswordVisibility("password")}
@@ -533,12 +573,13 @@ function SignUp() {
                         id="confirmPassword"
                         type={state.confirmPasswordVisible ? "text" : "password"}
                         placeholder="Confirm Password"
-                        className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full py-2 px-3 border ${confirmPasswordError ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                         name="confirmPassword"
                         value={formData.confirmPassword}
                         onChange={handleChange}
                         required
                       />
+                      {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
                       <div 
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                         onClick={() => togglePasswordVisibility("confirmPassword")}

@@ -36,6 +36,8 @@ import { useTranslation } from "react-i18next";
 import DownloadPdfZip from "./DownloadPdfZip";
 import * as XLSX from "xlsx";
 import EditContactForm from "../components/EditContactForm";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ReportTable = (props) => {
   const { t } = useTranslation();
@@ -201,7 +203,7 @@ const ReportTable = (props) => {
       try {
         const tenantDetails = await getTenantDetails(user?.objectId);
         if (tenantDetails && tenantDetails === "user does not exist!") {
-          alert(t("user-not-exist"));
+          showToast(t("user-not-exist"), "error"); // Updated line
         } else if (tenantDetails) {
           const signatureType = tenantDetails?.SignatureType || [];
           const filterSignTypes = signatureType?.filter(
@@ -210,10 +212,10 @@ const ReportTable = (props) => {
           return filterSignTypes;
         }
       } catch (e) {
-        alert(t("user-not-exist"));
+        showToast(t("user-not-exist"), "error"); // Updated line
       }
     } else {
-      alert(t("user-not-exist"));
+      showToast(t("user-not-exist"), "error"); // Updated line
     }
   };
 
@@ -337,42 +339,26 @@ const ReportTable = (props) => {
 
                 if (res.data && res.data.objectId) {
                   setActLoader({});
-                  setIsAlert(true);
-                  setTimeout(() => setIsAlert(false), 1500);
+                  showToast(t("template-loaded-successfully"), "success"); // Updated line
                   navigate(`/${act.redirectUrl}/${res.data.objectId}`, {
                     state: { title: "Use Template" }
                   });
                 }
               } catch (err) {
                 console.log("Err", err);
-                setIsAlert(true);
-                setAlertMsg({
-                  type: "danger",
-                  message: t("something-went-wrong-mssg")
-                });
-                setTimeout(() => setIsAlert(false), 1500);
+                showToast(t("something-went-wrong-mssg"), "error"); // Updated line
                 setActLoader({});
               }
             } else {
               setActLoader({});
             }
           } else {
-            setIsAlert(true);
-            setAlertMsg({
-              type: "danger",
-              message: t("something-went-wrong-mssg")
-            });
-            setTimeout(() => setIsAlert(false), 1500);
+            showToast(t("something-went-wrong-mssg"), "error"); // Updated line
             setActLoader({});
           }
         } catch (err) {
           console.log("err", err);
-          setIsAlert(true);
-          setAlertMsg({
-            type: "danger",
-            message: t("something-went-wrong-mssg")
-          });
-          setTimeout(() => setIsAlert(false), 1500);
+          showToast(t("something-went-wrong-mssg"), "error"); // Updated line
           setActLoader({});
         }
       }
@@ -447,11 +433,15 @@ const ReportTable = (props) => {
     props.setList((prevData) => [data, ...prevData]);
   };
 
+  const showToast = (message, type = "success") => {
+    toast[type](message);
+  };
+
   const handleDelete = async (item) => {
     setIsDeleteModal({});
     setActLoader({ [`${item.objectId}`]: true });
     const clsObj = {
-      Contactbook: "contracts_Contactbook",
+      Contacts: "contracts_Contactbook",
       Templates: "contracts_Template"
     };
     try {
@@ -471,12 +461,7 @@ const ReportTable = (props) => {
       });
       if (res.data && res.data.updatedAt) {
         setActLoader({});
-        setIsAlert(true);
-        setAlertMsg({
-          type: "success",
-          message: t("record-delete-alert")
-        });
-        setTimeout(() => setIsAlert(false), 1500);
+        showToast(t("record-delete-alert"), "success"); // Updated line
         const upldatedList = props.List.filter(
           (x) => x.objectId !== item.objectId
         );
@@ -484,12 +469,7 @@ const ReportTable = (props) => {
       }
     } catch (err) {
       console.log("err", err);
-      setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
-      setTimeout(() => setIsAlert(false), 1500);
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
       setActLoader({});
     }
   };
@@ -562,12 +542,7 @@ const ReportTable = (props) => {
         const res = result.data;
         if (res) {
           setActLoader({});
-          setIsAlert(true);
-          setAlertMsg({
-            type: "success",
-            message: t("record-revoke-alert")
-          });
-          setTimeout(() => setIsAlert(false), 1500);
+          showToast(t("record-revoke-alert"), "success"); // Updated line
           const upldatedList = props.List.filter(
             (x) => x.objectId !== item.objectId
           );
@@ -578,12 +553,7 @@ const ReportTable = (props) => {
       .catch((err) => {
         console.log("err", err);
         setReason("");
-        setIsAlert(true);
-        setAlertMsg({
-          type: "danger",
-          message: t("something-went-wrong-mssg")
-        });
-        setTimeout(() => setIsAlert(false), 1500);
+        showToast(t("something-went-wrong-mssg"), "error"); // Updated line
         setActLoader({});
       });
   };
@@ -660,7 +630,7 @@ const ReportTable = (props) => {
         setActLoader({});
       } catch (err) {
         console.log("err in getsignedurl", err);
-        alert(t("something-went-wrong-mssg"));
+        showToast(t("something-went-wrong-mssg"), "error"); // Updated line
         setActLoader({});
       }
     }
@@ -801,23 +771,14 @@ const ReportTable = (props) => {
     try {
       const res = await axios.post(url, params, { headers: headers });
       if (res?.data?.result?.status === "success") {
-        setIsAlert(true);
-        setAlertMsg({ type: "success", message: t("mail-sent-alert") });
+        showToast(t("mail-sent-alert"), "success"); // Updated line
         setIsResendMail({});
       } else {
-        setIsAlert(true);
-        setAlertMsg({
-          type: "danger",
-          message: t("something-went-wrong-mssg")
-        });
+        showToast(t("something-went-wrong-mssg"), "error"); // Updated line
       }
     } catch (err) {
       console.log("err in sendmail", err);
-      setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
     } finally {
       setTimeout(() => setIsAlert(false), 1500);
       setIsNextStep({});
@@ -855,24 +816,12 @@ const ReportTable = (props) => {
     setIsAlert(true);
     if (status === "success") {
       if (count > 1) {
-        setAlertMsg({
-          type: "success",
-          message: count + " " + t("document-sent-alert")
-        });
-        setTimeout(() => setIsAlert(false), 1500);
+        showToast(count + " " + t("document-sent-alert"), "success"); // Updated line
       } else {
-        setAlertMsg({
-          type: "success",
-          message: count + " " + t("document-sent-alert")
-        });
-        setTimeout(() => setIsAlert(false), 1500);
+        showToast(count + " " + t("document-sent-alert"), "success"); // Updated line
       }
     } else {
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
-      setTimeout(() => setIsAlert(false), 1500);
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
     }
   };
 
@@ -912,7 +861,7 @@ const ReportTable = (props) => {
       console.log("err in fetch template in bulk modal", err);
       setIsBulkSend({});
       setIsAlert(true);
-      setAlertMsg({ type: "danger", message: t("something-went-wrong-mssg") });
+      showToast(t("something-went-wrong-mssg"), "error");
       setTimeout(() => setIsAlert(false), 1500);
     }
   };
@@ -938,17 +887,11 @@ const ReportTable = (props) => {
       const res = await templateCls.save();
       if (res) {
         setIsAlert(true);
-        setAlertMsg({
-          type: "success",
-          message: t("template-share-alert")
-        });
+        showToast(t("template-share-alert"),"success");
       }
     } catch (err) {
       setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
+      showToast(t("something-went-wrong-mssg"),"error");
     } finally {
       setActLoader({});
       setTimeout(() => setIsAlert(false), 1500);
@@ -978,13 +921,7 @@ const ReportTable = (props) => {
             }
           });
           if (res.data && res.data.updatedAt) {
-            setIsAlert(true);
-            setAlertMsg({
-              type: "success",
-              message: t("expiry-date-updated", {
-                newexpirydate: new Date(expiryDate)?.toLocaleDateString()
-              })
-            });
+            showToast(t("expiry-date-updated", { newexpirydate: new Date(expiryDate)?.toLocaleDateString() }), "success"); // Updated line
             if (props.ReportName === "Expired Documents") {
               const upldatedList = props.List.filter(
                 (x) => x.objectId !== item.objectId
@@ -994,11 +931,7 @@ const ReportTable = (props) => {
           }
         } catch (err) {
           console.log("err", err);
-          setIsAlert(true);
-          setAlertMsg({
-            type: "danger",
-            message: t("something-went-wrong-mssg")
-          });
+          showToast(t("something-went-wrong-mssg"), "error"); // Updated line
         } finally {
           setActLoader({});
           setExpiryDate();
@@ -1006,13 +939,11 @@ const ReportTable = (props) => {
           setIsModal({});
         }
       } else {
-        setIsAlert(true);
-        setAlertMsg({ type: "danger", message: t("expiry-date-error") });
+        showToast(t("expiry-date-error"), "error"); // Updated line
         setTimeout(() => setIsAlert(false), 2000);
       }
     } else {
-      setIsAlert(true);
-      setAlertMsg({ type: "danger", message: t("expiry-date-error") });
+      showToast(t("expiry-date-error"), "error"); // Updated line
       setTimeout(() => setIsAlert(false), 2000);
     }
   };
@@ -1112,12 +1043,12 @@ const ReportTable = (props) => {
           setInvalidRecords(invalidItems);
           setImportedData(validRecords);
         } else {
-          alert(t("100-records-only"));
+          showToast(t("100-records-only"), "warning"); // Updated line
           event.target.value = "";
           setImportedData([]);
         }
       } else {
-        alert(t("invalid-data"));
+        showToast(t("invalid-data"), "warning"); // Updated line
         event.target.value = "";
       }
     };
@@ -1163,11 +1094,11 @@ const ReportTable = (props) => {
             setInvalidRecords(invalidItems);
             setImportedData(validRecords);
           } else {
-            alert(t("invalid-data"));
+            showToast(t("invalid-data"), "warning"); // Updated line
             event.target.value = "";
           }
         } else {
-          alert(t("100-records-only"));
+          showToast(t("100-records-only"), "warning"); // Updated line
           event.target.value = "";
           setImportedData([]);
         }
@@ -1245,22 +1176,17 @@ const ReportTable = (props) => {
       const contacts = JSON.stringify(filterdata);
       const res = await Parse.Cloud.run("createbatchcontact", { contacts });
       if (res) {
-        setIsAlert(true);
-        setAlertMsg({
-          type: "info",
-          message: t("contact-imported", {
-            imported: res?.success || 0,
-            failed: res?.failed || 0
-          })
-        });
+        showToast(t("contact-imported", {
+          imported: res?.success || 0,
+          failed: res?.failed || 0
+        }), "info"); // Updated line
         if (res?.success > 0) {
           setTimeout(() => window.location.reload(), 2000);
         }
       }
     } catch (err) {
       console.log("err while creating batch contact", err);
-      setIsAlert(true);
-      setAlertMsg({ type: "danger", message: t("something-went-wrong-mssg") });
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
     } finally {
       setActLoader({});
       setIsModal({});
@@ -1281,18 +1207,10 @@ const ReportTable = (props) => {
       if (duplicateRes) {
         const newTemplate = JSON.parse(JSON.stringify(duplicateRes));
         props.setList((prevData) => [newTemplate, ...prevData]);
-        setIsAlert(true);
-        setAlertMsg({
-          type: "success",
-          message: t("duplicate-template-created")
-        });
+        showToast(t("duplicate-template-created"), "success"); // Success toast
       }
     } catch (err) {
-      setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
+      showToast(t("something-went-wrong-mssg"), "error"); // Error toast
       console.log("Err while create duplicate template", err);
     } finally {
       setActLoader({});
@@ -1317,19 +1235,11 @@ const ReportTable = (props) => {
         x.objectId === item.objectId ? { ...x, Name: renameDoc } : x
       );
       props.setList(updateList);
-      setIsAlert(true);
-      setAlertMsg({
-        type: "success",
-        message: "Document updated"
-      });
+      showToast(t("document-updated"), "success"); // Updated line
       setActLoader({});
       setTimeout(() => setIsAlert(false), 2000);
     } catch (err) {
-      setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
       setActLoader({});
       setTimeout(() => setIsAlert(false), 2000);
     }
@@ -1351,12 +1261,24 @@ const ReportTable = (props) => {
       x.objectId === contact.objectId ? { ...x, ...updateContact } : x
     );
     props.setList(updateList);
+    showToast(t("contact-updated-successfully"), "success"); // Success toast
   };
   const handleCloseModal = () => {
     setIsModal({});
   };
   return (
     <div className="relative">
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       {Object.keys(actLoader)?.length > 0 && (
         <div className="absolute w-full h-full flex justify-center items-center bg-black bg-opacity-30 z-30">
           <Loader />

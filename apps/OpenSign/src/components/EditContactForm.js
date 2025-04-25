@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import Parse from "parse";
+import { toast } from "react-toastify";
+
 const EditContactForm = (props) => {
   const { t } = useTranslation();
   const [isLoader, setIsLoader] = useState(false);
@@ -45,9 +47,9 @@ const EditContactForm = (props) => {
       } catch (err) {
         console.log("err in edit contact ", err);
         if (err.code === 137) {
-          alert(t("contact-already-exists"));
+          toast.error(t("contact-already-exists"));
         } else {
-          alert(t("something-went-wrong-mssg"));
+          toast.error(t("something-went-wrong-mssg"));
         }
       } finally {
         setIsLoader(false);

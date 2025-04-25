@@ -22,6 +22,8 @@ import SelectLanguage from "../components/pdf/SelectLanguage";
 import { setPaymentMode } from "../redux/reducers/PaymentReducer";
 import countries from "../json/CountriesJson";
 import _ from 'lodash';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -159,7 +161,7 @@ function UserProfile() {
           setIsLoader(false);
         }
       } catch (e) {
-        alert(t("something-went-wrong-mssg"));
+        toast.error(t("something-went-wrong-mssg"));
       }
     }
   };
@@ -208,14 +210,14 @@ function UserProfile() {
                 });
                 await updatePaymentMode(tempPaymentMode ? 'post_paid' : 'pre_paid');
                 dispatch(setPaymentMode(tempPaymentMode));
-                alert(t("profile-update-alert"));
+                toast.success(t("profile-update-alert"));
                 setEditMode(false);
                 setIsLoader(false);
                 //navigate("/dashboard/35KBoSgoAK");
               }
             },
             (error) => {
-              alert(t("something-went-wrong-mssg"));
+              toast.error(t("something-went-wrong-mssg"));
               console.error("Error while updating tour", error);
               setIsLoader(false);
             }
@@ -332,15 +334,15 @@ function UserProfile() {
       });
       if (resEmail?.message === "Email is verified.") {
         setIsEmailVerified(true);
-        alert(t("Email-verified-alert-1"));
+        toast.success(t("Email-verified-alert-1"));
       } else if (resEmail?.message === "Email is already verified.") {
         setIsEmailVerified(true);
-        alert(t("Email-verified-alert-2"));
+        toast.info(t("Email-verified-alert-2"));
       }
       setOtp("");
       setIsVerifyModal(false);
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setOtpLoader(false);
     }
@@ -351,7 +353,7 @@ function UserProfile() {
     setOtpLoader(true);
     await handleSendOTP();
     setOtpLoader(false);
-    alert(t("otp-sent-alert"));
+    toast.info(t("otp-sent-alert"));
   };
 
   const handleCancel = () => {
@@ -387,6 +389,17 @@ function UserProfile() {
 
   return (
     <React.Fragment>
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Title title={"Profile"} />
       {isLoader ? (
         <div className="h-[100vh] flex justify-center items-center">

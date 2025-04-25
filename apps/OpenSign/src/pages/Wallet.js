@@ -5,6 +5,8 @@ import PaginationComponent from "./PaginationComponent"; // Adjust the import pa
 import AddCreditsModal from "./AddCreditsModal";
 import { WalletCard } from "./WalletCard";
 import Loader from "../primitives/Loader";
+import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS for toasts
 
 
 // Import necessary components and hooks
@@ -40,23 +42,26 @@ const Wallet = () => {
     fetchData();
   }, [rowsPerPage]);
 
-  const fetchWalletDetails = async () => {
-    try {
-      const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
-        headers: {
-          Authorization: `Bearer ${djangoToken}`,
-        },
-      });
-      if (response.data.status) {
-        console.log("Wallet details fetched successfully:", response.data.data);
-        setWalletDetails(response.data.data); // Store wallet details in state
-      } else {
-        console.error("Failed to fetch wallet details:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching wallet details:", error);
-    }
-  };
+  // const fetchWalletDetails = async () => {
+  //   try {
+  //     const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
+  //       headers: {
+  //         Authorization: `Bearer ${djangoToken}`,
+  //       },
+  //     });
+  //     if (response.data.status) {
+  //       console.log("Wallet details fetched successfully:", response.data.data);
+  //       setWalletDetails(response.data.data);
+  //       toast.success("Wallet details fetched successfully!"); // Toast for success
+  //     } else {
+  //       console.error("Failed to fetch wallet details:", response.data.message);
+  //       toast.error("Failed to fetch wallet details: " + response.data.message); // Toast for error
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching wallet details:", error);
+  //     toast.error("Error fetching wallet details: " + error.message); // Toast for error
+  //   }
+  // };
 
   const fetchOfflineOrders = async () => {
     try {
@@ -68,14 +73,15 @@ const Wallet = () => {
       console.log(response.data);
       if (response.data) {
         console.log("Offline orders fetched successfully:", response.data.data);
-        // Assuming response.data.data is an array of orders
-        // setCreditsData(prevData => [...prevData, ...response.data.data]); // Update creditsData state
         setCreditsData(response.data.data);
+        toast.success("Offline orders fetched successfully!"); // Toast for success
       } else {
         console.error("Failed to fetch offline orders:", response.data.message);
+        toast.error("Failed to fetch offline orders: " + response.data.message); // Toast for error
       }
     } catch (error) {
       console.error("Error fetching offline orders:", error);
+      toast.error("Error fetching offline orders: " + error.message); // Toast for error
     }
   };
 
@@ -169,6 +175,17 @@ const Wallet = () => {
     
     {/* <div className="flex flex-col h-80vh bg-gray-100 p-5"> */}
     <div>
+    <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Title title="Wallet" drive={false} /> {/* Set the page title using Title component */}
       
       {/* New Card */}

@@ -5,6 +5,8 @@ import PaginationComponent from "./PaginationComponent"; // Adjust the import pa
 import AddCreditsModal from "./AddCreditsModal";
 import Loader from "../primitives/Loader";
 import Title from "../components/Title";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const MonthlyBills = () => {
@@ -43,8 +45,10 @@ const MonthlyBills = () => {
       });
       console.log("Transactions data is fetched:", response.data);
       setBillsData(response.data.data); // Store the fetched data in state
+      toast.success("Transactions data fetched successfully!");
     } catch (error) {
       console.error("Error fetching transactions data:", error);
+      toast.error("Error fetching transactions data!");
     } finally {
       setIsLoading(false); // Set loading to false after fetching
     }
@@ -493,8 +497,17 @@ const MonthlyBills = () => {
           setCurrentPage={setCurrentPage}
         />
       </div>
-
-      
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     {/* </div> */}
     </>
   );
