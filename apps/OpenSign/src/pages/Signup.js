@@ -400,22 +400,29 @@ function SignUp() {
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
         phone: formData.phoneNumber,
-        company: formData.companyName,
+        company: formData.companySignup === "yes" ? formData.companyName : "",
         jobTitle: "", // You can add this if needed
       };
 
       try {
-        // Attempt to create user on Instasign
-        const response = await axios.post(`${djangoUrl}/base/api/v1/register/`, {
+        // Prepare the payload based on company signup status
+        const payload = {
           first_name: formData.firstName,
           last_name: formData.lastName,
           email: formData.email,
           phone_number: formData.phoneNumber,
           password: formData.password,
           country: formData.country,
-          company_name: formData.companyName,
-          user_type: "admin"
-        }, {
+          user_type: formData.companySignup === "yes" ? "admin" : "customer", // Set user_type based on company signup
+        };
+
+        // Include company_name only if signing up as a company
+        if (formData.companySignup === "yes") {
+          payload.company_name = formData.companyName;
+        }
+
+        // Attempt to create user on Instasign
+        const response = await axios.post(`${djangoUrl}/base/api/v1/register/`, payload, {
           headers: {
             'Content-Type': 'application/json', // Ensure the content type is set correctly 
           }
