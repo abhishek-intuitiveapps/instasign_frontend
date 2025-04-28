@@ -1,10 +1,7 @@
 import dotenv from 'dotenv';
-// import { format, toZonedTime } from 'date-fns-tz';
-// import { getSignedLocalUrl } from './cloud/parsefunction/getSignedUrl.js';
-// import { PDFDocument } from 'pdf-lib';
-const { format, toZonedTime } = require('date-fns-tz');
-const { getSignedLocalUrl } = require('./cloud/parsefunction/getSignedUrl');
-const { PDFDocument } = require('pdf-lib');
+import { format, toZonedTime } from 'date-fns-tz';
+import { getSignedLocalUrl } from './cloud/parsefunction/getSignedUrl.js';
+import { PDFDocument } from 'pdf-lib';
 dotenv.config();
 
 export const cloudServerUrl = 'http://localhost:8080/app';
@@ -294,23 +291,3 @@ export function formatDateTime(date, dateFormat, timeZone, is12Hour) {
     ? format(zonedDate, `${selectFormat(dateFormat)}, ${timeFormat} 'GMT' XXX`, { timeZone })
     : formatTimeInTimezone(date, timeZone);
 }
-
-module.exports = {
-  cloudServerUrl,
-  appName,
-  color,
-  replaceMailVaribles,
-  saveFileUsage,
-  updateMailCount,
-  sanitizeFileName,
-  useLocal,
-  smtpsecure,
-  smtpenable,
-  generateId,
-  formatTimeInTimezone,
-  getSecureUrl,
-  flattenPdf,
-  mailTemplate,
-  selectFormat,
-  formatDateTime,
-};
