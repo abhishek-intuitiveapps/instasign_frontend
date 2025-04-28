@@ -35,7 +35,7 @@ const Wallet = () => {
     localStorage.setItem("rowsPerPage", rowsPerPage);
     const fetchData = async () => {
       setIsLoading(true); // Set loading to true before fetching
-      await fetchWalletDetails();
+      // await fetchWalletDetails();
       fetchOfflineOrders();
       setIsLoading(false); // Set loading to false after fetching
     };
@@ -74,7 +74,7 @@ const Wallet = () => {
       if (response.data) {
         console.log("Offline orders fetched successfully:", response.data.data);
         setCreditsData(response.data.data);
-        toast.success("Offline orders fetched successfully!"); // Toast for success
+        // toast.success("Offline orders fetched successfully!"); // Toast for success
       } else {
         console.error("Failed to fetch offline orders:", response.data.message);
         toast.error("Failed to fetch offline orders: " + response.data.message); // Toast for error
@@ -175,17 +175,6 @@ const Wallet = () => {
     
     {/* <div className="flex flex-col h-80vh bg-gray-100 p-5"> */}
     <div>
-    <ToastContainer 
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
       <Title title="Wallet" drive={false} /> {/* Set the page title using Title component */}
       
       {/* New Card */}
@@ -303,6 +292,17 @@ const Wallet = () => {
       </div>
       <AddCreditsModal show={showModal} handleClose={() => setShowModal(false)} />
     {/* </div> */}
+    <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   );
 };
