@@ -461,7 +461,7 @@ const ReportTable = (props) => {
       });
       if (res.data && res.data.updatedAt) {
         setActLoader({});
-        showToast(t("record-delete-alert"), "success"); // Updated line
+        showToast(t("record-delete-alert"), "error"); // Updated line
         const upldatedList = props.List.filter(
           (x) => x.objectId !== item.objectId
         );
