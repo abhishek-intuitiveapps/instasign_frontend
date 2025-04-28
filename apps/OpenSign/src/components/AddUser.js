@@ -11,6 +11,8 @@ import {
 } from "../constant/const";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function generatePassword(length) {
   const characters =
@@ -76,7 +78,7 @@ const AddUser = (props) => {
     e.preventDefault();
     e.stopPropagation();
     if (!emailRegex.test(formdata.email)) {
-      alert("Please enter a valid email address.");
+      toast.error("Please enter a valid email address.");
     } else {
       const localUser = JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
       setIsFormLoader(true);
@@ -163,6 +165,9 @@ const AddUser = (props) => {
 
             const user = await _user.save();
             if (user) {
+              // Success toast for user creation
+              toast.success(t("user-created-successfully"));
+
               const currentUser = Parse.User.current();
               extUser.set(
                 "CreatedBy",
@@ -259,10 +264,7 @@ const AddUser = (props) => {
         } catch (err) {
           console.log("err", err);
           setIsFormLoader(false);
-          props.setIsAlert({
-            type: "danger",
-            msg: t("something-went-wrong-mssg")
-          });
+          toast.error(t("something-went-wrong-mssg"));
         } finally {
           setTimeout(
             () => props.setIsAlert({ type: "success", msg: "" }),
@@ -301,6 +303,17 @@ const AddUser = (props) => {
   };
   return (
     <div className="shadow-md rounded-box my-[1px] p-3 bg-base-100 relative">
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Title title={t("add-user")} />
       {isFormLoader && (
         <div className="absolute w-full h-full inset-0 flex justify-center items-center bg-base-content/30 z-50">

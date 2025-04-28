@@ -1080,7 +1080,7 @@ const Forms = (props) => {
                       </div>
                       {props.bcc && (
                         <SignersInput
-                          label={t("Bcc")}
+                          label={t("cc")}
                           initialData={bcc}
                           onChange={handleBcc}
                           isReset={isReset}

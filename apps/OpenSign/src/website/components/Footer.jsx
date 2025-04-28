@@ -4,7 +4,7 @@ const Footer = () => {
   return (
     <footer className="op-bg-primary text-white py-16">
       <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
             <div className="mb-4">
               <a href="/" className="text-2xl font-bold">
@@ -110,7 +110,7 @@ const Footer = () => {
             </ul>
           </div>
           
-          <div className="md:col-span-1">
+          {/* <div className="md:col-span-1">
             <h3 className="font-semibold text-lg mb-4 text-white">Subscribe</h3>
             <p className="text-white/80 mb-4">
               Subscribe to our newsletter to get updates on new features and releases.
@@ -125,7 +125,7 @@ const Footer = () => {
                 Subscribe
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
         
         <div className="border-t border-white/20 mt-12 pt-6 text-center">

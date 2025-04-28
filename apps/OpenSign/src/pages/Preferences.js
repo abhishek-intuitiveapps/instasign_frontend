@@ -20,6 +20,8 @@ import EditorToolbar, {
   module2,
   formats
 } from "../components/pdf/EditorToolbar";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Preferences = () => {
   const { t } = useTranslation();
@@ -123,15 +125,17 @@ const Preferences = () => {
           enabledSignTypes?.length === 1 &&
           enabledSignTypes[0]?.name === "default";
         if (enabledSignTypes.length === 0) {
-          setIsAlert({
-            type: "danger",
-            msg: t("at-least-one-signature-type")
-          });
+          // setIsAlert({
+          //   type: "danger",
+          //   msg: t("at-least-one-signature-type")
+          // });
+          toast.error(t("at-least-one-signature-type"));
         } else if (isDefaultSignTypeOnly) {
-          setIsAlert({
-            type: "danger",
-            msg: t("expect-default-one-more-signature-type")
-          });
+          // setIsAlert({
+          //   type: "danger",
+          //   msg: t("expect-default-one-more-signature-type")
+          // });
+          toast.error(t("expect-default-one-more-signature-type"));
         } else {
           params = { ...params, SignatureType: signatureType };
         }
@@ -142,7 +146,7 @@ const Preferences = () => {
       try {
         const updateRes = await Parse.Cloud.run("updatepreferences", params);
         if (updateRes) {
-          setIsAlert({ type: "success", msg: "Saved successfully." });
+          toast.success("Saved successfully.");
           let extUser =
             localStorage.getItem("Extand_Class") &&
             JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
@@ -154,7 +158,7 @@ const Preferences = () => {
         }
       } catch (err) {
         console.log("Error updating signature type", err);
-        setIsAlert({ type: "danger", msg: err.message });
+        toast.error(err.message);
       }
 
       setTimeout(() => setIsAlert({ type: "success", msg: "" }), 1500);
@@ -168,7 +172,8 @@ const Preferences = () => {
   };
   const tenantEmailTemplate = async (tenantRes) => {
     if (tenantRes === "user does not exist!") {
-      alert("User does not exist");
+      // alert("User does not exist");
+      toast.error("user does not exist");
     } else if (tenantRes) {
       setIsLoader(true);
       const updateRes = tenantRes;
@@ -220,12 +225,14 @@ const Preferences = () => {
         const updateRes = JSON.parse(JSON.stringify(res));
         SetCompletionBody(updateRes?.CompletionBody);
         setCompletionSubject(updateRes?.CompletionSubject);
-        setIsAlert({ type: "success", msg: "Saved successfully." });
+        // setIsAlert({ type: "success", msg: "Saved successfully." });
+        toast.success("Saved successfully.");
         setTimeout(() => setIsAlert({ type: "", msg: "" }), 1500);
       }
     } catch (err) {
       console.log("Err", err);
-      setIsAlert({ type: "danger", msg: "Something went wrong." });
+      // setIsAlert({ type: "danger", msg: "Something went wrong." });
+      toast.error("Something went wrong!!");
       setTimeout(() => setIsAlert({ type: "", msg: "" }), 1500);
     } finally {
       setIsLoader(false);
@@ -247,12 +254,14 @@ const Preferences = () => {
         const updateRes = JSON.parse(JSON.stringify(res));
         setRequestBody(updateRes?.RequestBody);
         setRequestSubject(updateRes?.RequestSubject);
-        setIsAlert({ type: "success", msg: "Saved successfully." });
+        // setIsAlert({ type: "success", msg: "Saved successfully." });
+        toast.success("Saved Successfully.");
         setTimeout(() => setIsAlert({ type: "", msg: "" }), 1500);
       }
     } catch (err) {
       console.log("Err", err);
-      setIsAlert({ type: "danger", msg: "Something went wrong." });
+      // setIsAlert({ type: "danger", msg: "Something went wrong." });
+      toast.error("Something went wrong.");
       setTimeout(() => setIsAlert({ type: "", msg: "" }), 1500);
     } finally {
       setIsLoader(false);
@@ -285,8 +294,19 @@ const Preferences = () => {
 
   return (
     <React.Fragment>
+      {/* <ToastContainer /> */}
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Title title={t("Preferences")} />
-      {isalert.msg && <Alert type={isalert.type}>{isalert.msg}</Alert>}
       {isTopLoader ? (
         <div className="flex justify-center items-center h-screen">
           <Loader />
