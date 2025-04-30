@@ -519,6 +519,7 @@ const Preferences = () => {
                               <Tooltip
                                 id={"request-sub-tooltip"}
                                 message={`${t("variables-use")}: {{sender_name}} {{document_title}}`}
+                                className="ml-1"
                               />
                             </label>
                             <input
@@ -537,6 +538,7 @@ const Preferences = () => {
                               <Tooltip
                                 id={"request-body-tooltip"}
                                 message={`${t("variables-use")}: {{sender_name}} {{document_title}}`}
+                                className="ml-1"
                               />
                             </label>
                             <EditorToolbar containerId="toolbar1" />
@@ -583,6 +585,7 @@ const Preferences = () => {
                               <Tooltip
                                 id={"complete-sub-tooltip"}
                                 message={`${t("variables-use")}:{{sender_name}} {{document_title}}`}
+                                className="ml-1"
                               />
                             </label>
                             <input
@@ -601,6 +604,7 @@ const Preferences = () => {
                               <Tooltip
                                 id={"complete-body-tooltip"}
                                 message={`${t("variables-use")}:{{sender_name}} {{document_title}} {{signing_url}}`}
+                                className="ml-1"
                               />
                             </label>
                             <EditorToolbar containerId="toolbar2" />
