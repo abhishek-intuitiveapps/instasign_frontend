@@ -71,6 +71,7 @@ function SignUp() {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [companyNameError, setCompanyNameError] = useState("");
 
   useEffect(() => {
     checkUserExt();
@@ -248,9 +249,12 @@ function SignUp() {
     } else if (name === "password" || name === "confirmPassword") {
       // Update state for password fields
       setFormData({ ...formData, [name]: value });
+    } else if (name === "companySignup" || name === "email") {
+      // Don't capitalize email or radio button values
+      setFormData({ ...formData, [name]: value });
     } else {
-      // Capitalize the first letter of the input value, except for the email field
-      const capitalizedValue = name === "email" ? value : value.charAt(0).toUpperCase() + value.slice(1);
+      // Capitalize the first letter of other input values
+      const capitalizedValue = value.charAt(0).toUpperCase() + value.slice(1);
       setFormData({ ...formData, [name]: capitalizedValue });
     }
   };
@@ -373,6 +377,7 @@ function SignUp() {
     setPasswordError("");
     setConfirmPasswordError("");
     setPhoneError("");
+    setCompanyNameError("");
 
     if (!emailRegex.test(formData.email)) {
       setEmailError("Please enter a valid email address.");
@@ -391,6 +396,11 @@ function SignUp() {
 
     if (!formData.phoneNumber) {
       setPhoneError("Phone number is required.");
+      valid = false;
+    }
+
+    if (formData.companySignup === "yes" && !formData.companyName.trim()) {
+      setCompanyNameError("Company name is required when signing up as a company.");
       valid = false;
     }
 
@@ -640,12 +650,14 @@ function SignUp() {
                     id="companyName"
                     type="text"
                     placeholder="Company Name"
-                    className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full py-2 px-3 border ${formData.companySignup === "yes" && companyNameError ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     name="companyName"
                     value={formData.companyName}
                     onChange={handleChange}
                     disabled={formData.companySignup === "no"}
+                    required={formData.companySignup === "yes"}
                   />
+                  {formData.companySignup === "yes" && companyNameError && <p className="text-red-500 text-sm">{companyNameError}</p>}
                 </fieldset>
                 <div className="grid grid-cols-1 gap-1 text-center mb-6">
                   <button
