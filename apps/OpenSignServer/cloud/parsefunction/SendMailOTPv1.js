@@ -28,6 +28,10 @@ async function sendMailOTPv1(request) {
       const recipient = request.params.email;
       const mailsender = smtpenable ? process.env.SMTP_USER_EMAIL : process.env.MAILGUN_SENDER;
       try {
+        console.log('Attempting to send email to:', recipient);
+        console.log('Using email provider:', smtpenable ? 'SMTP' : 'Mailgun');
+        console.log('Sender email:', mailsender);
+        
         await Parse.Cloud.sendEmail({
           from: appName + ' <' + mailsender + '>',
           recipient: recipient,
@@ -47,6 +51,7 @@ async function sendMailOTPv1(request) {
         }
       } catch (err) {
         console.log('error in send OTP mail', err);
+        console.log('Error details:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
       }
       const tempOtp = new Parse.Query('defaultdata_Otp');
       tempOtp.equalTo('Email', email);
