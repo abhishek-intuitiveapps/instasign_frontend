@@ -358,13 +358,13 @@ export default async function GenerateCertificate(docDetails) {
     color: rgb(0.12, 0.12, 0.12),
     thickness: 0.5,
   });
-  let yPosition1 = 512;
-  let yPosition2 = 498;
-  let yPosition3 = 478;
-  let yPosition4 = 458;
-  let yPosition5 = 438;
-  let yPosition6 = 418;
-  let yPosition7 = 398;
+  let yPosition1 = 512-10;
+  let yPosition2 = 487-10;
+  let yPosition3 = 462-10;
+  let yPosition4 = 437-10;
+  let yPosition5 = 412-10;
+  let yPosition6 = 387-10;
+  let yPosition7 = 362;
   let yPosition8 = 363;
 
   // Get KYC verification status for all signers
@@ -385,6 +385,13 @@ export default async function GenerateCertificate(docDetails) {
     const isVerified = isKycRequired && kycData[signerEmail]?.verified;
 
     console.log(`Signer ${i + 1} - Email: ${signerEmail}, Verified: ${isVerified}`);
+    page.drawText(`Signer ${1 + i}`, {
+      x: 30,
+      y: yPosition1,
+      size: subtitle,
+      font: timesRomanFont,
+      color: titleColor,
+    });
 
     if (isVerified) {
       // Draw verification badge
@@ -395,12 +402,12 @@ export default async function GenerateCertificate(docDetails) {
       //   height: 40,
       // });
 
-      page.drawImage(verifiedBadgeImage, {
-        x: width - 75,
-        y: yPosition1 - 65,
-        width: 40,
-        height: 40,
-      });
+      // page.drawImage(verifiedBadgeImage, {
+      //   x: width - 75,
+      //   y: yPosition1 - 65,
+      //   width: 40,
+      //   height: 40,
+      // });
       
       // Add KYC Verified text
       // page.drawText('KYC Verified', {
@@ -430,7 +437,7 @@ export default async function GenerateCertificate(docDetails) {
             // });
 
             page.drawRectangle({
-              x: width - 202,
+              x: width - 152,
               y: yPosition1 - 77,
               width: 74,
               height: 74,
@@ -440,7 +447,7 @@ export default async function GenerateCertificate(docDetails) {
             
             // Verification image - moved above
             page.drawImage(embeddedImage, {
-              x: width - 200,
+              x: width - 150,
               y: yPosition1 - 75, // Moved above
               width: 70, // Kept larger size
               height: 70, // Kept larger size
@@ -551,17 +558,17 @@ export default async function GenerateCertificate(docDetails) {
       color: textValueColor,
     });
 
-    page.drawText('Signature :', {
-      x: 30,
-      y: yPosition7,
-      size: signertext,
-      font: timesRomanFont,
-      color: textKeyColor,
-    });
+    // page.drawText('Signature :', {
+    //   x: 30,
+    //   y: yPosition7,
+    //   size: signertext,
+    //   font: timesRomanFont,
+    //   color: textKeyColor,
+    // });
 
     page.drawRectangle({
-      x: 140,
-      y: yPosition7 - 30,
+      x: width - 162,
+      y: yPosition7 + 5 , // Adjusted to match new spacing
       width: 104,
       height: 44,
       borderColor: rgb(0.22, 0.18, 0.47),
@@ -569,8 +576,8 @@ export default async function GenerateCertificate(docDetails) {
     });
     if (embedPng) {
       page.drawImage(embedPng, {
-        x: 142,
-        y: yPosition7 - 27,
+        x: width - 160,
+        y: yPosition7 + 2, // Adjusted to match new spacing
         width: 100,
         height: 40,
       });
@@ -583,12 +590,12 @@ export default async function GenerateCertificate(docDetails) {
     });
 
     yPosition1 = yPosition8 - 20;
-    yPosition2 = yPosition1 - 20;
-    yPosition3 = yPosition2 - 20;
-    yPosition4 = yPosition3 - 20;
-    yPosition5 = yPosition4 - 20;
-    yPosition6 = yPosition5 - 20;
-    yPosition7 = yPosition6 - 20;
+    yPosition2 = yPosition1 - 25;
+    yPosition3 = yPosition2 - 25;
+    yPosition4 = yPosition3 - 25;
+    yPosition5 = yPosition4 - 25;
+    yPosition6 = yPosition5 - 25;
+    yPosition7 = yPosition6 - 25;
     yPosition8 = yPosition8 - 174;
   }
 
@@ -620,16 +627,16 @@ export default async function GenerateCertificate(docDetails) {
         yPosition5 = yPosition4 - 20;
         yPosition6 = yPosition5 - 20;
         yPosition7 = yPosition6 - 20;
-        yPosition8 = currentPage.getHeight() - 190;
+        yPosition8 = currentPage.getHeight() - 170;
       }
 
-      // currentPage.drawText(`Signer ${4 + i}`, {
-      //   x: 30,
-      //   y: yPosition1,
-      //   size: subtitle,
-      //   font: timesRomanFont,
-      //   color: titleColor,
-      // });
+      currentPage.drawText(`Signer ${4 + i}`, {
+        x: 30,
+        y: yPosition1,
+        size: subtitle,
+        font: timesRomanFont,
+        color: titleColor,
+      });
       
       // Add verification badge and KYC info if available
       const signerEmail = x?.Email || '';
@@ -643,12 +650,12 @@ export default async function GenerateCertificate(docDetails) {
         //   height: 40,
         // });
 
-        currentPage.drawImage(verifiedBadgeImage, {
-          x: width - 75,
-          y: yPosition1 - 65, // Moved below
-          width: 40,
-          height: 40,
-        });
+        // currentPage.drawImage(verifiedBadgeImage, {
+        //   x: width - 75,
+        //   y: yPosition1 - 65, // Moved below
+        //   width: 40,
+        //   height: 40,
+        // });
         
         // currentPage.drawText('KYC Verified', {
         //   x: width - 140,
@@ -676,7 +683,7 @@ export default async function GenerateCertificate(docDetails) {
               // });
 
               currentPage.drawRectangle({
-                x: width - 202,
+                x: width - 152,
                 y: yPosition1 - 77,
                 width: 74,
                 height: 74,
@@ -686,7 +693,7 @@ export default async function GenerateCertificate(docDetails) {
               
               // Verification image - moved above
               currentPage.drawImage(embeddedImage, {
-                x: width - 200,
+                x: width - 150,
                 y: yPosition1 - 75, // Moved above
                 width: 70, // Kept larger size
                 height: 70, // Kept larger size
@@ -797,16 +804,17 @@ export default async function GenerateCertificate(docDetails) {
         color: textValueColor,
       });
 
-      currentPage.drawText('Signature :', {
-        x: 30,
-        y: yPosition7,
-        size: signertext,
-        font: timesRomanFont,
-        color: textKeyColor,
-      });
+      // currentPage.drawText('Signature :', {
+      //   x: 30,
+      //   y: yPosition7,
+      //   size: signertext,
+      //   font: timesRomanFont,
+      //   color: textKeyColor,
+      // });
+      
       currentPage.drawRectangle({
-        x: 140,
-        y: yPosition7 - 27,
+        x: width - 162,
+        y: yPosition7 + 5 , // Adjusted to match new spacing
         width: 104,
         height: 44,
         borderColor: rgb(0.22, 0.18, 0.47),
@@ -814,8 +822,8 @@ export default async function GenerateCertificate(docDetails) {
       });
       if (embedPng) {
         currentPage.drawImage(embedPng, {
-          x: 142,
-          y: yPosition7 - 25,
+          x: width - 160,
+          y: yPosition7 + 2 , // Adjusted to match new spacing
           width: 100,
           height: 40,
         });
@@ -830,12 +838,12 @@ export default async function GenerateCertificate(docDetails) {
 
       // Update y positions for the next entry
       yPosition1 = yPosition8 - 20;
-      yPosition2 = yPosition1 - 20;
-      yPosition3 = yPosition2 - 20;
-      yPosition4 = yPosition3 - 20;
-      yPosition5 = yPosition4 - 20;
-      yPosition6 = yPosition5 - 20;
-      yPosition7 = yPosition6 - 20;
+      yPosition2 = yPosition1 - 25;
+      yPosition3 = yPosition2 - 25;
+      yPosition4 = yPosition3 - 25;
+      yPosition5 = yPosition4 - 25;
+      yPosition6 = yPosition5 - 25;
+      yPosition7 = yPosition6 - 25;
       yPosition8 = yPosition8 - 174;
     }
   }

@@ -55,6 +55,7 @@ function App() {
   const [isloading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
   const paymentMode = useSelector((state) => state.payment.mode);
+  const djangoUser = JSON.parse(localStorage.getItem('djangoUser'))
 
   useEffect(() => {
     const storedPaymentMode = localStorage.getItem('paymentMode');
@@ -197,7 +198,7 @@ function App() {
                 path="/recipientSignPdf/:docId"
                 element={<PdfRequestFiles />}
               />
-              <Route path="/users" element={<UserList />} />
+              {djangoUser?.is_main_admin && (<Route path="/users" element={<UserList />} />)}
               <Route
                 path="/preferences"
                 element={<LazyPage Page={Preferences} />}
