@@ -38,7 +38,8 @@ const AddUser = (props) => {
   });
   const [isFormLoader, setIsFormLoader] = useState(false);
   const [teamList, setTeamList] = useState([]);
-  const role = ["OrgAdmin", "Editor", "User"];
+  // const role = ["OrgAdmin", "Editor", "User"];
+  const role = ["User"];
   const djangoUrl = process.env.REACT_APP_DJANGO_URL;
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
   const djangoToken = localStorage.getItem('django');
@@ -49,7 +50,6 @@ const AddUser = (props) => {
   }, []);
 
   const getTeamList = async () => {
-    setFormdata((prev) => ({ ...prev, password: generatePassword(12) }));
     const teamRes = await Parse.Cloud.run("getteams", { active: true });
     if (teamRes.length > 0) {
       const _teamRes = JSON.parse(JSON.stringify(teamRes));
@@ -93,6 +93,13 @@ const AddUser = (props) => {
           const nameParts = formdata.name.split(" ");
           const firstName = nameParts[0] || "";
           const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+          // Check if last name is empty
+          if (!lastName) {
+            toast.error("Please enter full name");
+            setIsFormLoader(false);
+            return; // Exit the function if last name is not present
+          }
           
           // Call Django register API
           
@@ -335,6 +342,7 @@ const AddUser = (props) => {
                           name="name"
                           value={formdata.name}
                           onChange={(e) => handleChange(e)}
+                          placeholder="Name should be matched as govt document"
                           onInvalid={(e) =>
                             e.target.setCustomValidity(t("input-required"))
                           }
@@ -365,19 +373,25 @@ const AddUser = (props) => {
                         />
                       </div>
                       <div className="mb-3">
-                        <label className="block text-xs text-gray-700 font-semibold">
+                        <label
+                          htmlFor="password"
+                          className="block text-xs text-gray-700 font-semibold"
+                        >
                           {t("password")}
+                          <span className="text-[red] text-[13px]"> *</span>
                         </label>
-                        <div className="flex justify-between items-center op-input op-input-bordered op-input-sm text-base-content w-full h-full text-[13px]">
-                          <div className="break-all">{formdata?.password}</div>
-                          <i
-                            onClick={() => copytoclipboard(formdata?.password)}
-                            className="fa-light fa-copy rounded-full hover:bg-base-300 p-[8px] cursor-pointer "
-                          ></i>
-                        </div>
-                        <div className="text-[12px] ml-2 mb-0 text-[red] select-none">
-                          {t("password-generateed")}
-                        </div>
+                        <input
+                          type="password"
+                          name="password"
+                          value={formdata.password}
+                          onChange={(e) => handleChange(e)}
+                          required
+                          onInvalid={(e) =>
+                            e.target.setCustomValidity(t("input-required"))
+                          }
+                          onInput={(e) => e.target.setCustomValidity("")}
+                          className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
+                        />
                       </div>
                       <div className="mb-3">
                         <label

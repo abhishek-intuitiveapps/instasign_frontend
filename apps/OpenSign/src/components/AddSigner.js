@@ -240,6 +240,7 @@ const AddSigner = (props) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              placeholder="Name should be matched as govt document"
               disabled={addYourself}
               onInvalid={(e) => e.target.setCustomValidity(t("input-required"))}
               onInput={(e) => e.target.setCustomValidity("")}

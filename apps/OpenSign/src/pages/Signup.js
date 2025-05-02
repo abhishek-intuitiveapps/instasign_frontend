@@ -415,6 +415,7 @@ function SignUp() {
       };
 
       try {
+        console.log("Company Signup Value:", formData.companySignup);
         // Prepare the payload based on company signup status
         const payload = {
           first_name: formData.firstName,
@@ -510,7 +511,7 @@ function SignUp() {
             <div className="w-full max-w-2xl p-8">
               <h1 className="text-2xl font-bold text-left mb-6">{t("Sign Up")}</h1>
               <form onSubmit={handleSubmit} aria-label="Login Form">
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-4 mb-3">
                   <fieldset className="relative">
                     <input
                       id="firstName"
@@ -622,29 +623,32 @@ function SignUp() {
                       </select>
                     </div>
                   </fieldset>
+                  <fieldset className="relative">
+                      <div className="mt-2">
+                      <span className="font-bold">Sign up as company:</span>
+                      <label className="ml-2 font-bold">
+                        <input
+                          type="radio"
+                          name="companySignup"
+                          value="yes"
+                          onChange={handleChange}
+                        />
+                        <span className="ml-1">Yes</span>
+                      </label>
+                      <label className="ml-2 font-bold">
+                        <input
+                          type="radio"
+                          name="companySignup"
+                          value="no"
+                          onChange={handleChange}
+                          defaultChecked
+                        />
+                        <span className="ml-1">No</span>
+                      </label>
+                    </div>
+                  </fieldset>
                 </div>
-                <div className="mb-4">
-                  <span className="font-bold">Sign up as company:</span>
-                  <label className="ml-2 font-bold">
-                    <input
-                      type="radio"
-                      name="companySignup"
-                      value="yes"
-                      onChange={handleChange}
-                    />
-                    <span className="ml-1">Yes</span>
-                  </label>
-                  <label className="ml-2 font-bold">
-                    <input
-                      type="radio"
-                      name="companySignup"
-                      value="no"
-                      onChange={handleChange}
-                      defaultChecked
-                    />
-                    <span className="ml-1">No</span>
-                  </label>
-                </div>
+                
                 <fieldset className="mb-4 relative">
                   <input
                     id="companyName"
