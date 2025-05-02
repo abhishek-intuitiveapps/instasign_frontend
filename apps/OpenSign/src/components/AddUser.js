@@ -78,7 +78,8 @@ const AddUser = (props) => {
     e.preventDefault();
     e.stopPropagation();
     if (!emailRegex.test(formdata.email)) {
-      toast.error("Please enter a valid email address.");
+      // toast.error("Please enter a valid email address.");
+      props.setIsAlert({type: "danger", msg: "Please enter a valid email address."});
     } else {
       const localUser = JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
       setIsFormLoader(true);
@@ -96,7 +97,8 @@ const AddUser = (props) => {
 
           // Check if last name is empty
           if (!lastName) {
-            toast.error("Please enter full name");
+            // toast.error("Please enter full name");
+            props.setIsAlert({ type: "danger", msg: "Please enter full name."});
             setIsFormLoader(false);
             return; // Exit the function if last name is not present
           }
@@ -173,7 +175,8 @@ const AddUser = (props) => {
             const user = await _user.save();
             if (user) {
               // Success toast for user creation
-              toast.success(t("user-created-successfully"));
+              // toast.success(t("user-created-successfully"));
+              props.setIsAlert({ type: "success", msg: t("user-created-successfully") });
 
               const currentUser = Parse.User.current();
               extUser.set(
@@ -271,7 +274,8 @@ const AddUser = (props) => {
         } catch (err) {
           console.log("err", err);
           setIsFormLoader(false);
-          toast.error(t("something-went-wrong-mssg"));
+          // toast.error(t("something-went-wrong-mssg"));
+          props.setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
         } finally {
           setTimeout(
             () => props.setIsAlert({ type: "success", msg: "" }),
@@ -310,7 +314,7 @@ const AddUser = (props) => {
   };
   return (
     <div className="shadow-md rounded-box my-[1px] p-3 bg-base-100 relative">
-      <ToastContainer 
+      {/* <ToastContainer 
         position="bottom-right"
         autoClose={5000}
         hideProgressBar={false}
@@ -320,7 +324,7 @@ const AddUser = (props) => {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-      />
+      /> */}
       <Title title={t("add-user")} />
       {isFormLoader && (
         <div className="absolute w-full h-full inset-0 flex justify-center items-center bg-base-content/30 z-50">
