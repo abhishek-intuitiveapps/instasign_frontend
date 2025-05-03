@@ -2021,7 +2021,7 @@ function PdfRequestFiles(
       
       // Check if the response contains data and find the current signer's KYC status
       const currentSignerKyc = response.data.data.find(signer => signer.signer_email === signerEmail);
-      const kycDone = currentSignerKyc ? currentSignerKyc.status : false; // Default to false if not found
+      const kycDone = currentSignerKyc ? true : false; // Default to false if not found
       
       setKycStatus(kycDone);
       return kycDone;

@@ -168,6 +168,7 @@ const AddContact = (props) => {
               onChange={(e) => setName(e.target.value)}
               onInvalid={(e) => e.target.setCustomValidity(t("input-required"))}
               onInput={(e) => e.target.setCustomValidity("")}
+              placeholder="Name should be matched as govt document"
               required
               disabled={addYourself}
               className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"

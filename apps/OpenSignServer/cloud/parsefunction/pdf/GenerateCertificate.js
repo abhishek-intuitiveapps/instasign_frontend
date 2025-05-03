@@ -40,14 +40,13 @@ async function getKYCDetails(docId, signerEmails) {
       return {};
     }
     
-    // Call the actual KYC API using axios
     const response = await axios.post(`${process.env.DJANGO_SERVER_URL}/base/api/v1/kycee/get/details/`, {
       document_id: docId,
       client_secret: process.env.KYCEE_DJANGO_CLIENT_SECRET
     });
     
     const result = response.data;
-    console.log(result);
+    console.log("KYC API Response:", result); // Log the entire response
     
     if (!result.status) {
       console.error('KYC API returned an error');
@@ -61,9 +60,9 @@ async function getKYCDetails(docId, signerEmails) {
     if (result.data && Array.isArray(result.data)) {
       result.data.forEach(entry => {
         const email = entry.signer_email;
-        if (email && entry.status === true) {
+        if (email) {
           kycData[email] = {
-            verified: true,
+            verified: entry.status === true,
             details: entry.kycee_data || {},
             verificationImage: entry.kycee_data?.verification_image || null
           };
@@ -383,6 +382,7 @@ export default async function GenerateCertificate(docDetails) {
     const embedPng = x.Signature ? await pdfDoc.embedPng(x.Signature) : '';
     const signerEmail = x?.Email || '';
     const isVerified = isKycRequired && kycData[signerEmail]?.verified;
+    const borderColor = isVerified ? verifiedColor : rgb(1, 0, 0); // Red color for unverified
 
     console.log(`Signer ${i + 1} - Email: ${signerEmail}, Verified: ${isVerified}`);
     page.drawText(`Signer ${1 + i}`, {
@@ -393,7 +393,7 @@ export default async function GenerateCertificate(docDetails) {
       color: titleColor,
     });
 
-    if (isVerified) {
+    // if (isVerified) {
       // Draw verification badge
       // page.drawImage(verifiedBadgeImage, {
       //   x: width - 60,
@@ -422,7 +422,7 @@ export default async function GenerateCertificate(docDetails) {
       const verificationImage = kycData[signerEmail]?.verificationImage;
       console.log(`Verification Image for ${signerEmail}:`, verificationImage?.slice(0, 50));
 
-      if (verificationImage) {
+      // if (verificationImage) {
         try {
           const imageBuffer = base64ToBuffer(verificationImage);
           console.log(`Image Buffer Length for ${signerEmail}:`, imageBuffer, imageBuffer?.length);
@@ -441,7 +441,7 @@ export default async function GenerateCertificate(docDetails) {
               y: yPosition1 - 77,
               width: 74,
               height: 74,
-              borderColor: verifiedColor,
+              borderColor: borderColor,
               borderWidth: 2,
             });
             
@@ -458,8 +458,8 @@ export default async function GenerateCertificate(docDetails) {
         } catch (error) {
           console.error(`Error embedding verification image for ${signerEmail}:`, error);
         }
-      }
-    }
+      // }
+    // }
     
     page.drawText('Name :', {
       x: 30,
@@ -641,8 +641,9 @@ export default async function GenerateCertificate(docDetails) {
       // Add verification badge and KYC info if available
       const signerEmail = x?.Email || '';
       const isVerified = isKycRequired && kycData[signerEmail]?.verified;
+      const borderColor = isVerified ? verifiedColor : rgb(1, 0, 0); // Red color for unverified
       
-      if (isVerified) {
+      // if (isVerified) {
         // currentPage.drawImage(verifiedBadgeImage, {
         //   x: width - 60,
         //   y: yPosition1 - 35,
@@ -687,7 +688,7 @@ export default async function GenerateCertificate(docDetails) {
                 y: yPosition1 - 77,
                 width: 74,
                 height: 74,
-                borderColor: verifiedColor,
+                borderColor: borderColor,
                 borderWidth: 2,
               });
               
@@ -705,7 +706,7 @@ export default async function GenerateCertificate(docDetails) {
             console.error(`Error embedding verification image for ${signerEmail}:`, error);
           }
         }
-      }
+      // }
       
       currentPage.drawText('Name :', {
         x: 30,

@@ -71,6 +71,7 @@ function SignUp() {
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const [companyNameError, setCompanyNameError] = useState("");
 
   useEffect(() => {
     checkUserExt();
@@ -248,9 +249,12 @@ function SignUp() {
     } else if (name === "password" || name === "confirmPassword") {
       // Update state for password fields
       setFormData({ ...formData, [name]: value });
+    } else if (name === "companySignup" || name === "email") {
+      // Don't capitalize email or radio button values
+      setFormData({ ...formData, [name]: value });
     } else {
-      // Capitalize the first letter of the input value, except for the email field
-      const capitalizedValue = name === "email" ? value : value.charAt(0).toUpperCase() + value.slice(1);
+      // Capitalize the first letter of other input values
+      const capitalizedValue = value.charAt(0).toUpperCase() + value.slice(1);
       setFormData({ ...formData, [name]: capitalizedValue });
     }
   };
@@ -373,6 +377,7 @@ function SignUp() {
     setPasswordError("");
     setConfirmPasswordError("");
     setPhoneError("");
+    setCompanyNameError("");
 
     if (!emailRegex.test(formData.email)) {
       setEmailError("Please enter a valid email address.");
@@ -394,6 +399,11 @@ function SignUp() {
       valid = false;
     }
 
+    if (formData.companySignup === "yes" && !formData.companyName.trim()) {
+      setCompanyNameError("Company name is required when signing up as a company.");
+      valid = false;
+    }
+
     if (valid) {
       setState({ ...state, loading: true });
       const userDetails = {
@@ -405,6 +415,7 @@ function SignUp() {
       };
 
       try {
+        console.log("Company Signup Value:", formData.companySignup);
         // Prepare the payload based on company signup status
         const payload = {
           first_name: formData.firstName,
@@ -500,7 +511,7 @@ function SignUp() {
             <div className="w-full max-w-2xl p-8">
               <h1 className="text-2xl font-bold text-left mb-6">{t("Sign Up")}</h1>
               <form onSubmit={handleSubmit} aria-label="Login Form">
-                <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-2 gap-4 mb-3">
                   <fieldset className="relative">
                     <input
                       id="firstName"
@@ -612,40 +623,45 @@ function SignUp() {
                       </select>
                     </div>
                   </fieldset>
+                  <fieldset className="relative">
+                      <div className="mt-2">
+                      <span className="font-bold">Sign up as company:</span>
+                      <label className="ml-2 font-bold">
+                        <input
+                          type="radio"
+                          name="companySignup"
+                          value="yes"
+                          onChange={handleChange}
+                        />
+                        <span className="ml-1">Yes</span>
+                      </label>
+                      <label className="ml-2 font-bold">
+                        <input
+                          type="radio"
+                          name="companySignup"
+                          value="no"
+                          onChange={handleChange}
+                          defaultChecked
+                        />
+                        <span className="ml-1">No</span>
+                      </label>
+                    </div>
+                  </fieldset>
                 </div>
-                <div className="mb-4">
-                  <span className="font-bold">Sign up as company:</span>
-                  <label className="ml-2 font-bold">
-                    <input
-                      type="radio"
-                      name="companySignup"
-                      value="yes"
-                      onChange={handleChange}
-                    />
-                    <span className="ml-1">Yes</span>
-                  </label>
-                  <label className="ml-2 font-bold">
-                    <input
-                      type="radio"
-                      name="companySignup"
-                      value="no"
-                      onChange={handleChange}
-                      defaultChecked
-                    />
-                    <span className="ml-1">No</span>
-                  </label>
-                </div>
+                
                 <fieldset className="mb-4 relative">
                   <input
                     id="companyName"
                     type="text"
                     placeholder="Company Name"
-                    className="w-full py-2 px-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full py-2 px-3 border ${formData.companySignup === "yes" && companyNameError ? 'border-red-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
                     name="companyName"
                     value={formData.companyName}
                     onChange={handleChange}
                     disabled={formData.companySignup === "no"}
+                    required={formData.companySignup === "yes"}
                   />
+                  {formData.companySignup === "yes" && companyNameError && <p className="text-red-500 text-sm">{companyNameError}</p>}
                 </fieldset>
                 <div className="grid grid-cols-1 gap-1 text-center mb-6">
                   <button

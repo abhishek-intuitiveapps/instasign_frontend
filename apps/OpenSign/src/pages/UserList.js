@@ -208,6 +208,17 @@ const UserList = () => {
             <>
               {isAdmin ? (
                 <div className="p-2 w-full bg-base-100 text-base-content op-card shadow-lg">
+                  <ToastContainer 
+                    position="bottom-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                  />
                   {isAlert.msg && (
                     <Alert type={isAlert.type}>{isAlert.msg}</Alert>
                   )}
@@ -394,17 +405,7 @@ const UserList = () => {
             </>
           )
       }
-      <ToastContainer 
-        position="bottom-right"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      
     </div>
   );
 };
