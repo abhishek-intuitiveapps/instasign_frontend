@@ -2154,8 +2154,9 @@ function PlaceHolderSign() {
                     }
                     title={isSendAlert.mssg === "confirm" && t("send-mail")}
                     handleClose={() => handleCloseSendmailModal()}
+                    reduceWidth={isCustomize ? "md:min-w-[700px] md:max-w-[80%]" : undefined}
                   >
-                    <div className="max-h-96 overflow-y-scroll scroll-hide p-[20px] text-base-content">
+                    <div className={`${isCustomize ? "max-h-[70vh]" : "max-h-96"} overflow-y-auto scroll-hide p-[20px] text-base-content`}>
                       {isSendAlert.mssg === "confirm" && (
                         <>
                           {!isCustomize && (
