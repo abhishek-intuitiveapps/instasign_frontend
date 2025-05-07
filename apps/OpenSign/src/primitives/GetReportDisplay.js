@@ -741,10 +741,290 @@ const ReportTable = (props) => {
     const subject =
       doc?.RequestSubject ||
       `{{sender_name}} has requested you to sign "{{document_title}}"`;
-    const body =
-      doc?.RequestBody ||
-      `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team InstaSign™</p><br></body> </html>`;
-    const res = replaceMailVaribles(subject, body, variables);
+    // const body =
+    //   doc?.RequestBody ||
+      // `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team InstaSign™</p><br></body> </html>`;
+    
+    
+    const body = doc?.RequestBody ||  `
+    
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Document Signing Request</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            -webkit-text-size-adjust: none;
+            text-size-adjust: none;
+            font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+        }
+        a {
+            color: #0159C3;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        p {
+            line-height: 1.5;
+            margin: 0 0 10px;
+        }
+        .nl-container {
+            width: 100%;
+            background-color: #f5f5f5;
+        }
+        .row-content {
+            width: 680px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            color: #000000;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .column {
+            font-weight: 400;
+            text-align: left;
+            vertical-align: top;
+            border: 0;
+        }
+        .image_block img {
+            display: block;
+            height: auto;
+            border: 0;
+            width: 100%;
+        }
+        .text_block {
+            word-break: break-word;
+        }
+        .button_block a {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #0159C3;
+            color: #ffffff;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        .button_block a:hover {
+            background-color: #0147a0;
+        }
+        .social_block .social-table {
+            display: inline-block;
+        }
+        .social_block img {
+            display: block;
+            height: 32px;
+            width: 32px;
+        }
+        .header {
+            background-color: #002864;
+            color: #ffffff;
+            padding: 15px;
+            text-align: center;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        @media (max-width: 700px) {
+            .row-content {
+                width: 100% !important;
+                border-radius: 0;
+            }
+            .stack .column {
+                width: 100%;
+                display: block;
+            }
+            .image_block div.fullWidth {
+                max-width: 100% !important;
+            }
+            .text_block td.pad {
+                padding: 15px !important;
+            }
+            .button_block a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table border="0" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+        <tbody>
+            <tr>
+                <td>
+                    <!-- Header -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 20px 0; width: 100%;">
+                                                                <div align="center" class="alignment" style="line-height:10px">
+                                                                    <div style="max-width: 136px;">
+                                                                        <img src="https://api.dev.instasign.ai/media/new_instasign_logo.png" style="width: 100%;" width="136" alt="InstaSign Logo" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color:#002864;" width="100%">
+                                              
+                                                            <td class="pad">
+                                                                <div class="header">
+                                                                    <p style="margin: 0; font-size: 20px; font-weight: 500;">Document Signing Request</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Main Content -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; " width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color:#002864;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 20px;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 20px;">
+                                                                <div style="font-size: 16px; color: #ffffff; line-height: 1.5;">
+                                                                    <p>Hi {{receiver_name}},</p>
+                                                                    <p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p>
+                                                                    <p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="button_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px; text-align: center;">
+                                                                <a href="{{signing_url}}" target="_blank">Sign Document Now</a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Footer -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px 0;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 20px;">
+                                                                <div align="center" class="alignment" style="line-height:10px">
+                                                                    <div style="max-width: 530px;">
+                                                                        <img alt="Wave decoration image" src="https://api.dev.gurujibayarea.com/media/images/waves.png" style="width: 100%;" width="530" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div style="font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
+                                                                    <p style="margin: 0;">Thanks,</p>
+                                                                    <p style="margin: 0; font-weight: 500;">Team InstaSign™</p>
+                                                                    <p style="margin: 10px 0;">This is an automated email from InstaSign. For any queries, please contact the sender at <a href="mailto:{{sender_email}}">{{sender_email}}</a>.</p>
+                                                                    <p style="margin: 0;">If you think this email is inappropriate or spam, you may file a complaint with InstaSign <a href="{{opurl}}" target="_blank">here</a>.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="social_block block-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div align="center" class="alignment">
+                                                                    <table border="0" cellpadding="0" cellspacing="0" class="social-table" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="108px">
+                                                                        <tr>
+                                                                            <td style="padding:0 2px;"><a href="https://www.facebook.com" target="_blank"><img alt="Facebook" src="https://api.dev.gurujibayarea.com/media/images/facebook2x.png" /></a></td>
+                                                                            <td style="padding:0 2px;"><a href="https://www.twitter.com" target="_blank"><img alt="Twitter" src="https://api.dev.gurujibayarea.com/media/images/twitter2x.png" /></a></td>
+                                                                            <td style="padding:0 2px;"><a href="https://www.linkedin.com/" target="_blank"><img alt="LinkedIn" src="https://api.dev.gurujibayarea.com/media/images/linkedin2x.png" /></a></td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div style="font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
+                                                                    <p style="margin: 0;">Product Developed by <a href="https://www.intuitiveapps.com" target="_blank" style="color: #a6dc9e;">Intuitive Apps Inc.</a></p>
+                                                                    <p style="margin: 0;">India | USA | Canada</p>
+                                                                    <p style="margin: 0;">Our <a href="#" style="color: #a6dc9e;">Privacy Policy</a> and <a href="#" style="color: #a6dc9e;">Terms of Use</a>.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Spacer -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 20px 0;" width="100%">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+    `
+
+      const res = replaceMailVaribles(subject, body, variables);
     setMail((prev) => ({ ...prev, subject: res.subject, body: res.body }));
     setIsNextStep({ [user.Id]: true });
   };

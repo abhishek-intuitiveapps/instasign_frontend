@@ -19,9 +19,12 @@ const APPID = process.env.APP_ID;
 const masterKEY = process.env.MASTER_KEY;
 const eSignName = 'OpenSign';
 const eSigncontact = 'hello@opensignlabs.com';
+// const logo =
+//   "<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' style='padding:20px'/>";
+
 const logo =
-  "<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' style='padding:20px'/>";
-const opurl = ` <a href=www.opensignlabs.com target=_blank>here</a>`;
+  "<img src='https://api.dev.instasign.ai/media/new_instasign_logo.png' height='50' style='padding:20px'/>";
+const opurl = ` <a href=https://instasign.ai target=_blank>here</a>`;
 
 // `updateDoc` is used to create url in from pdfFile
 async function uploadFile(pdfName, filepath) {
@@ -107,12 +110,269 @@ async function sendNotifyMail(doc, signUser, mailProvider) {
       const signerEmail = signUser.Email;
       const viewDocUrl = `${process.env.PUBLIC_URL}/recipientSignPdf/${doc.objectId}`;
       const subject = `Document "${pdfName}" has been signed by ${signerName}`;
-      const body =
-        "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
-        `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document signed by ${signerName}</p>` +
-        `</div><div style='padding:20px;font-family:system-ui;font-size:14px'><p>Dear ${creatorName},</p><p>${pdfName} has been signed by ${signerName} "${signerEmail}" successfully</p>` +
-        `<p><a href=${viewDocUrl} target=_blank>View Document</a></p></div></div><div><p>This is an automated email from ${appName}. For any queries regarding this email, ` +
-        `please contact the sender ${creatorEmail} directly. If you think this email is inappropriate or spam, you may file a complaint with ${appName}${opurl}.</p></div></div></body></html>`;
+      // const body =
+      //   "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
+      //   `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document signed by ${signerName}</p>` +
+      //   `</div><div style='padding:20px;font-family:system-ui;font-size:14px'><p>Dear ${creatorName},</p><p>${pdfName} has been signed by ${signerName} "${signerEmail}" successfully</p>` +
+      //   `<p><a href=${viewDocUrl} target=_blank>View Document</a></p></div></div><div><p>This is an automated email from ${appName}. For any queries regarding this email, ` +
+      //   `please contact the sender ${creatorEmail} directly. If you think this email is inappropriate or spam, you may file a complaint with ${appName}${opurl}.</p></div></div></body></html>`;
+
+      const body = `
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Document Signed Notification</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #002864;
+            -webkit-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+        a {
+            color: #a6dc9e;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        p {
+            line-height: 1.5;
+        }
+        .nl-container {
+            width: 100%;
+            background-color: #002864;
+        }
+        .row-content {
+            width: 680px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .column {
+            font-weight: 400;
+            text-align: left;
+            vertical-align: top;
+            border: 0;
+        }
+        .image_block img {
+            display: block;
+            height: auto;
+            border: 0;
+            width: 100%;
+        }
+        .text_block {
+            word-break: break-word;
+        }
+        .button_block a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0159C3;
+            color: #ffffff;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .button_block a:hover {
+            background-color: #0147a0;
+        }
+        .social_block .social-table {
+            display: inline-block;
+        }
+        .social_block img {
+            display: block;
+            height: 32px;
+            width: 32px;
+        }
+        @media (max-width: 700px) {
+            .row-content {
+                width: 100% !important;
+            }
+            .stack .column {
+                width: 100%;
+                display: block;
+            }
+            .image_block div.fullWidth {
+                max-width: 100% !important;
+            }
+            .text_block td.pad {
+                padding: 15px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table border="0" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+        <tbody>
+            <tr>
+                <td>
+                    <!-- Header -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-radius: 0;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 10px 0;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px 0; width: 100%;">
+                                                                <div align="center" class="alignment" style="line-height:10px">
+                                                                    <div style="max-width: 136px;">
+                                                                        <img src=${logo} style="width: 100%;" width="136" alt="Logo" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Main Content -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 20px;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif; color: #ffffff;">
+                                                                    <p style="margin: 0; font-size: 24px; text-align: center; line-height: 1.2;">
+                                                                        Document Signed by ${signerName}
+                                                                    </p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 20px;">
+                                                                <div style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 16px; color: #ffffff; line-height: 1.5;">
+                                                                    <p style="margin: 0 0 10px;">Dear ${creatorName},</p>
+                                                                    <p style="margin: 0 0 10px;">${pdfName} has been signed by ${signerName} (${signerEmail}) successfully.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="button_block block-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px; text-align: center;">
+                                                                <a href="${viewDocUrl}" target="_blank">View Document</a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Footer -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px 0;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 20px;">
+                                                                <div align="center" class="alignment" style="line-height:10px">
+                                                                    <div style="max-width: 530px;">
+                                                                        <img alt="Wave decoration image" src="https://api.dev.gurujibayarea.com/media/images/waves.png" style="width: 100%;" width="530" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
+                                                                    <p style="margin: 0;">This is an automated email from ${appName}. For any queries, please contact the sender ${creatorEmail} directly.</p>
+                                                                    <p style="margin: 5px 0;">If you think this email is inappropriate or spam, you may file a complaint with ${appName} <a href="${opurl}" target="_blank">here</a>.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="social_block block-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div align="center" class="alignment">
+                                                                    <table border="0" cellpadding="0" cellspacing="0" class="social-table" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="108px">
+                                                                        <tr>
+                                                                            <td style="padding:0 2px;"><a href="https://www.facebook.com" target="_blank"><img alt="Facebook" src="https://api.dev.gurujibayarea.com/media/images/facebook2x.png" /></a></td>
+                                                                            <td style="padding:0 2px;"><a href="https://www.twitter.com" target="_blank"><img alt="Twitter" src="https://api.dev.gurujibayarea.com/media/images/twitter2x.png" /></a></td>
+                                                                            <td style="padding:0 2px;"><a href="https://www.linkedin.com/" target="_blank"><img alt="LinkedIn" src="https://api.dev.gurujibayarea.com/media/images/linkedin2x.png" /></a></td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
+                                                                    <p style="margin: 0;">Product Developed by <a href="https://www.intuitiveapps.com" target="_blank" style="color: #a6dc9e;">Intuitive Apps Inc.</a></p>
+                                                                    <p style="margin: 0;">India | USA | Canada</p>
+                                                                    <p style="margin: 0;">Our Privacy Policy and Terms of Use.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Spacer -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 20px 0;" width="100%">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+      `
 
       const params = {
         extUserId: sender.objectId,
@@ -153,12 +413,268 @@ async function sendCompletedMail(obj) {
   }
   const recipient = signersMail;
   let subject = `Document "${pdfName}" has been signed by all parties`;
-  let body =
-    "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
-    `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document signed successfully</p></div><div>` +
-    `<p style='padding:20px;font-family:system-ui;font-size:14px'>All parties have successfully signed the document <b>"${pdfName}"</b>. Kindly download the document from the attachment.</p>` +
-    `</div></div><div><p>This is an automated email from ${appName}. For any queries regarding this email, please contact the sender ${sender.Email} directly.` +
-    `If you think this email is inappropriate or spam, you may file a complaint with ${appName}${opurl}.</p></div></div></body></html>`;
+//   let body =
+//     "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><div style='background-color:#f5f5f5;padding:20px'><div style='background-color:white'>" +
+//     `<div>${logo}</div><div style='padding:2px;font-family:system-ui;background-color:#47a3ad'><p style='font-size:20px;font-weight:400;color:white;padding-left:20px'>Document signed successfully</p></div><div>` +
+//     `<p style='padding:20px;font-family:system-ui;font-size:14px'>All parties have successfully signed the document <b>"${pdfName}"</b>. Kindly download the document from the attachment.</p>` +
+//     `</div></div><div><p>This is an automated email from ${appName}. For any queries regarding this email, please contact the sender ${sender.Email} directly.` +
+//     `If you think this email is inappropriate or spam, you may file a complaint with ${appName}${opurl}.</p></div></div></body></html>`;
+
+  let body = `
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Document Signed Notification</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #002864;
+            -webkit-text-size-adjust: none;
+            text-size-adjust: none;
+        }
+        a {
+            color: #a6dc9e;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        p {
+            line-height: 1.5;
+        }
+        .nl-container {
+            width: 100%;
+            background-color: #002864;
+        }
+        .row-content {
+            width: 680px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .column {
+            font-weight: 400;
+            text-align: left;
+            vertical-align: top;
+            border: 0;
+        }
+        .image_block img {
+            display: block;
+            height: auto;
+            border: 0;
+            width: 100%;
+        }
+        .text_block {
+            word-break: break-word;
+        }
+        .button_block a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0159C3;
+            color: #ffffff;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .button_block a:hover {
+            background-color: #0147a0;
+        }
+        .social_block .social-table {
+            display: inline-block;
+        }
+        .social_block img {
+            display: block;
+            height: 32px;
+            width: 32px;
+        }
+        @media (max-width: 700px) {
+            .row-content {
+                width: 100% !important;
+            }
+            .stack .column {
+                width: 100%;
+                display: block;
+            }
+            .image_block div.fullWidth {
+                max-width: 100% !important;
+            }
+            .text_block td.pad {
+                padding: 15px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table border="0" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+        <tbody>
+            <tr>
+                <td>
+                    <!-- Header -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-radius: 0;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 10px 0;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px 0; width: 100%;">
+                                                                <div align="center" class="alignment" style="line-height:10px">
+                                                                    <div style="max-width: 136px;">
+                                                                        <img src=${logo} style="width: 100%;" width="136" alt="Logo" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Main Content -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 20px;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 2px;">
+                                                                <div style="font-family: system-ui, Arial, Helvetica Neue, Helvetica, sans-serif; color: #ffffff;">
+                                                                    <p style="margin: 0; font-size: 20px; text-align: left; line-height: 1.2; font-weight: 400; padding-left: 20px;">
+                                                                        Document signed successfully
+                                                                    </p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 20px;">
+                                                                <div style="font-family: system-ui, Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 14px; color: #ffffff; line-height: 1.5;">
+                                                                    <p style="margin: 0 0 10px;">All parties have successfully signed the document <b>${pdfName}</b>. Kindly download the document from the attachment.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="button_block block-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px; text-align: center;">
+                                                                <a href="${url}" target="_blank">View Document</a>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Footer -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px 0;" width="100%">
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 20px;">
+                                                                <div align="center" class="alignment" style="line-height:10px">
+                                                                    <div style="max-width: 530px;">
+                                                                        <img alt="Wave decoration image" src="https://api.dev.gurujibayarea.com/media/images/waves.png" style="width: 100%;" width="530" />
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
+                                                                    <p style="margin: 0;">This is an automated email from ${appName}. For any queries, please contact the sender ${sender.Email} directly.</p>
+                                                                    <p style="margin: 5px 0;">If you think this email is inappropriate or spam, you may file a complaint with ${appName} <a href="${opurl}" target="_blank">here</a>.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="social_block block-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div align="center" class="alignment">
+                                                                    <table border="0" cellpadding="0" cellspacing="0" class="social-table" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="108px">
+                                                                        <tr>
+                                                                            <td style="padding:0 2px;"><a href="https://www.facebook.com" target="_blank"><img alt="Facebook" src="https://api.dev.gurujibayarea.com/media/images/facebook2x.png" /></a></td>
+                                                                            <td style="padding:0 2px;"><a href="https://www.twitter.com" target="_blank"><img alt="Twitter" src="https://api.dev.gurujibayarea.com/media/images/twitter2x.png" /></a></td>
+                                                                            <td style="padding:0 2px;"><a href="https://www.linkedin.com/" target="_blank"><img alt="LinkedIn" src="https://api.dev.gurujibayarea.com/media/images/linkedin2x.png" /></a></td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    <table border="0" cellpadding="0" cellspacing="0" class="text_block block-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                        <tr>
+                                                            <td class="pad" style="padding: 10px;">
+                                                                <div style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
+                                                                    <p style="margin: 0;">Product Developed by <a href="https://www.intuitiveapps.com" target="_blank" style="color: #a6dc9e;">Intuitive Apps Inc.</a></p>
+                                                                    <p style="margin: 0;">India | USA | Canada</p>
+                                                                    <p style="margin: 0;">Our Privacy Policy and Terms of Use.</p>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Spacer -->
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="680">
+                                        <tbody>
+                                            <tr>
+                                                <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 20px 0;" width="100%">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
+  `
 
   if (obj?.isCustomMail) {
     const tenant = sender?.TenantId;
