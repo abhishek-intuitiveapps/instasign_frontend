@@ -18,8 +18,8 @@ const Dashboard = () => {
   const [loading, setloading] = useState(true);
 
   // account activation modal
-  const [activationModal, setActivationModal] = useState(true);
-  const [otpScreen, setOtpScreen] = useState(false);
+  // const [activationModal, setActivationModal] = useState(true);
+  // const [otpScreen, setOtpScreen] = useState(false);
 
   useEffect(() => {
     if (localStorage.getItem("accesstoken")) {
@@ -61,18 +61,18 @@ const Dashboard = () => {
   };
 
   // account activation modal
-  const handleLogout = () => {
-    // Handle logout functionality here
-    console.log("Logout clicked");
-  };
+  // const handleLogout = () => {
+  //   // Handle logout functionality here
+  //   console.log("Logout clicked");
+  // };
 
-  const handleActivateAccount = () => {
-    setOtpScreen(true);
-  };
+  // const handleActivateAccount = () => {
+  //   setOtpScreen(true);
+  // };
 
-  const handleResendOTP = () => {
-    console.log("Resend OTP clicked");
-  };
+  // const handleResendOTP = () => {
+  //   console.log("Resend OTP clicked");
+  // };
 
   return (
     <React.Fragment>
@@ -86,7 +86,7 @@ const Dashboard = () => {
       )}
 
       {/* account activation modal */}
-      <ModalUi
+      {/* <ModalUi
         isOpen={activationModal}
         title="Activate your account"
         handleClose={() => setActivationModal(false)}
@@ -164,7 +164,7 @@ const Dashboard = () => {
             </div>
           </div>
         )}
-      </ModalUi>
+      </ModalUi> */}
     </React.Fragment>
   );
 };
