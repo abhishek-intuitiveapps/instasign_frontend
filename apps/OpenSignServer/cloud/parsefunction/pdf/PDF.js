@@ -17,8 +17,8 @@ import { P12Signer } from '@signpdf/signer-p12';
 const serverUrl = cloudServerUrl; // process.env.SERVER_URL;
 const APPID = process.env.APP_ID;
 const masterKEY = process.env.MASTER_KEY;
-const eSignName = 'OpenSign';
-const eSigncontact = 'hello@opensignlabs.com';
+const eSignName = 'InstaSign';
+const eSigncontact = 'support@instasign.ai';
 // const logo =
 //   "<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' style='padding:20px'/>";
 
