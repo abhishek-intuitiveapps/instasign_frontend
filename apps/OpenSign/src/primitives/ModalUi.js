@@ -18,7 +18,7 @@ const ModalUi = ({
           <div
             className={`${
               width || "md:min-w-[500px]"
-            } op-modal-box p-0 max-h-90 overflow-y-auto hide-scrollbar text-sm`}
+            } op-modal-box p-0 max-h-[90vh] overflow-visible hide-scrollbar text-sm`}
           >
             {showHeader && (
               <>

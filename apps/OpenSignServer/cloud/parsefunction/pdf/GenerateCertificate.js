@@ -120,11 +120,11 @@ export default async function GenerateCertificate(docDetails) {
   const textValueColor = rgb(0.3, 0.3, 0.3);
   const verifiedColor = rgb(0.13, 0.55, 0.13); // Green color for verification
   const completedAt = docDetails?.completedAt ? new Date(docDetails?.completedAt) : new Date();
-  const completedAtperTimezone = formatDateTime(completedAt, DateFormat, timezone, Is12Hr);
+  const completedAtperTimezone = formatDateTime(completedAt, "MMM dd, yyyy | hh:mm a", timezone, true);
   const completedUTCtime = completedAtperTimezone;
   const signersCount = docDetails?.Signers?.length || 1;
   const generateAt = docDetails?.completedAt ? new Date(docDetails?.completedAt) : new Date();
-  const generatedAtperTimezone = formatDateTime(generateAt, DateFormat, timezone, Is12Hr);
+  const generatedAtperTimezone = formatDateTime(generateAt, "MMM dd, yyyy | hh:mm a", timezone, true);
   const generatedUTCTime = generatedAtperTimezone;
   const generatedOn = 'Generated On ' + generatedUTCTime;
   const textWidth = timesRomanFont.widthOfTextAtSize(generatedOn, 12);
@@ -133,7 +133,7 @@ export default async function GenerateCertificate(docDetails) {
   const OriginIp = docDetails?.OriginIp || '';
   const company = docDetails?.ExtUserPtr?.Company || '';
   const createdAt = docDetails?.DocSentAt?.iso || docDetails.createdAt;
-  const createdAtperTimezone = formatDateTime(createdAt, DateFormat, timezone, Is12Hr);
+  const createdAtperTimezone = formatDateTime(createdAt, "MMM dd, yyyy | hh:mm a", timezone, true);
   const IsEnableOTP = docDetails?.IsEnableOTP || false;
   const filteredaudit = docDetails?.AuditTrail?.filter(x => x?.UserPtr?.objectId);
   const auditTrail =
@@ -177,13 +177,13 @@ export default async function GenerateCertificate(docDetails) {
     height: 25,
   });
 
-  page.drawText(generatedOn, {
-    x: Math.max(startX, maxX),
-    y: 810,
-    size: 12,
-    font: timesRomanFont,
-    color: rgb(0.12, 0.12, 0.12),
-  });
+  // page.drawText(generatedOn, {
+  //   x: Math.max(startX, maxX),
+  //   y: 810,
+  //   size: 12,
+  //   font: timesRomanFont,
+  //   color: rgb(0.12, 0.12, 0.12),
+  // });
 
   page.drawText('Certificate of Completion', {
     x: 160,
@@ -203,7 +203,7 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText('Summary', {
     x: 30,
-    y: 727,
+    y: 717,
     size: subtitle,
     font: timesRomanFont,
     color: titleColor,
@@ -211,7 +211,7 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText('Document ID :', {
     x: 30,
-    y: 710,
+    y: 687,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
@@ -219,7 +219,7 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText(docDetails.objectId, {
     x: 140,
-    y: 710,
+    y: 687,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
@@ -227,7 +227,7 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText('Document Name :', {
     x: 30,
-    y: 690,
+    y: 657,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
@@ -235,7 +235,7 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText(docDetails?.Name, {
     x: 140,
-    y: 690,
+    y: 657,
     size: docDetails?.Name?.length >= 78 ? 12 : text,
     font: timesRomanFont,
     color: textValueColor,
@@ -243,7 +243,7 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText('Organization :', {
     x: 30,
-    y: 670,
+    y: 627,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
@@ -251,44 +251,44 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText(company, {
     x: 140,
-    y: 670,
+    y: 627,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
   page.drawText('Created On :', {
     x: 30,
-    y: 650,
+    y: 597,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
   });
 
-  page.drawText(`${typeof createdAt === 'string' && createdAt ? formatDateTime(new Date(createdAt), DateFormat, timezone, Is12Hr) : generatedUTCTime}`, {
+  page.drawText(`${typeof createdAt === 'string' && createdAt ? formatDateTime(new Date(createdAt), "MMM dd, yyyy | hh:mm a", timezone, true) : generatedUTCTime}`, {
     x: 140,
-    y: 650,
+    y: 597,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
   page.drawText('Completed On :', {
     x: 30,
-    y: 630,
+    y: 567,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
   });
 
-  page.drawText(`${typeof completedAt === 'object' ? completedUTCtime : typeof docDetails?.completedAt === 'string' ? formatDateTime(new Date(docDetails.completedAt), DateFormat, timezone, Is12Hr) : generatedUTCTime}`, {
+  page.drawText(`${typeof completedAt === 'object' ? completedUTCtime : typeof docDetails?.completedAt === 'string' ? formatDateTime(new Date(docDetails.completedAt), "MMM dd, yyyy | hh:mm a", timezone, true) : generatedUTCTime}`, {
     x: 140,
-    y: 630,
+    y: 567,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
   page.drawText('Signers :', {
     x: 30,
-    y: 610,
+    y: 537,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
@@ -296,56 +296,56 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText(`${signersCount}`, {
     x: 140,
-    y: 610,
+    y: 537,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
   page.drawText('Document originator', {
-    x: 30,
-    y: 590,
+    x: (width-30)/2 + 30,
+    y: 717,
     size: 17,
     font: timesRomanFont,
     color: titleColor,
   });
   page.drawText('Name :', {
-    x: 30,
-    y: 573,
+    x: (width-30)/2 + 30,
+    y: 687,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
   });
   page.drawText(ownerName, {
-    x: 140,
-    y: 573,
+    x: (width-30)/2 + 110,
+    y: 687,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
   page.drawText('Email :', {
-    x: 30,
-    y: 553,
+    x: (width-30)/2 + 30,
+    y: 657,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
   });
   page.drawText(ownerEmail, {
-    x: 140,
-    y: 553,
+    x: (width-30)/2 + 110,
+    y: 657,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
   page.drawText('IP Address :', {
-    x: 30,
-    y: 533,
+    x: (width-30)/2 + 30,
+    y: 627,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
   });
   page.drawText(`${OriginIp}`, {
-    x: 140,
-    y: 533,
+    x: (width-30)/2 + 110,
+    y: 627,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
@@ -442,7 +442,7 @@ export default async function GenerateCertificate(docDetails) {
               width: 74,
               height: 74,
               borderColor: borderColor,
-              borderWidth: 2,
+              borderWidth: 4,
             });
             
             // Verification image - moved above
@@ -518,7 +518,7 @@ export default async function GenerateCertificate(docDetails) {
       color: textKeyColor,
     });
 
-    page.drawText(`${typeof x.ViewedOn === 'string' && x.ViewedOn ? formatDateTime(new Date(x.ViewedOn), DateFormat, timezone, Is12Hr) : generatedUTCTime}`, {
+    page.drawText(`${typeof x.ViewedOn === 'string' && x.ViewedOn ? formatDateTime(new Date(x.ViewedOn), "MMM dd, yyyy | hh:mm a", timezone, true) : generatedUTCTime}`, {
       x: 140,
       y: yPosition4,
       size: signertext,
@@ -534,7 +534,7 @@ export default async function GenerateCertificate(docDetails) {
       color: textKeyColor,
     });
 
-    page.drawText(`${typeof x.SignedOn === 'string' && x.SignedOn ? formatDateTime(new Date(x.SignedOn), DateFormat, timezone, Is12Hr) : generatedUTCTime}`, {
+    page.drawText(`${typeof x.SignedOn === 'string' && x.SignedOn ? formatDateTime(new Date(x.SignedOn), "MMM dd, yyyy | hh:mm a", timezone, true) : generatedUTCTime}`, {
       x: 140,
       y: yPosition5,
       size: signertext,
@@ -577,7 +577,7 @@ export default async function GenerateCertificate(docDetails) {
     if (embedPng) {
       page.drawImage(embedPng, {
         x: width - 160,
-        y: yPosition7 + 2, // Adjusted to match new spacing
+        y: yPosition7 + 2 , // Adjusted to match new spacing
         width: 100,
         height: 40,
       });
@@ -689,7 +689,7 @@ export default async function GenerateCertificate(docDetails) {
                 width: 74,
                 height: 74,
                 borderColor: borderColor,
-                borderWidth: 2,
+                borderWidth: 4,
               });
               
               // Verification image - moved above
@@ -765,7 +765,7 @@ export default async function GenerateCertificate(docDetails) {
         color: textKeyColor,
       });
 
-      currentPage.drawText(`${typeof x.ViewedOn === 'string' && x.ViewedOn ? formatDateTime(new Date(x.ViewedOn), DateFormat, timezone, Is12Hr) : generatedUTCTime}`, {
+      currentPage.drawText(`${typeof x.ViewedOn === 'string' && x.ViewedOn ? formatDateTime(new Date(x.ViewedOn), "MMM dd, yyyy | hh:mm a", timezone, true) : generatedUTCTime}`, {
         x: 140,
         y: yPosition4,
         size: signertext,
@@ -781,7 +781,7 @@ export default async function GenerateCertificate(docDetails) {
         color: textKeyColor,
       });
 
-      currentPage.drawText(`${typeof x.SignedOn === 'string' && x.SignedOn ? formatDateTime(new Date(x.SignedOn), DateFormat, timezone, Is12Hr) : generatedUTCTime}`, {
+      currentPage.drawText(`${typeof x.SignedOn === 'string' && x.SignedOn ? formatDateTime(new Date(x.SignedOn), "MMM dd, yyyy | hh:mm a", timezone, true) : generatedUTCTime}`, {
         x: 140,
         y: yPosition5,
         size: signertext,

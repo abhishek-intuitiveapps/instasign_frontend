@@ -576,7 +576,6 @@ function SignUp() {
                         onChange={handlePasswordChange}
                         required
                       />
-                      {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
                       <div 
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                         onClick={() => togglePasswordVisibility("password")}
@@ -584,6 +583,7 @@ function SignUp() {
                         <i className={`fa ${state.passwordVisible ? 'fa-eye' : 'fa-eye-slash'}`}></i>
                       </div>
                     </div>
+                    {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
                   </fieldset>
                   <fieldset className="relative">
                     <div className="relative w-full max-w-md">
@@ -597,7 +597,6 @@ function SignUp() {
                         onChange={handleChange}
                         required
                       />
-                      {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
                       <div 
                         className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
                         onClick={() => togglePasswordVisibility("confirmPassword")}
@@ -605,6 +604,7 @@ function SignUp() {
                         <i className={`fa ${state.confirmPasswordVisible ? 'fa-eye' : 'fa-eye-slash'}`}></i>
                       </div>
                     </div>
+                    {confirmPasswordError && <p className="text-red-500 text-sm">{confirmPasswordError}</p>}
                   </fieldset>
                   <fieldset className="relative">
                     <div className="relative w-full">

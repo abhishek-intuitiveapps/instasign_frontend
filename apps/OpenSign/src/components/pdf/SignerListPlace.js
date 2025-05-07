@@ -33,7 +33,7 @@ function SignerListPlace(props) {
           </span>
         </span>
       </div>
-      <div className="overflow-auto hide-scrollbar max-h-[180px]">
+      <div className="overflow-auto hide-scrollbar max-h-[300px]">
         <RecipientList {...props} />
       </div>
       <div className="mx-1">

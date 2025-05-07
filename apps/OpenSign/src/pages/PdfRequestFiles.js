@@ -2072,7 +2072,7 @@ function PdfRequestFiles(
               >
                 <div className="p-4 flex flex-col items-center">
                   <img src={kycImage} alt="Empty Wallet" className="w-32 h-auto mb-4" />
-                  <p className="text-xl font-semibold">Validate Your KYC !</p>
+                  <p className="text-xl font-semibold">Validate Your Identity !</p>
                   <button 
                     className="op-btn op-btn-primary mt-2 text-lg text-white"
                     onClick={() => {

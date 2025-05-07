@@ -284,8 +284,13 @@ export const selectFormat = data => {
 
 export function formatDateTime(date, dateFormat, timeZone, is12Hour) {
   const zonedDate = DateTime.fromJSDate(date).setZone(timeZone);
-  const timeFormat = is12Hour ? 'hh:mm:ss a' : 'HH:mm:ss';
   
+  // If dateFormat is a custom format with MMM, use it directly
+  if (dateFormat && dateFormat.includes('MMM')) {
+    return zonedDate.toFormat(dateFormat);
+  }
+  
+  const timeFormat = is12Hour ? 'hh:mm:ss a' : 'HH:mm:ss';
   return dateFormat
     ? zonedDate.toFormat(`${selectFormat(dateFormat)}, ${timeFormat}`)
     : formatTimeInTimezone(date, timeZone);
