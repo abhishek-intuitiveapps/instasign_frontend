@@ -24,7 +24,7 @@ const eSigncontact = 'support@instasign.ai';
 
 const logo =
   "https://api.dev.instasign.ai/media/new_instasign_logo.png";
-const opurl = ` <a href=https://instasign.ai target=_blank>here</a>`;
+const opurl = ` <a href=https://instasign.ai style="color: #ffffff;" target=_blank>here</a>`;
 
 // `updateDoc` is used to create url in from pdfFile
 async function uploadFile(pdfName, filepath) {
@@ -309,8 +309,8 @@ async function sendNotifyMail(doc, signUser, mailProvider) {
                                                         <tr>
                                                             <td class="pad" style="padding: 10px;">
                                                                 <div style="font-family: Arial, Helvetica Neue, Helvetica, sans-serif; font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
-                                                                    <p style="margin: 0;">This is an automated email from ${appName}. For any queries, please contact the sender ${creatorEmail} directly.</p>
-                                                                    <p style="margin: 5px 0;">If you think this email is inappropriate or spam, you may file a complaint with ${appName} <a href="${opurl}" target="_blank">here</a>.</p>
+                                                                    <p style="margin: 0;">This is an automated email from ${appName}. For any queries, please contact the sender <a href="mailto:${creatorEmail}" style="color: #ffffff;" target="_blank">${creatorEmail}</a>  directly.</p>
+                                                                    <p style="margin: 5px 0;">If you think this email is inappropriate or spam, you may file a complaint with ${appName} <a href="${opurl}" style="color: #ffffff;" target="_blank">here</a>.</p>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -818,7 +818,7 @@ async function sendCompletedMail(obj) {
 																	style="line-height:10px">
 																	<div style="max-width: 272px;"><img
 																			src="https://api.dev.instasign.ai/media/new_instasign_logo.png"
-																			style="display: block; height: auto; border: 0; width: 100%;"
+																			style="margin-left: 2rem; display: block; height: auto; border: 0; width: 100%;"
 																			width="272"/></div>
 																</div>
 															</td>
@@ -953,7 +953,7 @@ async function sendCompletedMail(obj) {
 																		style="font-size: 14px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px; color: #ffffff; line-height: 1.5;">
 																		<p
 																			style="margin: 0; font-size: 14px; text-align: justify; mso-line-height-alt: 21px;">
-																			All parties have successfully signed the document ${pdfName}. Kindly download the document from the attachment.
+																			All parties have successfully signed the document "${pdfName}". Kindly download the document from the attachment.
 																			</p>
 															
 																		<p
@@ -961,7 +961,7 @@ async function sendCompletedMail(obj) {
 																			 </p>
 																		<p
 																			style="margin: 0; mso-line-height-alt: 21px;">
-																			This is an automated email from ${appName}. For any queries regarding this email, please contact the sender ${sender.Email} directly. If you think this email is inappropriate or spam, you may file a complaint with ${appName}${opurl}.</p>
+																			This is an automated email from ${appName}. For any queries regarding this email, please contact the sender <a href="mailto:${sender.Email}" style="color: #ffffff;" target="_blank">${sender.Email}</a>directly. If you think this email is inappropriate or spam, you may file a complaint with ${appName}${opurl}.</p>
 																	
                                                                         </div>
 																</div>
