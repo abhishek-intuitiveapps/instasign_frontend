@@ -14,6 +14,7 @@ import Loader from "../primitives/Loader";
 import { showHeader } from "../redux/reducers/showHeader";
 import { useTranslation } from "react-i18next";
 import { setPaymentMode } from "../redux/reducers/PaymentReducer";
+import AccountActivationModal from "../primitives/AccountActivationModal";
 
 const HomeLayout = () => {
   const { t, i18n } = useTranslation();
@@ -30,7 +31,10 @@ const HomeLayout = () => {
   const [tourStatusArr, setTourStatusArr] = useState([]);
   const [tourConfigs, setTourConfigs] = useState([]);
   const [, setCookie] = useCookies(["accesstoken", "main_Domain"]);
+  const [isDjangoUserFetched, setIsDjangoUserFetched] = useState(false);
+  const [isParseUserChecked, setIsParseUserChecked] = useState(false);
 
+  const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
 
   const tenantId = localStorage.getItem("TenantId");
 
@@ -42,8 +46,16 @@ const HomeLayout = () => {
     localStorage.setItem("isGuestSigner", "");
     getRefreshToken();
     getDjangoUserDetails();
+    validateUser();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Update loader state when both API calls are complete
+  useEffect(() => {
+    if (isDjangoUserFetched && isParseUserChecked) {
+      setIsLoader(false);
+    }
+  }, [isDjangoUserFetched, isParseUserChecked]);
 
   const getDjangoUserDetails = async () => {
     try {
@@ -74,37 +86,37 @@ const HomeLayout = () => {
         console.log("Django token expired, logging out.");
         handleLoginBtn();
       }
+    } finally {
+      setIsDjangoUserFetched(true);
     }
   }
 
-  useEffect(() => {
+  const validateUser = async () => {
     if (!tenantId) {
       setIsUserValid(false);
+      setIsParseUserChecked(true);
     } else {
-      (async () => {
-        try {
-          // Use the session token to validate the user
-          const userQuery = new Parse.Query(Parse.User);
-          const user = await userQuery.get(Parse?.User?.current()?.id, {
-            sessionToken: localStorage.getItem("accesstoken")
-          });
-          if (user) {
-            localStorage.setItem("profileImg", user.get("ProfilePic") || "");
-              setIsUserValid(true);
-              setIsLoader(false);
-          } else {
-            setIsUserValid(false);
-          }
-        } catch (error) {
-          // Session token is invalid or there was an error
+      try {
+        // Use the session token to validate the user
+        const userQuery = new Parse.Query(Parse.User);
+        const user = await userQuery.get(Parse?.User?.current()?.id, {
+          sessionToken: localStorage.getItem("accesstoken")
+        });
+        if (user) {
+          localStorage.setItem("profileImg", user.get("ProfilePic") || "");
+          setIsUserValid(true);
+        } else {
           setIsUserValid(false);
         }
-      })();
+      } catch (error) {
+        // Session token is invalid or there was an error
+        setIsUserValid(false);
+      } finally {
+        setIsParseUserChecked(true);
+      }
       saveCookies();
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tenantId]);
+  };
 
   const getRefreshToken = async () => {
     const refreshToken = localStorage.getItem("djangoRefresh");
@@ -294,7 +306,11 @@ const HomeLayout = () => {
     <div className="flex flex-col h-screen">
       <div className="sticky top-0 z-[501]">
         {!isLoader && (
-          <Header showSidebar={showSidebar} setIsMenu={setIsOpen} />
+          <Header 
+            showSidebar={showSidebar} 
+            setIsMenu={setIsOpen} 
+            // isPendingVerification={djangoUser?.status === "pending_verification"}
+          />
         )}
       </div>
       {isUserValid ? (
@@ -304,18 +320,21 @@ const HomeLayout = () => {
               <Loader />
             </div>
           ) : (
-            <div className="flex md:flex-row flex-col z-50 flex-grow overflow-hidden">
-              <Sidebar isOpen={isOpen} closeSidebar={closeSidebar} />
-              <div
-                id="renderList"
-                className="relative flex flex-col justify-between w-full overflow-y-auto"
-              >
-                <div className="bg-base-200 p-2 flex-grow">{<Outlet />}</div>
-                {/* <div className="z-30">
-                  <Footer />
-                </div> */}
+            <>
+              {/* {djangoUser?.status === "pending_verification" && <AccountActivationModal />} */}
+              <div className="flex md:flex-row flex-col z-50 flex-grow overflow-hidden">
+                <Sidebar isOpen={isOpen} closeSidebar={closeSidebar} />
+                <div
+                  id="renderList"
+                  className="relative flex flex-col justify-between w-full overflow-y-auto"
+                >
+                  <div className="bg-base-200 p-2 flex-grow">{<Outlet />}</div>
+                  {/* <div className="z-30">
+                    <Footer />
+                  </div> */}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </>
       ) : (

@@ -10,8 +10,7 @@ import {
   saveLanguageInLocal
 } from "../constant/Utils";
 import { useTranslation } from "react-i18next";
-
-const Header = ({ showSidebar, setIsMenu }) => {
+const Header = ({ showSidebar, setIsMenu, isPendingVerification }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { width } = useWindowSize();
@@ -235,76 +234,78 @@ const Header = ({ showSidebar, setIsMenu }) => {
             </ul>
           </div>
         </div> */}
+{/* 
+        {!isPendingVerification && ( */}
+          <div className="flex-none gap-2 flex items-center" id="profile-menu">
+            <div className="op-dropdown op-dropdown-end relative">
+              <div
+                tabIndex={0}
+                role="button"
+                onClick={toggleDropdown}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <div className={`w-[35px] h-[35px] rounded-full ring-[1px] ring-offset-2 ring-gray-400 overflow-hidden ${width < 768 ? 'hidden' : ''}`}>
+                  <img
+                    className="w-full h-full object-cover"
+                    src={image}
+                    alt="profile"
+                  />
+                </div>
+                <div className={`text-base-content text-sm ${width < 768 ? 'hidden' : ''}`}>
+                  {username && username.split(" ")[0]}
+                </div>
+                <i className="fa-light fa-angle-down text-base-content"></i>
+              </div>
 
-        <div className="flex-none gap-2 flex items-center" id="profile-menu">
-          <div className="op-dropdown op-dropdown-end relative">
-            <div
-              tabIndex={0}
-              role="button"
-              onClick={toggleDropdown}
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <div className={`w-[35px] h-[35px] rounded-full ring-[1px] ring-offset-2 ring-gray-400 overflow-hidden ${width < 768 ? 'hidden' : ''}`}>
-                <img
-                  className="w-full h-full object-cover"
-                  src={image}
-                  alt="profile"
-                />
-              </div>
-              <div className={`text-base-content text-sm ${width < 768 ? 'hidden' : ''}`}>
-                {username && username.split(" ")[0]}
-              </div>
-              <i className="fa-light fa-angle-down text-base-content"></i>
+              <ul
+                tabIndex={0}
+                className={`absolute right-0 mt-3 z-[1] p-2 shadow op-menu op-menu-sm op-dropdown-content text-base-content bg-base-100 rounded-box w-52 ${
+                  isOpen ? "" : "hidden"
+                }`}
+              >
+                <li
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate("/profile");
+                  }}
+                  className="flex"
+                >
+                  <span className="flex">
+                    <i
+                      className="fa-light fa-user"
+                      style={{ width: "24px" }}
+                    ></i>
+                    <span className="ml-2">{t("profile")}</span>
+                  </span>
+                </li>
+                <li
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate("/changepassword");
+                  }}
+                  className="flex"
+                >
+                  <span className="flex">
+                    <i
+                      className="fa-light fa-lock"
+                      style={{ width: "24px" }}
+                    ></i>
+                    <span className="ml-2">{t("change-password")}</span>
+                  </span>
+                </li>
+                <li onClick={closeDropdown} className="flex">
+                  <span className="flex">
+                    <i
+                      className="fa-light fa-arrow-right-from-bracket"
+                      style={{ width: "24px" }}
+                    ></i>
+                    <span className="ml-2">{t("log-out")}</span>
+                  </span>
+                </li>
+              </ul>
             </div>
-
-            <ul
-              tabIndex={0}
-              className={`absolute right-0 mt-3 z-[1] p-2 shadow op-menu op-menu-sm op-dropdown-content text-base-content bg-base-100 rounded-box w-52 ${
-                isOpen ? "" : "hidden"
-              }`}
-            >
-              <li
-                onClick={() => {
-                  setIsOpen(false);
-                  navigate("/profile");
-                }}
-                className="flex"
-              >
-                <span className="flex">
-                  <i
-                    className="fa-light fa-user"
-                    style={{ width: "24px" }}
-                  ></i>
-                  <span className="ml-2">{t("profile")}</span>
-                </span>
-              </li>
-              <li
-                onClick={() => {
-                  setIsOpen(false);
-                  navigate("/changepassword");
-                }}
-                className="flex"
-              >
-                <span className="flex">
-                  <i
-                    className="fa-light fa-lock"
-                    style={{ width: "24px" }}
-                  ></i>
-                  <span className="ml-2">{t("change-password")}</span>
-                </span>
-              </li>
-              <li onClick={closeDropdown} className="flex">
-                <span className="flex">
-                  <i
-                    className="fa-light fa-arrow-right-from-bracket"
-                    style={{ width: "24px" }}
-                  ></i>
-                  <span className="ml-2">{t("log-out")}</span>
-                </span>
-              </li>
-            </ul>
           </div>
-        </div>
+        {/* )} */}
 
         <div className="flex-none">
           <button
