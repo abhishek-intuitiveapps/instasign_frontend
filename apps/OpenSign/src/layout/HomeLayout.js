@@ -309,7 +309,7 @@ const HomeLayout = () => {
           <Header 
             showSidebar={showSidebar} 
             setIsMenu={setIsOpen} 
-            isPendingVerification={djangoUser?.status === "pending_verification"}
+            // isPendingVerification={djangoUser?.status === "pending_verification"}
           />
         )}
       </div>
@@ -321,7 +321,7 @@ const HomeLayout = () => {
             </div>
           ) : (
             <>
-              {djangoUser?.status === "pending_verification" && <AccountActivationModal />}
+              {/* {djangoUser?.status === "pending_verification" && <AccountActivationModal />} */}
               <div className="flex md:flex-row flex-col z-50 flex-grow overflow-hidden">
                 <Sidebar isOpen={isOpen} closeSidebar={closeSidebar} />
                 <div

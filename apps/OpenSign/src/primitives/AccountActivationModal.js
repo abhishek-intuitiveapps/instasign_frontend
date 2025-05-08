@@ -3,12 +3,19 @@ import ModalUi from './ModalUi';
 import { useNavigate } from 'react-router';
 import Parse from 'parse';
 import { useTranslation } from 'react-i18next';
+import axios from 'axios';
 
 const AccountActivationModal = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [activationModal, setActivationModal] = useState(true);
     const [otpScreen, setOtpScreen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [fileError, setFileError] = useState('');
+    const [uploadStatus, setUploadStatus] = useState('');
+    const [loading, setLoading] = useState(false);
+    const djangoToken = localStorage.getItem('django');
+    const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
     const handleLogout = async () => {
         try {
@@ -47,6 +54,78 @@ const AccountActivationModal = () => {
         // Add API call to resend OTP here
     };
     
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        setFileError('');
+        setUploadStatus('');
+        
+        if (!file) {
+            setSelectedFile(null);
+            return;
+        }
+        
+        const fileType = file.type;
+        const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        
+        if (!validTypes.includes(fileType)) {
+            setFileError('Only PDF and DOCX files are allowed');
+            setSelectedFile(null);
+            return;
+        }
+        
+        setSelectedFile(file);
+    };
+    
+    const uploadCertificate = async () => {
+        if (!selectedFile) {
+            setFileError('Please select a file to upload');
+            return;
+        }
+        
+        setLoading(true);
+        setUploadStatus('');
+        setFileError('');
+        
+        try {
+            // Convert file to base64
+            const reader = new FileReader();
+            
+            const base64Promise = new Promise((resolve, reject) => {
+                reader.onload = () => {
+                    // Get base64 string (remove the data:application/pdf;base64, part)
+                    const base64String = reader.result.split(',')[1];
+                    resolve(base64String);
+                };
+                reader.onerror = (error) => reject(error);
+            });
+            
+            reader.readAsDataURL(selectedFile);
+            
+            const base64Data = await base64Promise;
+            
+            // Send the base64 data to the API using axios
+            const response = await axios.post(`${djangoUrl}/base/api/v1/upload/certificate/`, {
+                certificate: base64Data
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Include any auth headers if needed
+                    'Authorization': `Bearer ${djangoToken}`
+                }
+            });
+            
+            if (response.status === 200) {
+                setUploadStatus('Certificate uploaded successfully');
+                // You might want to proceed with OTP verification or other steps
+            } else {
+                setFileError(`Upload failed: ${response.data.message || 'Unknown error'}`);
+            }
+        } catch (error) {
+            setFileError(`Error uploading certificate: ${error.message}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
   return (
     <ModalUi
@@ -88,9 +167,32 @@ const AccountActivationModal = () => {
           </p>
           <div className="mb-6">
             <h3 className="font-medium mb-3">Upload CIN Certificate</h3>
-            <div className="flex items-center">
-              <button className="border border-gray-300 px-4 py-2 rounded-l-md">Choose File</button>
-              <div className="border border-gray-300 border-l-0 px-4 py-2 rounded-r-md flex-grow">No file chosen</div>
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <label htmlFor="file-upload" className="cursor-pointer mt-2 border border-gray-300 px-4 py-2 rounded-l-md bg-gray-50">
+                  Choose File
+                </label>
+                <input 
+                  id="file-upload" 
+                  type="file" 
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
+                  className="hidden" 
+                  onChange={handleFileChange}
+                />
+                <div className="border border-gray-300 border-l-0 px-4 py-2 rounded-r-md flex-grow overflow-hidden text-ellipsis whitespace-nowrap">
+                  {selectedFile ? selectedFile.name : 'No file chosen'}
+                </div>
+              </div>
+              {fileError && <p className="text-red-500 text-sm mt-1">{fileError}</p>}
+              {uploadStatus && <p className="text-green-500 text-sm mt-1">{uploadStatus}</p>}
+              <button
+                className="mt-3 rounded-md bg-blue-500 text-white px-4 py-2 disabled:bg-blue-300"
+                onClick={uploadCertificate}
+                disabled={!selectedFile || loading}
+              >
+                {loading ? 'Uploading...' : 'Upload Certificate'}
+              </button>
+              <p className="text-xs text-gray-500 mt-1">Only PDF and DOCX files are accepted</p>
             </div>
           </div>
           <div className="mb-6">
