@@ -39,8 +39,8 @@ services:
     image: nginx:latest
     container_name: nginx-container
     ports:
-      - "80:80"   # Expose HTTP port to the LAN
-      - "443:443" # Expose HTTPS port to the LAN (if using SSL)
+      - "8081:80"    # HTTP
+      - "8443:443"   # HTTPS (if needed)
     volumes:
       - /etc/nginx/nginx.conf:/etc/nginx/nginx.conf  # Mount the custom nginx.conf
       - /etc/nginx/certs:/etc/nginx/certs           # Optional: SSL certificates for HTTPS
