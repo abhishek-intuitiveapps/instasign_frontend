@@ -525,24 +525,24 @@ export const mailTemplate = param => {
 																		style="font-size: 14px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px; color: #ffffff; line-height: 1.5;">
                                                                         <p
 																			style="margin: 0; font-size: 14px; text-align: justify; mso-line-height-alt: 21px;">
-																			"{{param.senderName}}" has requested you to review and sign <strong> "{{param.title}}" </strong>.
+																			"${param.senderName}" has requested you to review and sign <strong> "${param.title}" </strong>.
 																			</p>
                                                                             <div style='padding: 5px 0px 5px 25px;display:flex;flex-direction:row;justify-content:space-around;'>
                                                                                 <table>
                                                                                     <tr>
                                                                                         <td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Sender</td>
                                                                                         <td></td>
-                                                                                        <td style='color:#ffffff;font-weight:bold;'>{{param.senderMail}}</td>
+                                                                                        <td style='color:#ffffff;font-weight:bold;'>${param.senderMail}</td>
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Organization</td>
                                                                                         <td></td>
-                                                                                        <td style='color:#ffffff;font-weight:bold'>{{param.organization}}</td>
+                                                                                        <td style='color:#ffffff;font-weight:bold'>${param.organization}</td>
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Expire on</td>
                                                                                         <td></td>
-                                                                                        <td style='color:#ffffff;font-weight:bold'>{{param.localExpireDate}}</td>
+                                                                                        <td style='color:#ffffff;font-weight:bold'>${param.localExpireDate}</td>
                                                                                     </tr>
                                                                                 </table>
                                                                             </div>
@@ -562,7 +562,7 @@ export const mailTemplate = param => {
                                                                             <table border="0" cellpadding="0" cellspacing="0" class="button_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
                                                                                 <tr>
                                                                                     <td class="pad" style="padding: 10px; text-align: center;">
-                                                                                        <a href="{{param.sigingUrl}}" style="background-color: #4CAF50; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 16px; border: 1px solid #3e8e41; box-shadow: 0 2px 5px rgba(0,0,0,0.2);" target="_blank">Sign Here</a>
+                                                                                        <a href="${param.sigingUrl}" style="background-color: #4CAF50; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 16px; border: 1px solid #3e8e41; box-shadow: 0 2px 5px rgba(0,0,0,0.2);" target="_blank">Sign Here</a>
                                                                                     </td>
                                                                                 </tr>
                                                                             </table>
@@ -572,7 +572,7 @@ export const mailTemplate = param => {
 																			 </p>
 																		<p
 																			style="margin: 0; mso-line-height-alt: 21px;">
-																			This is an automated email from InstaSign™. For any queries regarding this email, please contact the sender {{senderEmail}} directly. If you think this email is inappropriate or spam, you may file a complaint with InstaSign™ <a href="https://instasign.ai" style="color: #ffffff;" target="_blank">here</a>".</p>
+																			This is an automated email from InstaSign™. For any queries regarding this email, please contact the sender ${param.senderMail} directly. If you think this email is inappropriate or spam, you may file a complaint with InstaSign™ <a href="https://instasign.ai" style="color: #ffffff;" target="_blank">here</a>".</p>
 																	
                                                                         </div>
 																</div>
