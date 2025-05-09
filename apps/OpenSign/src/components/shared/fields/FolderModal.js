@@ -79,7 +79,7 @@ const FolderModal = (props) => {
 
   // `handleSubmit` is used to pass folderPtr to parent component
   const handleSubmit = () => {
-    let url = "OpenSign™ Drive";
+    let url = "InstaSign™ Drive";
     tabList.forEach((t) => {
       url = url + " / " + t.Name;
     });

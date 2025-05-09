@@ -275,7 +275,7 @@ const EditTemplate = ({
           </div>
           <div className="text-xs mt-3">
             <SignersInput
-              label={t("Bcc")}
+              label={t("cc")}
               initialData={template?.Bcc}
               onChange={handleBcc}
               helptextZindex={50}

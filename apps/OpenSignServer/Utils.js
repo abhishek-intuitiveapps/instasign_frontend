@@ -1,12 +1,12 @@
 import dotenv from 'dotenv';
-import { format, toZonedTime } from 'date-fns-tz';
+// import { format, toZonedTime } from 'date-fns-tz';
 import { getSignedLocalUrl } from './cloud/parsefunction/getSignedUrl.js';
 import { PDFDocument } from 'pdf-lib';
+import { DateTime } from 'luxon';
 dotenv.config();
 
-// export const cloudServerUrl = 'http://localhost:8080/app';
 export const cloudServerUrl = 'https://instasign.ai/app';
-export const appName = 'OpenSign™';
+export const appName = 'InstaSign™';
 
 export const color = [
   '#93a3db',
@@ -160,11 +160,8 @@ export function generateId(length) {
 
 // Format date and time for the selected timezone
 export const formatTimeInTimezone = (date, timezone) => {
-  const nyDate = timezone && toZonedTime(date, timezone);
-  const generatedDate = timezone
-    ? format(nyDate, 'EEE, dd MMM yyyy HH:mm:ss zzz', { timeZone: timezone })
-    : new Date(date).toUTCString();
-  return generatedDate;
+  const nyDate = timezone ? DateTime.fromJSDate(date).setZone(timezone) : DateTime.fromJSDate(date).toUTC();
+  return nyDate.toString();
 };
 
 // `getSecureUrl` is used to return local secure url if local files
@@ -286,9 +283,15 @@ export const selectFormat = data => {
 };
 
 export function formatDateTime(date, dateFormat, timeZone, is12Hour) {
-  const zonedDate = toZonedTime(date, timeZone); // Convert date to the given timezone
+  const zonedDate = DateTime.fromJSDate(date).setZone(timeZone);
+  
+  // If dateFormat is a custom format with MMM, use it directly
+  if (dateFormat && dateFormat.includes('MMM')) {
+    return zonedDate.toFormat(dateFormat);
+  }
+  
   const timeFormat = is12Hour ? 'hh:mm:ss a' : 'HH:mm:ss';
   return dateFormat
-    ? format(zonedDate, `${selectFormat(dateFormat)}, ${timeFormat} 'GMT' XXX`, { timeZone })
+    ? zonedDate.toFormat(`${selectFormat(dateFormat)}, ${timeFormat}`)
     : formatTimeInTimezone(date, timeZone);
 }

@@ -10,7 +10,7 @@ const Validate = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const [isUserValid, setIsUserValid] = useState(true);
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   useEffect(() => {
     (async () => {

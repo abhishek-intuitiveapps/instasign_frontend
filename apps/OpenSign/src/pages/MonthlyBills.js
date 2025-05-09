@@ -5,6 +5,9 @@ import PaginationComponent from "./PaginationComponent"; // Adjust the import pa
 import AddCreditsModal from "./AddCreditsModal";
 import Loader from "../primitives/Loader";
 import Title from "../components/Title";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const MonthlyBills = () => {
   const [activeTable, setActiveTable] = useState("transactions");
@@ -18,7 +21,7 @@ const MonthlyBills = () => {
   const [isLoading, setIsLoading] = useState(false); // Add isLoading state
   const djangoToken = localStorage.getItem('django'); // Commenting out the token retrieval
   const paymentMode = useSelector((state) => state.payment.mode);
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
    // Retrieve rowsPerPage from localStorage or default to 25
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const savedRowsPerPage = localStorage.getItem("rowsPerPage");
@@ -42,8 +45,10 @@ const MonthlyBills = () => {
       });
       console.log("Transactions data is fetched:", response.data);
       setBillsData(response.data.data); // Store the fetched data in state
+      toast.success("Transactions data fetched successfully!");
     } catch (error) {
       console.error("Error fetching transactions data:", error);
+      toast.error("Error fetching transactions data!");
     } finally {
       setIsLoading(false); // Set loading to false after fetching
     }
@@ -371,6 +376,22 @@ const MonthlyBills = () => {
   //     "status": "Failed"
   //   }
   // ]
+
+  const downloadInvoice = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'invoice.pdf'; // You can customize the filename here
+      link.click();
+      window.URL.revokeObjectURL(link.href); // Clean up the URL object
+    } catch (error) {
+      console.error('Error downloading the invoice:', error);
+    }
+  };
   
   
 
@@ -394,9 +415,9 @@ const MonthlyBills = () => {
       </div> */}
 
       {/* Table Section */}
-      <div className="bg-white p-5 rounded-md shadow-md overflow-hidden" style={{ height: '80vh' }}>
+      <div className="bg-white px-3 pt-4 rounded-md shadow-md overflow-hidden" style={{ height: '90vh' }}>
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Billing History</h2>
-        <div className="table-container" style={{ height: 'calc(65vh - 80px)', overflowY: 'auto' }}>
+        <div className="table-container" style={{ height: 'calc(73vh - 80px)', overflowY: 'auto' }}>
         <table 
             className="min-w-full border border-gray-300" 
             style={{
@@ -407,11 +428,12 @@ const MonthlyBills = () => {
             <thead className="bg-gray-200 sticky top-0 z-10">
               <tr className="text-gray-700">
                 <th className="p-3 text-center border">S.No</th>
-                <th className="p-3 text-center border">Attachment</th>
+                <th className="p-3 text-center border">Invoice</th>
                 <th className="p-3 text-center border">Month</th>
+                <th className="p-3 text-center border">Documents</th>
                 <th className="p-3 text-center border">Amount</th>
-                <th className="p-3 text-center border">Raised On</th>
-                <th className="p-3 text-center border">Status</th>
+                <th className="p-3 text-center border">Taxable Amount</th>
+                {/* <th className="p-3 text-center border">Status</th> */}
               </tr>
             </thead>
             <tbody>
@@ -428,19 +450,23 @@ const MonthlyBills = () => {
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
                     <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
-                    <td className="p-2 border">
-                      <a href={item.pdf_attachment_url} target="_blank" rel="noopener noreferrer">
-                        <button 
-                          className="op-btn op-btn-primary text-sm text-white w-40 h-8"
+                    <td className="p-3 border">
+                      {item.invoice ? (
+                        <span 
+                          className="p-2 cursor-pointer"
+                          onClick={() => downloadInvoice(item.invoice)}
                         >
-                          Download
-                        </button>
-                      </a>
+                          <i className="fa-light fa-file-pdf text-[#002864] text-xl"></i>
+                        </span>
+                      ) : (
+                        <span>Not yet generated</span>
+                      )}
                     </td>
                     <td className="p-3 border">{item.month}</td>
-                    <td className="p-3 border">{item.amount}</td>
-                    <td className="p-3 border">{item.raised_on}</td>
-                    <td className="p-3 border">
+                    <td className="p-3 border">{item.total_documents}</td>
+                    <td className="p-3 border">{item.subtotal_amount.toFixed(2)}</td>
+                    <td className="p-3 border">{item.billing_amount.toFixed(2)}</td>
+                    {/* <td className="p-3 border">
                       <span 
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center ${
                           item.status.toLowerCase() === "pending" ? "bg-blue-100 text-blue-800" : 
@@ -451,7 +477,7 @@ const MonthlyBills = () => {
                       >
                         {item.status}
                       </span>
-                    </td>
+                    </td> */}
                   </tr>
                 ))
               ) : (
@@ -471,8 +497,17 @@ const MonthlyBills = () => {
           setCurrentPage={setCurrentPage}
         />
       </div>
-
-      
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     {/* </div> */}
     </>
   );

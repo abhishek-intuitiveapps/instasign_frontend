@@ -70,7 +70,7 @@ function DownloadPdfZip(props) {
             `${sanitizeFileName(pdfName)}_signed_by_${appName}.pdf`,
             pdf1Blob
           );
-          zip.file(`Certificate_signed_by_${appName}.pdf`, pdf2Blob);
+          zip.file(`Certificate_signed_by_InstaSign™.pdf`, pdf2Blob);
           // Generate the ZIP and trigger download
           const zipBlob = await zip.generateAsync({ type: "blob" });
           saveAs(

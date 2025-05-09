@@ -15,6 +15,8 @@ import Loader from "../../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import { PDFDocument } from "pdf-lib";
 
+import axios from 'axios';
+
 function Header(props) {
   const { t } = useTranslation();
   const filterPrefill =
@@ -25,6 +27,8 @@ function Header(props) {
   const [isDeletePage, setIsDeletePage] = useState(false);
   const mergePdfInputRef = useRef(null);
   const enabledBackBtn = props?.disabledBackBtn === true ? false : true;
+  const djangoToken = localStorage.getItem("django");
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
   //function for show decline alert
   const handleDeclinePdfAlert = async () => {
     const currentDecline = { currnt: "Sure", isDeclined: true };
@@ -86,6 +90,36 @@ function Header(props) {
       mergePdfInputRef.current.value = "";
       console.error("Error merging PDF:", error);
     }
+  };
+
+  // Add a function to handle the API call
+  const handleCompletionClick = async () => {
+    const signerEmails = props.signersdata
+      .filter((signer) => signer.Role !== "prefill")
+      .map((signer) => signer.Email)
+      .join(",");
+
+    console.log("this is pdf details on pdfHeader :",props.pdfDetails);
+
+    // try {
+    //   const response = await axios.post(`https://api.dev.instasign.ai/base/api/v1/signed/document/`, {
+    //     signers: signerEmails,
+    //     document_id: props.p
+    //   }, {
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       "Authorization": `Bearer ${djangoToken}`
+    //     }
+    //   });
+
+    //   if (response.status !== 200) {
+    //     throw new Error("Failed to send document");
+    //   }
+
+    //   console.log("Document sent successfully");
+    // } catch (error) {
+    //   console.error("Error sending document:", error);
+    // }
   };
 
   return (
@@ -419,7 +453,10 @@ function Header(props) {
                   disabled={props?.isMailSend && true}
                   data-tut="headerArea"
                   className="op-btn op-btn-primary op-btn-sm mr-[3px]"
-                  onClick={() => props?.alertSendEmail()}
+                  onClick={() => {
+                    props?.alertSendEmail();
+                    handleCompletionClick();
+                  }}
                 >
                   {props?.completeBtnTitle
                     ? props?.completeBtnTitle

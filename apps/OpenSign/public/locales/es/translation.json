@@ -89,7 +89,7 @@
       "Manage templates": "Administrar plantillas",
       "Embedding": "Incrustar"
     },
-    "OpenSign™ Drive": "{{appName}} Drive",
+    "InstaSign™ Drive": "{{appName}} Drive",
     "Reports": "Reportes",
     "Documents": "Documentos",
     "Documents-Children": {
@@ -100,7 +100,7 @@
       "Declined": "Rechazados",
       "Expired": "Expirados"
     },
-    "Contactbook": "Agenda de contactos",
+    "Contacts": "Agenda de contactos",
     "Settings": "Ajustes",
     "Settings-Children": {
       "My Signature": "Mi firma",
@@ -126,7 +126,7 @@
     "Recently sent for signatures": "Recientemente enviados para ser firmados",
     "Recent signature requests": "Solicitudes de firma recientes",
     "Drafts": "Borradores",
-    "Contactbook": "Agenda de contactos",
+    "Contacts": "Agenda de contactos",
     "Templates": "Plantillas",
     "Teams": "Equipos",
     "Users": "Usuarios"
@@ -182,7 +182,7 @@
     "Completed Documents": "Esta es una lista de documentos en los que todas las partes han firmado.",
     "Declined Documents": "Esta es una lista de documentos que han sido rechazados por uno de los firmantes.",
     "Expired Documents": "Esta es una lista de documentos que han alcanzado su fecha de caducidad.",
-    "Contactbook": "Esta es una lista de contactos/firmantes añadidos por ti. Aparecerán como sugerencias cuando intentes añadir firmantes a un nuevo documento.",
+    "Contacts": "Esta es una lista de contactos/firmantes añadidos por ti. Aparecerán como sugerencias cuando intentes añadir firmantes a un nuevo documento.",
     "Templates": "Esta es una lista de plantillas que están a tu disposición para crear documentos. Puedes hacer clic en el botón «usar» para crear un nuevo documento utilizando una plantilla, modifica el documento y añade firmantes en el siguiente paso."
   },
   "form-name": {

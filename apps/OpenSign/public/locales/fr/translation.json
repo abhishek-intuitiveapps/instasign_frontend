@@ -89,7 +89,7 @@
       "Manage templates": "Gérer les modèles",
       "Embedding": "Intégration"
     },
-    "OpenSign™ Drive": "Lecteur {{appName}}",
+    "InstaSign™ Drive": "Lecteur {{appName}}",
     "Reports": "Rapports",
     "Documents": "Documents",
     "Documents-Children": {
@@ -100,7 +100,7 @@
       "Declined": "Signature refusé",
       "Expired": "Expiré"
     },
-    "Contactbook": "Carnet de contacts",
+    "Contacts": "Carnet de contacts",
     "Settings": "Paramètres",
     "Settings-Children": {
       "My Signature": "Ma signature",
@@ -126,7 +126,7 @@
     "Recently sent for signatures": "Récemment envoyé pour signature",
     "Recent signature requests": "Demandes de signature récentes",
     "Drafts": "Brouillons",
-    "Contactbook": "Carnet de contacts",
+    "Contacts": "Carnet de contacts",
     "Templates": "Modèles",
     "Teams": "Équipe",
     "Users": "Utilisateurs"
@@ -181,7 +181,7 @@
     "Completed Documents": "Il s'agit d'une liste de documents signés par toutes les parties.",
     "Declined Documents": "Il s'agit d'une liste de documents qui ont été refusés par l'un des signataires.",
     "Expired Documents": "Il s'agit d'une liste de documents qui ont atteint leur date d'expiration.",
-    "Contactbook": "Il s'agit d'une liste de contacts/signataires que vous avez ajoutés. Ceux-ci apparaîtront sous forme de suggestions lorsque vous tenterez d'ajouter des signataires à un nouveau document.",
+    "Contacts": "Il s'agit d'une liste de contacts/signataires que vous avez ajoutés. Ceux-ci apparaîtront sous forme de suggestions lorsque vous tenterez d'ajouter des signataires à un nouveau document.",
     "Templates": "Il s'agit d'une liste de modèles à votre disposition pour créer des documents. Vous pouvez cliquer sur le bouton 'Utiliser' pour créer un nouveau document à l'aide d'un modèle, modifier le document et ajouter des signataires à l'étape suivante."
   },
   "form-name": {

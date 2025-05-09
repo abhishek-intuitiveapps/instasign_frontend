@@ -22,6 +22,8 @@ import SelectLanguage from "../components/pdf/SelectLanguage";
 import { setPaymentMode } from "../redux/reducers/PaymentReducer";
 import countries from "../json/CountriesJson";
 import _ from 'lodash';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function UserProfile() {
   const navigate = useNavigate();
@@ -52,7 +54,8 @@ function UserProfile() {
   const paymentMode = useSelector((state) => state.payment.mode);
   const [tempPaymentMode, setTempPaymentMode] = useState(paymentMode);
   const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
+  const djangoToken = localStorage.getItem("django");
 
   useEffect(() => {
     setTempPaymentMode(paymentMode);
@@ -66,7 +69,6 @@ function UserProfile() {
 
   const getDjangoUserDetails = async () => {
     try {
-      const djangoToken = localStorage.getItem("django");
       const response = await axios.get(`${djangoUrl}/base/api/v1/get/user/detail/`, {
         headers: {
           Authorization: `Bearer ${djangoToken}`
@@ -86,20 +88,22 @@ function UserProfile() {
   const handleKyceeVerifyBtn = async() => {
     try {
       const payload = {
-        email: "rishabh@intuitiveapps.com",
-        first_name: "rishabh",
-        last_name: "bilwal",
-        phone_number: "+919910629281",
+        email: djangoUser.email,
+        first_name: djangoUser.first_name,
+        last_name: djangoUser.last_name,
+        phone_number: djangoUser.phone_number, // Fallback if phone not available
         verification_type: "instant",
-        unique_client_id: "TEST01",
-        client_secret: "APxVALVWjQrdNQFIOAKZuvXGGnhOxLrQKVwfBNNOvEEOvShNhaGptvvWBaoFVjyiJqOcVtwitJbslNXMwsmTffedXVfjwamoUfrm",
+        unique_client_id: djangoUser.id,
+        client_secret: process.env.REACT_APP_KYCEE_CLIENT_SECRET,
+        verification_application: "instasign",
+        verification_product:"uuid",
         type: "prod"
       };
 
-      const response = await axios.post("https://sandbox.kycee.in/api/v1/external/gateway/create/verification", payload);
+      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v1/external/gateway/create/verification`, payload);
       
       if (response.data && response.data.data && response.data.data.token) {
-        window.open(`https://sandbox.kycee.in/?token=${response.data.data.token}`, '_blank');
+        window.open(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/?token=${response.data.data.token}`, '_blank');
         startKyceeVerificationCheck(); // Start checking after opening the new tab
       }
     } catch (error) {
@@ -157,7 +161,7 @@ function UserProfile() {
           setIsLoader(false);
         }
       } catch (e) {
-        alert(t("something-went-wrong-mssg"));
+        toast.error(t("something-went-wrong-mssg"));
       }
     }
   };
@@ -169,6 +173,20 @@ function UserProfile() {
     if (!res) {
       setIsLoader(true);
       try {
+
+        const response = await axios.post(`${djangoUrl}/base/api/v1/update/profile/`, {
+          first_name: name.split(" ")[0], // Assuming first name is the first part of the name
+          last_name: name.split(" ").slice(1).join(" "), // Assuming last name is the rest
+          phone_number: phn || ""
+        },{
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${djangoToken}`
+          }
+        });
+
+        console.log("this is the reponse of update profile api :",response.data);
+
         const userQuery = Parse.Object.extend("_User");
         const query = new Parse.Query(userQuery);
         await query.get(UserProfile.objectId).then((object) => {
@@ -192,14 +210,14 @@ function UserProfile() {
                 });
                 await updatePaymentMode(tempPaymentMode ? 'post_paid' : 'pre_paid');
                 dispatch(setPaymentMode(tempPaymentMode));
-                alert(t("profile-update-alert"));
+                toast.success(t("profile-update-alert"));
                 setEditMode(false);
                 setIsLoader(false);
                 //navigate("/dashboard/35KBoSgoAK");
               }
             },
             (error) => {
-              alert(t("something-went-wrong-mssg"));
+              toast.error(t("something-went-wrong-mssg"));
               console.error("Error while updating tour", error);
               setIsLoader(false);
             }
@@ -316,15 +334,15 @@ function UserProfile() {
       });
       if (resEmail?.message === "Email is verified.") {
         setIsEmailVerified(true);
-        alert(t("Email-verified-alert-1"));
+        toast.success(t("Email-verified-alert-1"));
       } else if (resEmail?.message === "Email is already verified.") {
         setIsEmailVerified(true);
-        alert(t("Email-verified-alert-2"));
+        toast.info(t("Email-verified-alert-2"));
       }
       setOtp("");
       setIsVerifyModal(false);
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     } finally {
       setOtpLoader(false);
     }
@@ -335,7 +353,7 @@ function UserProfile() {
     setOtpLoader(true);
     await handleSendOTP();
     setOtpLoader(false);
-    alert(t("otp-sent-alert"));
+    toast.info(t("otp-sent-alert"));
   };
 
   const handleCancel = () => {
@@ -371,17 +389,28 @@ function UserProfile() {
 
   return (
     <React.Fragment>
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Title title={"Profile"} />
       {isLoader ? (
         <div className="h-[100vh] flex justify-center items-center">
           <Loader />
         </div>
       ) : (
-        <div className="flex flex-col items-center w-full relative h-[80vh]">
+        <div className="flex flex-col items-center w-full relative h-auto md:h-[80vh]">
           <div className="bg-base-100 text-base-content flex flex-col justify-between shadow-md rounded-box w-full p-4">
-            <div className="flex flex-row justify-start items-center mb-4">
+            <div className="flex flex-col md:flex-row justify-start items-center mb-4">
               <div className="flex flex-col justify-center items-center mr-8">
-                <div className="w-[250px] h-[250px] overflow-hidden rounded-full">
+                <div className="w-[150px] h-[150px] md:w-[250px] md:h-[250px] overflow-hidden rounded-full">
                   <img
                     className="object-cover w-full h-full"
                     src={Image === "" ? dp : Image}
@@ -401,7 +430,7 @@ function UserProfile() {
                 )}
                 {percentage !== 0 && (
                   <div className="flex items-center gap-x-2 mt-2">
-                    <div className="h-2 rounded-full w-[150px] bg-gray-200">
+                    <div className="h-2 rounded-full w-[100px] md:w-[150px] bg-gray-200">
                       <div
                         className="h-2 rounded-full bg-blue-500"
                         style={{ width: `${percentage}%` }}
@@ -425,7 +454,7 @@ function UserProfile() {
                     <input
                       type="text"
                       value={name}
-                      className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
+                      className="op-input op-input-bordered op-input-sm w-full md:w-[180px] focus:outline-none hover:border-base-content text-sm"
                       onChange={(e) => SetName(e.target.value)}
                     />
                   ) : (
@@ -441,7 +470,7 @@ function UserProfile() {
                   {editmode ? (
                     <input
                       type="text"
-                      className="op-input op-input-bordered op-input-sm w-[180px] focus:outline-none hover:border-base-content text-sm"
+                      className="op-input op-input-bordered op-input-sm w-full md:w-[180px] focus:outline-none hover:border-base-content text-sm"
                       onChange={(e) => SetPhone(e.target.value)}
                       value={Phone}
                     />
@@ -464,13 +493,13 @@ function UserProfile() {
                   </span>
                   <span>{UserProfile && UserProfile.email}</span>
                 </li>
-                <li
+                {djangoUser?.is_main_admin && (<li
                   className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
                     editmode ? "py-1.5" : "py-2"
                   }`}
                 >
                   <span className="font-semibold">{t("company")}:</span>{" "}
-                  {editmode ? (
+                  {/* {editmode ? (
                     <input
                       type="text"
                       value={company}
@@ -479,8 +508,9 @@ function UserProfile() {
                     />
                   ) : (
                     <span>{extendUser?.[0].Company}</span>
-                  )}
-                </li>
+                  )} */}
+                  <span>{extendUser?.[0].Company}</span>
+                </li>)}
                 {/* <li
                   className={`flex justify-between items-center border-b-[1px] border-gray-300 break-all ${
                     editmode ? "py-1.5" : "py-2"
@@ -580,36 +610,73 @@ function UserProfile() {
                   <span className="font-semibold">{t("Country")}:</span>{" "}
                   <span>{getCountryName(djangoUser.country)}</span>
                 </li>
-                <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
-                  <span className="font-semibold">Payment Mode:</span>
-                  <div className="flex items-center">
-                    <span className="mr-2">{"Prepaid"}</span>
-                    <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                      <input
-                        type="checkbox"
-                        className="sr-only peer"
-                        checked={tempPaymentMode}
-                        onChange={() => {
-                          const newPostpaidStatus = !tempPaymentMode;
-                          setTempPaymentMode(newPostpaidStatus);
-                          console.log("Payment mode changed to:", newPostpaidStatus);
+                {djangoUser?.is_main_admin && (
+                  //  <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all">
+                  //    <span className="font-semibold">Payment Mode:</span>
+                  //    <div className="flex items-center">
+                  //      <span className="mr-2">{"Prepaid"}</span>
+                  //      <label className={`relative inline-flex mt-2 items-center cursor-pointer ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  //        <input
+                  //          type="checkbox"
+                  //          className="sr-only peer"
+                  //          checked={tempPaymentMode}
+                  //          onChange={() => {
+                  //            const newPostpaidStatus = !tempPaymentMode;
+                  //            setTempPaymentMode(newPostpaidStatus);
+                  //            console.log("Payment mode changed to:", newPostpaidStatus);
+                  //          }}
+                  //          disabled={!editmode}
+                  //        />
+                  //        <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
+                  //      </label>
+                  //      <span className="ml-2">Postpaid</span>
+                  //    </div>
+
+                  //     <select
+                  //      className={`ml-2 op-input op-input-bordered op-input-sm ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  //      value={tempPaymentMode ? 'post_paid' : 'pre_paid'}
+                  //      onChange={(e) => {
+                  //        const selectedMode = e.target.value === 'post_paid';
+                  //        setTempPaymentMode(selectedMode);
+                  //        console.log("Payment mode changed to:", selectedMode);
+                  //      }}
+                  //      disabled={!editmode}
+                  //    >
+                  //      <option value="pre_paid">Prepaid</option>
+                  //      <option value="post_paid">Postpaid</option>
+                  //    </select>
+                  //  </li>
+                  <li className="flex justify-between items-center border-b-[1px] border-gray-300 break-all py-2">
+                    <span className="font-semibold">{t("Payment Mode")}:</span>
+                    <div className="relative inline-block w-1/5">
+                      <select
+                        className={`block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 pl-3 pr-8 rounded-full shadow leading-tight focus:outline-none focus:bg-white focus:border-blue-500 ${!editmode ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        value={tempPaymentMode ? 'post_paid' : 'pre_paid'}
+                        onChange={(e) => {
+                          const selectedMode = e.target.value === 'post_paid';
+                          setTempPaymentMode(selectedMode);
+                          console.log("Payment mode changed to:", selectedMode);
                         }}
                         disabled={!editmode}
-                      />
-                      <div className={`w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600 ${!editmode ? 'bg-gray-400' : ''}`}></div>
-                    </label>
-                    <span className="ml-2">Postpaid</span>
-                  </div>
-                </li>
+                      >
+                        <option value="pre_paid">Prepaid</option>
+                        <option value="post_paid">Postpaid</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                        <svg className="fill-current h-4 w-4" viewBox="0 0 20 20"><path d="M7 10l5 5 5-5H7z"/></svg>
+                      </div>
+                    </div>
+                  </li>
+                 )}
               </ul>
             </div>
-            <div className="flex justify-center gap-4 pt-4">
+            <div className="flex justify-center gap-4 pt-4 flex-col md:flex-row">
               <button
                 type="button"
                 onClick={(e) => {
                   editmode ? debouncedHandleSubmit(e) : setEditMode(true);
                 }}
-                className="op-btn text-white op-btn-primary w-[100px]"
+                className="op-btn text-white op-btn-primary w-full md:w-[100px]"
               >
                 {editmode ? t("save") : t("edit")}
               </button>
@@ -618,9 +685,7 @@ function UserProfile() {
                 onClick={() =>
                   editmode ? handleCancel() : navigate("/changepassword")
                 }
-                className={`op-btn ${
-                  editmode ? "op-btn-ghost w-[100px]" : "op-btn-secondary"
-                } ${!editmode ? "bg-[#D6DBE5] text-black border border-gray-300 hover:bg-gray-300" : ""}`}
+                className={`op-btn ${editmode ? "op-btn-ghost w-full md:w-[100px]" : "op-btn-secondary"}`}
               >
                 {editmode ? t("cancel") : t("change-password")}
               </button>

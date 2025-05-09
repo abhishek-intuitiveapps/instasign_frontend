@@ -13,6 +13,9 @@ import Alert from "../primitives/Alert";
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
 import sanitizeFileName from "../primitives/sanitizeFileName";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const ManageSign = () => {
   const { t } = useTranslation();
   const [penColor, setPenColor] = useState("blue");
@@ -74,7 +77,7 @@ const ManageSign = () => {
         setIsLoader(false);
       } catch (err) {
         console.log("Err", err);
-        alert(`${err.message}`);
+        toast.error(err.message);
       }
     }
   };
@@ -197,6 +200,11 @@ const ManageSign = () => {
     return new File([u8arr], name, { type: mime });
   }
 
+  const handleUploadFileError = (message) => {
+    toast.error(message);
+    setIsLoader(false);
+  };
+
   const uploadFile = async (file) => {
     try {
       const parseFile = new Parse.File(file.name, file);
@@ -208,19 +216,16 @@ const ManageSign = () => {
           SaveFileSize(file.size, fileRes?.url, tenantId);
           return fileRes?.url;
         } else {
-          alert(t("something-went-wrong-mssg"));
-          setIsLoader(false);
+          handleUploadFileError(t("something-went-wrong-mssg"));
           return false;
         }
       } else {
-        alert(t("something-went-wrong-mssg"));
-        setIsLoader(false);
+        handleUploadFileError(t("something-went-wrong-mssg"));
         return false;
       }
     } catch (err) {
       console.log("sign upload err", err);
-      setIsLoader(false);
-      alert(`${err.message}`);
+      handleUploadFileError(err.message);
     }
   };
 
@@ -237,11 +242,13 @@ const ManageSign = () => {
         updateSign.set("SignatureName", obj.name);
         updateSign.set("UserId", userId);
         const res = await updateSign.save();
-        setIsAlert({ type: "success", message: t("signature-saved-alert") });
+        // setIsAlert({ type: "success", message: t("signature-saved-alert") });
+        toast.success(t("signature-saved-alert"))
         return res;
       } catch (err) {
         console.log(err);
-        setIsAlert({ type: "danger", message: `${err.message}` });
+        // setIsAlert({ type: "danger", message: `${err.message}` });
+        toast.error(err.message)
       } finally {
         setIsLoader(false);
         setTimeout(() => setIsAlert({}), 2000);
@@ -254,11 +261,13 @@ const ManageSign = () => {
         updateSign.set("SignatureName", obj.name);
         updateSign.set("UserId", userId);
         const res = await updateSign.save();
-        setIsAlert({ type: "success", message: t("signature-saved-alert") });
+        // setIsAlert({ type: "success", message: t("signature-saved-alert") });
+        toast.success(t("signature-saved-alert"))
         return res;
       } catch (err) {
         console.log(err);
-        setIsAlert({ type: "success", message: `${err.message}` });
+        // setIsAlert({ type: "success", message: `${err.message}` });
+        toast.success(err.message)
       } finally {
         setIsLoader(false);
         setTimeout(() => setIsAlert({}), 2000);
@@ -297,6 +306,17 @@ const ManageSign = () => {
   };
   return (
     <div className="relative h-full bg-base-100 text-base-content flex shadow-md rounded-box overflow-auto">
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       {isLoader && (
         <div className="absolute bg-black bg-opacity-30 z-50 w-full h-full flex justify-center items-center">
           <Loader />

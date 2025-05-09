@@ -3,16 +3,36 @@ import Parse from "parse";
 import { Navigate } from "react-router";
 import Title from "../components/Title";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function ChangePassword() {
   const { t } = useTranslation();
   const [currentpassword, setCurrentPassword] = useState("");
   const [newpassword, setnewpassword] = useState("");
   const [confirmpassword, setconfirmpassword] = useState("");
+  const djangoToken = localStorage.getItem('django');
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
+  
   const handleSubmit = async (evt) => {
     evt.preventDefault();
     try {
       if (newpassword === confirmpassword) {
+
+        const response = await axios.post(`${djangoUrl}/base/api/v1/change/password/`, {
+          "old_password": currentpassword,
+            "new_password": newpassword
+        }, {
+          headers: {
+            Authorization: `Bearer ${djangoToken}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        console.log("this is the result of change password api :",response.data);
+
         Parse.User.logIn(localStorage.getItem("userEmail"), currentpassword)
           .then(async (user) => {
             if (user) {
@@ -29,23 +49,27 @@ function ChangePassword() {
                       await Parse.User.become(_user.sessionToken);
                       localStorage.setItem("accesstoken", _user.sessionToken);
                     }
-                    alert(t("password-update-alert-1"));
+                    // Clear the state after successful password update
+                    setCurrentPassword("");
+                    setnewpassword("");
+                    setconfirmpassword("");
+                    toast.success(t("password-update-alert-1"));
                   })
                   .catch((error) => {
                     console.log("err", error);
-                    alert(t("something-went-wrong-mssg"));
+                    toast.error(t("something-went-wrong-mssg"));
                   });
               });
             } else {
-              alert(t("password-update-alert-2"));
+              toast.error(t("password-update-alert-2"));
             }
           })
           .catch((error) => {
-            alert(t("password-update-alert-3"));
+            toast.error(t("password-update-alert-3"));
             console.error("Error while logging in user", error);
           });
       } else {
-        alert(t("password-update-alert-4"));
+        toast.error(t("password-update-alert-4"));
       }
     } catch (error) {
       console.log("err", error);
@@ -57,6 +81,17 @@ function ChangePassword() {
   return (
     <div className="w-full bg-base-100 text-base-content shadow rounded-box p-2">
       <Title title="Change Password" />
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="text-xl font-bold border-b-[1px] border-gray-300">
         {t("change-password")}
       </div>

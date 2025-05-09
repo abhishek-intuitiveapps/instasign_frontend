@@ -5,6 +5,9 @@ import PaginationComponent from "./PaginationComponent"; // Adjust the import pa
 import AddCreditsModal from "./AddCreditsModal";
 import { WalletCard } from "./WalletCard";
 import Loader from "../primitives/Loader";
+import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
+import 'react-toastify/dist/ReactToastify.css'; // Import CSS for toasts
+
 
 // Import necessary components and hooks
 const Wallet = () => {
@@ -19,7 +22,7 @@ const Wallet = () => {
   const [walletDetails, setWalletDetails] = useState(null); // State to store wallet details
   const [isLoading, setIsLoading] = useState(true); // New state for loading
   const [creditsData, setCreditsData] = useState([]); // Make creditsData a state variable
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const savedRowsPerPage = localStorage.getItem("rowsPerPage");
@@ -32,30 +35,33 @@ const Wallet = () => {
     localStorage.setItem("rowsPerPage", rowsPerPage);
     const fetchData = async () => {
       setIsLoading(true); // Set loading to true before fetching
-      await fetchWalletDetails();
+      // await fetchWalletDetails();
       fetchOfflineOrders();
       setIsLoading(false); // Set loading to false after fetching
     };
     fetchData();
   }, [rowsPerPage]);
 
-  const fetchWalletDetails = async () => {
-    try {
-      const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
-        headers: {
-          Authorization: `Bearer ${djangoToken}`,
-        },
-      });
-      if (response.data.status) {
-        console.log("Wallet details fetched successfully:", response.data.data);
-        setWalletDetails(response.data.data); // Store wallet details in state
-      } else {
-        console.error("Failed to fetch wallet details:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error fetching wallet details:", error);
-    }
-  };
+  // const fetchWalletDetails = async () => {
+  //   try {
+  //     const response = await axios.get(`${djangoUrl}/base/api/v1/get/wallet/`, {
+  //       headers: {
+  //         Authorization: `Bearer ${djangoToken}`,
+  //       },
+  //     });
+  //     if (response.data.status) {
+  //       console.log("Wallet details fetched successfully:", response.data.data);
+  //       setWalletDetails(response.data.data);
+  //       toast.success("Wallet details fetched successfully!"); // Toast for success
+  //     } else {
+  //       console.error("Failed to fetch wallet details:", response.data.message);
+  //       toast.error("Failed to fetch wallet details: " + response.data.message); // Toast for error
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching wallet details:", error);
+  //     toast.error("Error fetching wallet details: " + error.message); // Toast for error
+  //   }
+  // };
 
   const fetchOfflineOrders = async () => {
     try {
@@ -67,13 +73,15 @@ const Wallet = () => {
       console.log(response.data);
       if (response.data) {
         console.log("Offline orders fetched successfully:", response.data.data);
-        // Assuming response.data.data is an array of orders
-        setCreditsData(prevData => [...prevData, ...response.data.data]); // Update creditsData state
+        setCreditsData(response.data.data);
+        // toast.success("Offline orders fetched successfully!"); // Toast for success
       } else {
         console.error("Failed to fetch offline orders:", response.data.message);
+        toast.error("Failed to fetch offline orders: " + response.data.message); // Toast for error
       }
     } catch (error) {
       console.error("Error fetching offline orders:", error);
+      toast.error("Error fetching offline orders: " + error.message); // Toast for error
     }
   };
 
@@ -144,6 +152,21 @@ const Wallet = () => {
   //   }
   // };
 
+  const downloadInvoice = async (url) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Network response was not ok');
+      
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'invoice.pdf'; // You can customize the filename here
+      link.click();
+      window.URL.revokeObjectURL(link.href); // Clean up the URL object
+    } catch (error) {
+      console.error('Error downloading the invoice:', error);
+    }
+  };
 
   // Call fetchWalletDetails when the component mounts or at a specific event
 
@@ -155,7 +178,7 @@ const Wallet = () => {
       <Title title="Wallet" drive={false} /> {/* Set the page title using Title component */}
       
       {/* New Card */}
-      {isLoading ? ( // Conditional rendering based on loading state
+      {/* {isLoading ? ( // Conditional rendering based on loading state
         <div className="flex justify-center items-center" style={{ height: '100%' }}>
           <Loader /> 
         </div>
@@ -170,11 +193,11 @@ const Wallet = () => {
             updatedOn={walletDetails[0].updated_at} // Use updated_at from wallet details
           />
         )
-      )}
+      )} */}
       
     </div>
       {/* <h2 className="text-2xl font-bold text-gray-800 mb-4">Billing - Credits</h2> */}
-      <div className="bg-white mt-3 px-5 py-3.5 rounded-md shadow-md overflow-x-auto" style={{ maxHeight: '80vh' }}>
+      <div className="bg-white px-3 pt-4 rounded-md shadow-md overflow-hidden" style={{ height: '90vh', maxWidth: '100%' }}>
         <div className="flex justify-between mb-2">
           <h2 className="text-2xl font-bold text-gray-800 ">Credits History</h2>
           <button 
@@ -184,11 +207,19 @@ const Wallet = () => {
             Add Credits
           </button>
         </div>
-        <div className="table-container" style={{ height: 'calc(65vh - 80px)', overflowY: 'auto' }}>
-          <table className="min-w-full border border-gray-300" style={{ borderCollapse: 'collapse', height: isLoading || paginatedData.length === 0 ? '100%' : 'auto' }}>
+        <div className="table-container" style={{ height: 'calc(73vh - 80px)', overflowY: 'auto', overflowX: 'hidden' }}>
+          <table 
+            className="min-w-full border border-gray-300" 
+            style={{
+              borderCollapse: 'collapse', 
+              height: isLoading || paginatedData.length === 0 ? '100%' : 'auto',
+              width: '100%'
+            }}
+          >
             <thead className="bg-gray-200 sticky top-0">
               <tr className="text-gray-700">
                 <th className="p-3 text-center border">S.No</th>
+                <th className="p-3 text-center border">Invoice</th>
                 <th className="p-3 text-center border">Date</th>
                 <th className="p-3 text-center border">Amount</th>
                 <th className="p-3 text-center border">User</th>
@@ -202,19 +233,33 @@ const Wallet = () => {
               {isLoading ? ( // Show loader while loading
                 <tr>
                   <td colSpan="8" className="p-3 text-center" style={{ height: '400px' }}>
-                    <Loader />
+                    <div className="flex justify-center items-center" style={{ height: '100%' }}>
+                      <Loader />
+                    </div>
                   </td>
                 </tr>
               ) : paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
-                    <td className="p-3 text-center border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
-                    <td className="p-3 text-center border">{item.date}</td>
-                    <td className="p-3 text-center border">{item.amount}</td>
-                    <td className="p-3 text-center border">{item.user}</td>
-                    <td className="p-3 text-center border">{item.unitPrice}</td>
-                    <td className="p-3 text-center border">{item.utr}</td>
-                    <td className="p-3 text-center border">{item.walletId}</td>
+                    <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
+                    <td className="p-3 border">
+                      {item.invoice ? (
+                        <button 
+                          className="p-2 rounded-md border border-gray-300 hover:bg-gray-100 transition-colors"
+                          onClick={() => downloadInvoice(item.invoice)}
+                        >
+                          <i className="fa-light fa-file-pdf text-[#002864] text-xl"></i>
+                        </button>
+                      ) : (
+                        <span>Not yet generated</span>
+                      )}
+                    </td>
+                    <td className="p-3 text-center border">{item.created_at.split('T')[0]}</td>
+                    <td className="p-3 border">{item.amount}</td>
+                    <td className="p-3 border">{item.responsible_person}</td>
+                    <td className="p-3 border">{item.unit_price}</td>
+                    <td className="p-3 border">{item.utr}</td>
+                    <td className="p-3 border">{item.order_wallet}</td>
                     <td className="p-3 border">
                       <span 
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center ${
@@ -247,6 +292,17 @@ const Wallet = () => {
       </div>
       <AddCreditsModal show={showModal} handleClose={() => setShowModal(false)} />
     {/* </div> */}
+    <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </>
   );
 };

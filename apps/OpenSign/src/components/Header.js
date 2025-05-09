@@ -10,17 +10,18 @@ import {
   saveLanguageInLocal
 } from "../constant/Utils";
 import { useTranslation } from "react-i18next";
-const Header = ({ showSidebar, setIsMenu }) => {
+const Header = ({ showSidebar, setIsMenu, isPendingVerification }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { width } = useWindowSize();
+
   const username = localStorage.getItem("username") || "";
   const image = localStorage.getItem("profileImg") || dp;
   const [isOpen, setIsOpen] = useState(false);
   const [applogo, setAppLogo] = useState(
     localStorage.getItem("appLogo") || " "
   );
-  const [isOpenSettings, setIsOpenSettings] = useState(false);
+
   const Extand_Class = localStorage.getItem("Extand_Class");
   const extClass = Extand_Class && JSON.parse(Extand_Class);
   let userRole = "contracts_User";
@@ -34,17 +35,18 @@ const Header = ({ showSidebar, setIsMenu }) => {
       setIsMenu(false);
     }
   };
+
   useEffect(() => {
     initializeHead();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   async function initializeHead() {
-      const applogo = await getAppLogo();
-      if (applogo?.logo) {
-        setAppLogo(applogo?.logo);
-      } else {
-        setAppLogo(localStorage.getItem("appLogo") || "");
-      }
+    const applogo = await getAppLogo();
+    if (applogo?.logo) {
+      setAppLogo(applogo?.logo);
+    } else {
+      setAppLogo(localStorage.getItem("appLogo") || "");
+    }
   }
 
   const closeDropdown = async () => {
@@ -54,12 +56,13 @@ const Header = ({ showSidebar, setIsMenu }) => {
     } catch (err) {
       console.log("Err while logging out", err);
     }
-    let appdata = localStorage.getItem("userSettings");
-    let applogo = localStorage.getItem("appLogo");
-    let defaultmenuid = localStorage.getItem("defaultmenuid");
-    let PageLanding = localStorage.getItem("PageLanding");
-    let baseUrl = localStorage.getItem("baseUrl");
-    let appid = localStorage.getItem("parseAppId");
+
+    const appdata = localStorage.getItem("userSettings");
+    const applogo = localStorage.getItem("appLogo");
+    const defaultmenuid = localStorage.getItem("defaultmenuid");
+    const PageLanding = localStorage.getItem("PageLanding");
+    const baseUrl = localStorage.getItem("baseUrl");
+    const appid = localStorage.getItem("parseAppId");
 
     localStorage.clear();
     saveLanguageInLocal(i18n);
@@ -73,7 +76,7 @@ const Header = ({ showSidebar, setIsMenu }) => {
     navigate("/login");
   };
 
-  //handle to close profile drop down menu onclick screen
+  // Close dropdown on outside click
   useEffect(() => {
     const closeMenuOnOutsideClick = (e) => {
       if (isOpen && !e.target.closest("#profile-menu")) {
@@ -82,9 +85,7 @@ const Header = ({ showSidebar, setIsMenu }) => {
     };
 
     document.addEventListener("click", closeMenuOnOutsideClick);
-
     return () => {
-      // Cleanup the event listener when the component unmounts
       document.removeEventListener("click", closeMenuOnOutsideClick);
     };
   }, [isOpen]);
@@ -97,13 +98,13 @@ const Header = ({ showSidebar, setIsMenu }) => {
             <img
               className="object-contain h-full w-auto"
               src={applogo}
-              alt="img"
+              alt="logo"
             />
           </div>
         </div>
-        <div id="profile-menu" className="flex-none gap-2 flex items-center">
+        {/* <div id="profile-menu" className="flex-none gap-2 flex items-center">
           
-          {/* <FullScreenButton /> */}
+          <FullScreenButton />
           {width >= 768 && (
             <div
               onClick={toggleDropdown}
@@ -121,19 +122,19 @@ const Header = ({ showSidebar, setIsMenu }) => {
               onClick={toggleDropdown}
               className="cursor-pointer text-base-content text-sm"
             >
-              {username && username}
+              {username && username.split(" ")[0]}
             </div>
           )}
           <div className="op-dropdown op-dropdown-end" id="profile-menu">
             <div
               tabIndex={0}
               role="button"
+              onClick={toggleDropdown}
               className="op-btn op-btn-ghost op-btn-xs w-[10px] h-[20px] hover:bg-transparent"
             >
               <i
                 tabIndex={0}
                 role="button"
-                onClick={toggleDropdown}
                 className="fa-light fa-angle-down text-base-content"
               ></i>
             </div>
@@ -164,7 +165,7 @@ const Header = ({ showSidebar, setIsMenu }) => {
               >
                 <span className="flex">
                   <i className="fa-light fa-address-book" style={{ width: "24px" }}></i>
-                  <span className="ml-2">{t("Contactbook")}</span>
+                  <span className="ml-2">{t("Contacts")}</span>
                 </span>
               </li>
               <li
@@ -232,15 +233,88 @@ const Header = ({ showSidebar, setIsMenu }) => {
               </li>
             </ul>
           </div>
-        </div>
-        <div className="flex-none">
-            <button
-              className="op-btn op-btn-square op-btn-ghost focus:outline-none hover:bg-transparent op-btn-sm no-animation"
-              onClick={showSidebar}
-            >
-              <i className="fa-light fa-bars text-xl text-base-content"></i>
-            </button>
+        </div> */}
+{/* 
+        {!isPendingVerification && ( */}
+          <div className="flex-none gap-2 flex items-center" id="profile-menu">
+            <div className="op-dropdown op-dropdown-end relative">
+              <div
+                tabIndex={0}
+                role="button"
+                onClick={toggleDropdown}
+                className="flex items-center gap-2 cursor-pointer"
+              >
+                <div className={`w-[35px] h-[35px] rounded-full ring-[1px] ring-offset-2 ring-gray-400 overflow-hidden ${width < 768 ? 'hidden' : ''}`}>
+                  <img
+                    className="w-full h-full object-cover"
+                    src={image}
+                    alt="profile"
+                  />
+                </div>
+                <div className={`text-base-content text-sm ${width < 768 ? 'hidden' : ''}`}>
+                  {username && username.split(" ")[0]}
+                </div>
+                <i className="fa-light fa-angle-down text-base-content"></i>
+              </div>
+
+              <ul
+                tabIndex={0}
+                className={`absolute right-0 mt-3 z-[1] p-2 shadow op-menu op-menu-sm op-dropdown-content text-base-content bg-base-100 rounded-box w-52 ${
+                  isOpen ? "" : "hidden"
+                }`}
+              >
+                <li
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate("/profile");
+                  }}
+                  className="flex"
+                >
+                  <span className="flex">
+                    <i
+                      className="fa-light fa-user"
+                      style={{ width: "24px" }}
+                    ></i>
+                    <span className="ml-2">{t("profile")}</span>
+                  </span>
+                </li>
+                <li
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate("/changepassword");
+                  }}
+                  className="flex"
+                >
+                  <span className="flex">
+                    <i
+                      className="fa-light fa-lock"
+                      style={{ width: "24px" }}
+                    ></i>
+                    <span className="ml-2">{t("change-password")}</span>
+                  </span>
+                </li>
+                <li onClick={closeDropdown} className="flex">
+                  <span className="flex">
+                    <i
+                      className="fa-light fa-arrow-right-from-bracket"
+                      style={{ width: "24px" }}
+                    ></i>
+                    <span className="ml-2">{t("log-out")}</span>
+                  </span>
+                </li>
+              </ul>
+            </div>
           </div>
+        {/* )} */}
+
+        <div className="flex-none">
+          <button
+            className="op-btn op-btn-square op-btn-ghost focus:outline-none hover:bg-transparent op-btn-sm no-animation"
+            onClick={showSidebar}
+          >
+            <i className="fa-light fa-bars text-xl text-base-content"></i>
+          </button>
+        </div>
       </div>
     </div>
   );

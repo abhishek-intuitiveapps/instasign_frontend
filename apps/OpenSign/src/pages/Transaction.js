@@ -5,6 +5,8 @@ import AddCreditsModal from "./AddCreditsModal";
 import Loader from "../primitives/Loader";
 import Title from "../components/Title";
 
+
+
 const BillingPage = () => {
   const [activeTable, setActiveTable] = useState("transactions");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,7 +18,7 @@ const BillingPage = () => {
   const [transactionsData, setTransactionsData] = useState([]); // Add state for transactions data
   const [isLoading, setIsLoading] = useState(true); // Add isLoading state
   const djangoToken = localStorage.getItem('django'); // Commenting out the token retrieval
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
   
    // Retrieve rowsPerPage from localStorage or default to 25
   const [rowsPerPage, setRowsPerPage] = useState(() => {
@@ -128,9 +130,9 @@ const BillingPage = () => {
       </div> */}
 
       {/* Table Section */}
-      <div className="bg-white p-5 rounded-md shadow-md overflow-hidden" style={{ height: '80vh' }}>
+      <div className="bg-white px-3 pt-4 rounded-md shadow-md overflow-hidden" style={{ height: '90vh' }}>
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Transactions History</h2>
-        <div className="table-container" style={{ height: 'calc(65vh - 80px)', overflowY: 'auto' }}>
+        <div className="table-container" style={{ height: 'calc(73vh - 80px)', overflowY: 'auto' }}>
           <table 
             className="min-w-full border border-gray-300" 
             style={{
@@ -161,15 +163,15 @@ const BillingPage = () => {
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
                     <td className="p-3 border">{(currentPage - 1) * rowsPerPage + index + 1}</td>
-                    <td className="p-3 border">{item.date}</td>
+                    <td className="p-3 border">{item.transaction_date}</td>
                     <td className="p-3 border">{item.amount}</td>
-                    <td className="p-3 border">{item.transactionId}</td>
+                    <td className="p-3 border">{item.transaction_id}</td>
                     <td className="p-3 border">
                       <span 
                         className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center ${
                           item.status.toLowerCase() === "pending" ? "bg-blue-100 text-blue-800" : 
                           item.status.toLowerCase() === "failed" ? "bg-red-100 text-red-800" : 
-                          item.status.toLowerCase() === "approved" ? "bg-green-100 text-green-800" : 
+                          item.status.toLowerCase() === "success" ? "bg-green-100 text-green-800" : 
                           "bg-gray-100 text-gray-800"
                         }`}
                       >

@@ -9,6 +9,7 @@ import Tooltip from "../primitives/Tooltip";
 import AddUser from "../components/AddUser";
 import Title from "../components/Title";
 import { useTranslation } from "react-i18next";
+import { toast, ToastContainer } from 'react-toastify';
 const heading = ["Sr.No", "Name", "Email", "Phone", "Role", "Team", "Active"];
 // const actions = [];
 const UserList = () => {
@@ -111,10 +112,11 @@ const UserList = () => {
         organizationId: extUser.OrganizationId.objectId
       });
       const _userRes = JSON.parse(JSON.stringify(res));
+      console.log("this is user list :",_userRes);
       setUserList(_userRes);
     } catch (err) {
       console.log("Err in fetch userlist", err);
-      setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
+      toast.error(t("something-went-wrong-mssg"));
     } finally {
       setTimeout(() => setIsAlert({ type: "success", msg: "" }), 1500);
       setIsLoader(false);
@@ -173,13 +175,9 @@ const UserList = () => {
         extUser.id = user.objectId;
         extUser.set("IsDisabled", !IsDisabled);
         await extUser.save();
-        setIsAlert({
-          type: !IsDisabled === true ? "danger" : "success",
-          msg:
-            !IsDisabled === true ? t("user-deactivated") : t("user-activated")
-        });
+        toast[!IsDisabled ? 'error' : 'success'](!IsDisabled ? t("user-deactivated") : t("user-activated"));
       } catch (err) {
-        setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
+        toast.error(t("something-went-wrong-mssg"));
         console.log("err in disable team", err);
       } finally {
         setIsActLoader({});
@@ -210,6 +208,17 @@ const UserList = () => {
             <>
               {isAdmin ? (
                 <div className="p-2 w-full bg-base-100 text-base-content op-card shadow-lg">
+                  <ToastContainer 
+                    position="bottom-right"
+                    autoClose={5000}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                  />
                   {isAlert.msg && (
                     <Alert type={isAlert.type}>{isAlert.msg}</Alert>
                   )}
@@ -396,6 +405,7 @@ const UserList = () => {
             </>
           )
       }
+      
     </div>
   );
 };

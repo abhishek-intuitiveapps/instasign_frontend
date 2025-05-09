@@ -20,6 +20,9 @@ async function sendMailProvider(req, plan, monthchange) {
           user: process.env.SMTP_USERNAME ? process.env.SMTP_USERNAME : process.env.SMTP_USER_EMAIL,
           pass: process.env.SMTP_PASS,
         },
+        tls: {
+          rejectUnauthorized: false, // <- add this
+        },
       });
     } else {
       if (mailgunApiKey) {
@@ -207,8 +210,8 @@ async function sendMailProvider(req, plan, monthchange) {
         subject: req.params.subject,
         text: req.params.text || 'mail',
         html: req.params.html || '',
-        bcc: req.params.bcc ? req.params.bcc : undefined,
-        replyTo: replyto ? replyto : undefined,
+        cc: req.params.bcc ? req.params.bcc : undefined,
+        replyTo: process.env.REPLY_TO || replyto ? replyto : undefined,
       };
 
       if (transporterSMTP) {

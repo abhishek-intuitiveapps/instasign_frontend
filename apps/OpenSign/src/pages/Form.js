@@ -60,7 +60,8 @@ const Forms = (props) => {
     NotifyOnSignatures: "",
     Bcc: [],
     RedirectUrl: "",
-    AllowModifications: false
+    AllowModifications: false,
+    isKycRequired: true
   });
   const [fileupload, setFileUpload] = useState("");
   const [fileload, setfileload] = useState(false);
@@ -369,6 +370,7 @@ const Forms = (props) => {
         object.set("Description", formData?.Description);
         object.set("Note", formData?.Note);
         if (props.title === "Request Signatures") {
+          object.set("KycRequired", formData?.isKycRequired);
           object.set(
             "TimeToCompleteDays",
             parseInt(formData?.TimeToCompleteDays)
@@ -453,7 +455,8 @@ const Forms = (props) => {
             IsEnableOTP: "false",
             IsTourEnabled: "true",
             RedirectUrl: "",
-            AllowModifications: false
+            AllowModifications: false,
+            isKycRequired: true
           });
           setFileUpload("");
           setpercentage(0);
@@ -518,7 +521,7 @@ const Forms = (props) => {
           ? "Note to myself"
           : "Please review and sign this document",
       TimeToCompleteDays: 15,
-      SendinOrder: "true",
+      SendinOrder: "false",
       password: "",
       file: "",
       remindOnceInEvery: 5,
@@ -527,7 +530,8 @@ const Forms = (props) => {
       IsTourEnabled: "true",
       NotifyOnSignatures: notifySign,
       RedirectUrl: "",
-      AllowModifications: false
+      AllowModifications: false,
+      isKycRequired: true
     };
     setFormData(obj);
     removeFile();
@@ -846,6 +850,27 @@ const Forms = (props) => {
                 required
               />
             </div>
+
+            {props.title === "Request Signatures" && (
+              <div className="text-xs mt-2">
+                <label className="block">
+                  KYC required 
+                </label>
+                <div className="flex items-center gap-2">
+                  <label className="relative inline-flex items-center cursor-pointer mt-2">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={formData.isKycRequired}
+                      onChange={(e) => handleStrInput({ target: { name: 'isKycRequired', value: e.target.checked } })}
+                    />
+                    <div className="w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                  <span>{formData.isKycRequired ? "Yes" : "No"}</span>
+                </div>
+              </div>
+            )}
+            
             {props.title === "Sign Yourself" ? (
               <SelectFolder
                 onSuccess={handleFolder}
@@ -853,7 +878,7 @@ const Forms = (props) => {
                 isReset={isReset}
               />
             ) : (
-              <div className="flex flex-col md:flex-row w-full mt-4 md:mt-10 gap-3 ">
+              <div className="flex flex-col md:flex-row w-full mt-2 md:mt-10 gap-3 ">
                 <div className="card bg-base-100 rounded-box  flex-grow p-3  ">
                   {props.title !== "New Template" ? (
                     <SelectFolder
@@ -1055,7 +1080,7 @@ const Forms = (props) => {
                       </div>
                       {props.bcc && (
                         <SignersInput
-                          label={t("Bcc")}
+                          label={t("cc")}
                           initialData={bcc}
                           onChange={handleBcc}
                           isReset={isReset}

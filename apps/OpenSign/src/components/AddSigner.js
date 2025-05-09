@@ -240,6 +240,7 @@ const AddSigner = (props) => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              placeholder="Name should be matched as govt document"
               disabled={addYourself}
               onInvalid={(e) => e.target.setCustomValidity(t("input-required"))}
               onInput={(e) => e.target.setCustomValidity("")}
@@ -268,15 +269,26 @@ const AddSigner = (props) => {
           <div className="mb-3">
             <label htmlFor="phone" className="block text-xs font-semibold">
               {t("phone")}
+              <span className="text-[red] text-[13px]"> *</span>
             </label>
             <input
               type="text"
               id="phone"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                const value = e.target.value;
+                // Check if the value is a positive integer
+                if (/^\d*$/.test(value)) {
+                  setPhone(value);
+                }
+              }}
               disabled={addYourself}
+              maxLength={10}
+              required
+              onInvalid={(e) => e.target.setCustomValidity(t("input-required"))}
+              onInput={(e) => e.target.setCustomValidity("")}
               className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
-              placeholder={t("phone-optional")}
+              placeholder={t("phone")}
             />
           </div>
           <div className="mt-4 flex gap-x-2 justify-start">

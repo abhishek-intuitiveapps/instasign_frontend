@@ -14,7 +14,15 @@ export const subSetting = [
     pageType: "",
     description: "",
     objectId: "users"
-  }
+  },
+  {
+    icon: "fa-light fa-address-book",
+    title: "Contacts",
+    target: "_self",
+    pageType: "report",
+    description: "",
+    objectId: "contacts"
+  },
 ];
 
 const sidebarList = [
@@ -150,16 +158,8 @@ const sidebarList = [
       }
     ]
   },
-  // {
-  //   icon: "fa-light fa-address-book",
-  //   title: "Contactbook",
-  //   target: "_self",
-  //   pageType: "report",
-  //   description: "",
-  //   objectId: "contacts"
-  // },
   {
-    icon: "fa-light fa-money-bills",
+    icon: "fa-light fa-money-bill",
     title: "Billing",
     target: "_self",
     pageType: null,
@@ -192,39 +192,39 @@ const sidebarList = [
       },
     ]
   },
-  // {
-  //   icon: "fa-light fa-cog",
-  //   title: "Settings",
-  //   target: "_self",
-  //   pageType: null,
-  //   description: "",
-  //   objectId: null,
-  //   children: [
-  //     {
-  //       icon: "fa-light fa-pen-fancy",
-  //       title: "My Signature",
-  //       target: "_self",
-  //       pageType: "",
-  //       description: "",
-  //       objectId: "managesign"
-  //     },
-  //     {
-  //       icon: "fa-light fa-key",
-  //       title: "API Token",
-  //       target: "_self",
-  //       pageType: "",
-  //       description: "",
-  //       objectId: "generatetoken"
-  //     },
-  //     {
-  //       icon: "fa-light fa-globe",
-  //       title: "Webhook",
-  //       target: "_self",
-  //       pageType: "",
-  //       description: "",
-  //       objectId: "webhook"
-  //     }
-  //   ]
-  // }
+  {
+    icon: "fa-light fa-cog",
+    title: "Settings",
+    target: "_self",
+    pageType: null,
+    description: "",
+    objectId: null,
+    children: [
+      {
+        icon: "fa-light fa-pen-fancy",
+        title: "My Signature",
+        target: "_self",
+        pageType: "",
+        description: "",
+        objectId: "managesign"
+      },
+      {
+        icon: "fa-light fa-key",
+        title: "API Token",
+        target: "_self",
+        pageType: "",
+        description: "",
+        objectId: "generatetoken"
+      },
+      {
+        icon: "fa-light fa-globe",
+        title: "Webhook",
+        target: "_self",
+        pageType: "",
+        description: "",
+        objectId: "webhook"
+      }
+    ]
+  }
 ];
 export default sidebarList;

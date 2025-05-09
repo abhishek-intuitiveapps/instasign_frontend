@@ -69,6 +69,8 @@ import AsyncSelect from "react-select/async";
 import AddContact from "../primitives/AddContact";
 import EmptyWalletImage from "../assets/images/empty_wallet.png"; // Add the import for the image
 
+
+
 function PlaceHolderSign() {
   const { t } = useTranslation();
   const editorRef = useRef();
@@ -174,12 +176,13 @@ function PlaceHolderSign() {
     collect: (monitor) => ({ isOver: !!monitor.isOver() })
   });
   const [isWalletModalOpen, setIsWalletModalOpen] = useState(false); // Add state for the wallet modal
+  const [isKycRequired, setIsKycRequired] = useState(false); // Add state for KYC requirement
 
   const documentId = docId;
   const userEmail = localStorage.getItem('djangoUser')?.email; // Get user email from localStorage
   const token = localStorage.getItem('django'); 
 
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   useEffect(() => {
     if (documentId) {
@@ -242,7 +245,7 @@ function PlaceHolderSign() {
     );
     if (user) {
       try {
-        const defaultRequestBody = `<p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}}&nbsp;has requested you to review and sign&nbsp;{{document_title}}.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team OpenSign™</p><br>`;
+        const defaultRequestBody = `<p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}}&nbsp;has requested you to review and sign&nbsp;{{document_title}}.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team InstaSign™</p><br>`;
         const defaultSubject = `{{sender_name}} has requested you to sign {{document_title}}`;
         setDefaultBody(defaultRequestBody);
         setDefaultSubject(defaultSubject);
@@ -298,6 +301,9 @@ function PlaceHolderSign() {
     //getting document details
     const documentData = await contractDocument(documentId);
     if (documentData && documentData.length > 0) {
+      // Set KYC requirement from document data
+      setIsKycRequired(documentData[0]?.KycRequired || false);
+      
       if (documentData[0]?.Placeholders?.length > 0) {
         const signerNotExist = documentData[0]?.Placeholders.some(
           (data) => !data.signerObjId
@@ -998,17 +1004,53 @@ function PlaceHolderSign() {
       const signersName = getSigner.join(", ");
       setSignersName(signersName);
       setIsSendAlert({ mssg: "sure", alert: true });
+      return; // Exit early if there are unassigned widgets
     }
 
     if (getPrefill && isLabel) {
       setIsSendAlert({ mssg: textWidget, alert: true });
       setUnSignedWidgetId(unfilledTextWidgetId);
-    } else if (isPlaceholderExist && unassignedWidget.length === 0) {
+      return; // Exit early if there are unfilled text widgets
+    } 
+    
+    if (isPlaceholderExist && unassignedWidget.length === 0) {
       const IsSignerNotExist = filterPrefill?.filter((x) => !x.signerObjId);
       if (IsSignerNotExist && IsSignerNotExist?.length > 0) {
         setSignerExistModal(true);
         setSelectWidgetId(IsSignerNotExist[0]?.placeHolder?.[0]?.pos?.[0]?.key);
-      } else {
+        return; // Exit early if there are signers without object IDs
+      }
+      
+      // Extract signer emails and document ID for API call
+      const signerEmails = signersdata
+        .filter((signer) => signer.Role !== "prefill")
+        .map((signer) => signer.Email)
+        .join(",");
+
+        // const signerEmails = signersdata.filter((signer) => signer.Role !== "prefill");
+      
+      // Make API call to the endpoint
+      try {
+        const response = await axios.post(`${djangoUrl}/base/api/v1/signed/document/`, {
+          signers: signerEmails,
+          document_id: documentId
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("django")}`
+          }
+        });
+        
+        if (response.status !== 200) {
+          console.error('Error response from signed document API:', response.data);
+        }
+        
+        // Continue with the original functionality regardless of API response
+        saveDocumentDetails();
+        
+      } catch (error) {
+        console.error('Error calling signed document API:', error);
+        // Continue with original functionality even if API call fails
         saveDocumentDetails();
       }
     }
@@ -1231,7 +1273,7 @@ function PlaceHolderSign() {
           `${pdfDetails?.[0].objectId}/${signerMail[i].Email}/${objectId}`
         );
         let signPdf = `${hostUrl}/login/${encodeBase64}`;
-        const openSignUrl = "https://www.opensignlabs.com/";
+        const openSignUrl = `${hostUrl}`;
         const orgName = pdfDetails[0]?.ExtUserPtr.Company
           ? pdfDetails[0].ExtUserPtr.Company
           : "";
@@ -1326,9 +1368,9 @@ function PlaceHolderSign() {
               localExpireDate +
               "</td></tr><tr><td></td><td></td></tr></table></div> <div style='margin-left:70px'><a target=_blank href=" +
               signPdf +
-              "><button style='padding: 12px 12px 12px 12px;background-color:#d46b0f;color:white;border:0px;box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;font-weight:bold;margin-top:30px'>Sign here</button></a></div><div style='display: flex; justify-content: center;margin-top: 10px;'></div></div></div><div><p> This is an automated email from OpenSign™. For any queries regarding this email, please contact the sender " +
+              "><button style='padding: 12px 12px 12px 12px;background-color:#d46b0f;color:white;border:0px;box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;font-weight:bold;margin-top:30px'>Sign here</button></a></div><div style='display: flex; justify-content: center;margin-top: 10px;'></div></div></div><div><p> This is an automated email from InstaSign™. For any queries regarding this email, please contact the sender " +
               senderEmail +
-              " directly.If you think this email is inappropriate or spam, you may file a complaint with OpenSign™ <a href= " +
+              " directly.If you think this email is inappropriate or spam, you may file a complaint with InstaSign™ <a href= " +
               openSignUrl +
               " target=_blank>here</a>.</p></div></div></body></html>"
         };
@@ -2112,8 +2154,9 @@ function PlaceHolderSign() {
                     }
                     title={isSendAlert.mssg === "confirm" && t("send-mail")}
                     handleClose={() => handleCloseSendmailModal()}
+                    reduceWidth={isCustomize ? "md:min-w-[700px] md:max-w-[80%]" : undefined}
                   >
-                    <div className="max-h-96 overflow-y-scroll scroll-hide p-[20px] text-base-content">
+                    <div className={`${isCustomize ? "max-h-[70vh]" : "max-h-96"} overflow-y-auto scroll-hide p-[20px] text-base-content`}>
                       {isSendAlert.mssg === "confirm" && (
                         <>
                           {!isCustomize && (

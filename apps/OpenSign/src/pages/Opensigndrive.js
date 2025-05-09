@@ -104,6 +104,17 @@ function Opensigndrive() {
       style: { fontSize: "13px" }
     },
     {
+      selector: '[data-tut="reactourDocumentProgress"]',
+      content: () => (
+        <TourContentWithBtn
+          message={"Sort your documents by its progress using this menu."}
+          isChecked={handleDontShow}
+        />
+      ),
+      position: "top",
+      style: { fontSize: "13px" }
+    },
+    {
       selector: '[data-tut="reactourThird"]',
       content: () => (
         <TourContentWithBtn
@@ -124,7 +135,7 @@ function Opensigndrive() {
       ),
       position: "top",
       style: { fontSize: "13px" }
-    }
+    },
   ];
   //function for get all pdf document list
   const getPdfDocumentList = async (disbaleLoading) => {
@@ -772,7 +783,7 @@ function Opensigndrive() {
                 className={isStatusDropdownOpen ? "dropdown show" : "dropdown"}
                 onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
               >
-                <div className="sort" data-toggle="dropdown">
+                <div data-tut="reactourDocumentProgress" className="sort" data-toggle="dropdown">
                   <span
                     className={`text-xs font-semibold px-2.5 py-0.5 rounded text-center`}
                     style={{

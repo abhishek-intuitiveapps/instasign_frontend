@@ -329,7 +329,7 @@ export default function reportJson(id) {
     // contactbook report
     case "contacts":
       return {
-        reportName: "Contactbook",
+        reportName: "Contacts",
         heading: contactbook,
         actions: [
           {
@@ -348,7 +348,7 @@ export default function reportJson(id) {
           }
         ],
         import: true,
-        form: "ContactBook",
+        form: "Contacts",
         helpMsg:
           "This is a list of contacts/signers added by you. These will appear as suggestions when you try to add signers to a new document."
       };

@@ -21,7 +21,10 @@ import {
 } from "../constant/Utils";
 import Loader from "../primitives/Loader";
 import { useTranslation } from "react-i18next";
-import SelectLanguage from "../components/pdf/SelectLanguage";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+// import SelectLanguage from "../components/pdf/SelectLanguage";
+// import env_data from "../env_data.json";
 
 
 function Login() {
@@ -30,6 +33,7 @@ function Login() {
   const location = useLocation();
   const dispatch = useDispatch();
   const { width } = useWindowSize();
+  const djangoURL = process.env.REACT_APP_DJANGO_URL
   const [state, setState] = useState({
     email: "",
     alertType: "success",
@@ -53,14 +57,18 @@ function Login() {
   const [errMsg, setErrMsg] = useState();
   const [isChecked, setIsChecked] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-
-  const djangoUrl = 'https://api.instasign.ai';
+  const [isAlert, setIsAlert] = useState(false);
+  const [alertMsg, setAlertMsg] = useState({ type: "", message: "" });
   
 
   useEffect(() => {
     checkUserExt();
     // eslint-disable-next-line
   }, []);
+
+  const showToast = (message, type = "success") => {
+    toast[type](message);
+  };
 
   const checkUserExt = async () => {
     const app = await getAppLogo();
@@ -94,13 +102,13 @@ function Login() {
     localStorage.removeItem("accesstoken");
     event.preventDefault();
     if (!emailRegex.test(state.email)) {
-      alert("Please enter a valid email address.");
+      showToast("Please enter a valid email address.", "warning");
     } else {
       const { email, password } = state;
       if (email && password) {
         try {
           // Send Axios request to get access and refresh tokens
-          const response = await axios.post(`${djangoUrl}/base/api/token/`, {
+          const response = await axios.post(`${djangoURL}/base/api/token/`, {
             email: state.email,
             password: state.password
           });
@@ -124,6 +132,13 @@ function Login() {
             } else {
               localStorage.setItem("profileImg", "");
             }
+            
+            // Set success alert message
+            setState({
+              ...state,
+            });
+            showToast("Login successful!", "success");
+
             // Check extended class user role and tenantId
             try {
               const userSettings = appInfo.settings;
@@ -178,36 +193,31 @@ function Login() {
                       }
                     } else {
                       setState({
-                        ...state,
-                        alertType: "danger",
-                        alertMsg:
-                          "You don't have access, please contact the admin."
+                        ...state
                       });
+                      showToast("You don't have access, please contact the admin.", "error")
                       logOutUser();
                     }
                   } else {
                     setState({
-                      ...state,
-                      alertType: "danger",
-                      alertMsg: "User not found."
+                      ...state
                     });
+                    showToast("User not found", "error");
                     logOutUser();
                   }
                 })
                 .catch((error) => {
                   setState({
-                    ...state,
-                    alertType: "danger",
-                    alertMsg: `Something went wrong.`
+                    ...state
                   });
+                  showToast("Something went wrong", "error");
                   console.error("Error while fetching Follow", error);
                 });
             } catch (error) {
               setState({
-                ...state,
-                alertType: "danger",
-                alertMsg: `${error.message}`
+                ...state
               });
+              showToast(`${error.message}`, "error")
               console.log(error);
             }
 
@@ -215,20 +225,18 @@ function Login() {
             const parseSessionToken = localStorage.getItem("accesstoken");
             if (!access || !parseSessionToken) {
               setState({
-                ...state,
-                alertType: "danger",
-                alertMsg: "You must be logged in to both Django and Parse."
+                ...state
               });
+              showToast("You must be logged in to both Django and Parse.", "error")
               return; // Exit the function if not logged in
             }
 
           }
         } catch (error) {
           setState({
-            ...state,
-            alertType: "danger",
-            alertMsg: "Invalid username/password or region"
+            ...state
           });
+          showToast("Invalid username/password or region", "error")
           console.error("Error while logging in user", error);
         }
       }
@@ -305,45 +313,41 @@ function Login() {
                   }, 500); // Adjust the delay as needed
                 } else {
                   setState({
-                    ...state,
-                    alertType: "danger",
-                    alertMsg: "Role not found."
+                    ...state
                   });
+                  showToast("Role not found.", "error");
                   logOutUser();
                 }
               } else {
                 setState({
-                  ...state,
-                  alertType: "danger",
-                  alertMsg: "You don't have access, please contact the admin."
+                  ...state
                 });
+                showToast("You don't have access, please contact the admin.", "error")
                 logOutUser();
               }
             } else {
               setState({
-                ...state,
-                alertType: "danger",
-                alertMsg: "User not found."
+                ...state
               });
+              showToast("User not found", "error")
               logOutUser();
             }
           })
           .catch((err) => {
             console.error("err in fetching extUser", err);
             setState({
-              ...state,
-              alertType: "danger",
-              alertMsg: `${err.message}`
+              ...state
             });
+            showToast(`${err.message}`, "error")
             const payload = { sessionToken: sessionToken };
             handleSubmitbtn(payload);
           });
       } catch (error) {
         setState({
-          ...state,
-          alertType: "danger",
-          alertMsg: `${error.message}`
+          ...state
         });
+
+        showToast(`${error.message}`, "error");
         console.log(error);
       } finally {
         setThirdpartyLoader(false);
@@ -408,27 +412,24 @@ function Login() {
             }
           } else {
             setState({
-              ...state,
-              alertType: "danger",
-              alertMsg: "You don't have access, please contact the admin."
+              ...state
             });
+            showToast("You don't have access, please contact the admin.","error")
             logOutUser();
           }
         } else {
           setState({
-            ...state,
-            alertType: "danger",
-            alertMsg: "User not found."
+            ...state
           });
+          showToast("User not found", "error");
           logOutUser();
         }
       });
     } catch (error) {
       setState({
-        ...state,
-        alertType: "danger",
-        alertMsg: "Something went wrong, please try again later."
+        ...state
       });
+      showToast("Something went wrong please try again later.", "error");
       console.log("err", error);
     } finally {
       setState({ ...state, loading: false });
@@ -471,20 +472,19 @@ function Login() {
           localStorage.setItem("userDetails", JSON.stringify(LocalUserDetails));
           thirdpartyLoginfn(userSignUp.sessionToken);
         } else {
-          alert(userSignUp.message);
+          showToast(`${userSignUp.message}`,"error");
         }
       } else if (
         payload &&
         payload.message.replace(/ /g, "_") === "Internal_server_err"
       ) {
-        alert(t("server-error"));
+        showToast(t("server-error"),"error");
       }
     } else {
       setState({
-        ...state,
-        alertType: "warning",
-        alertMsg: "Please fill required details."
+        ...state
       });
+      showToast("Please fill required details", "warning");
       setTimeout(() => setState((prev) => ({ ...prev, alertMsg: "" })), 2000);
     }
   };
@@ -520,6 +520,7 @@ function Login() {
 
   return (
     <>
+     
       {
       state.loading ? (
         <div className="fixed inset-0 flex justify-center items-center bg-gray-500 bg-opacity-50 z-50">
@@ -532,6 +533,18 @@ function Login() {
       ) : (
         
         <div className="flex h-screen">
+          <ToastContainer 
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+          {isAlert && <Alert type={alertMsg.type}>{alertMsg.message}</Alert>}
           <Title title={"Login Page"} />
           <div className="hidden md:flex flex-none w-2/5 justify-center items-center bg-blue-500 overflow-hidden">
             <img src={login_img} alt="Login Illustration" className="object-cover w-full h-full" />

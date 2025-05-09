@@ -32,6 +32,7 @@ const AddAdmin = () => {
   const [isAuthorize, setIsAuthorize] = useState(false);
   const [isSubscribeNews, setIsSubscribeNews] = useState(false);
   const [errMsg, setErrMsg] = useState("");
+  const hostUrl = window.location.origin;
   const [state, setState] = useState({
     loading: false,
     alertType: "success",
@@ -458,7 +459,7 @@ const AddAdmin = () => {
                         className="underline cursor-pointer ml-1"
                         onClick={() =>
                           openInNewTab(
-                            "https://www.opensignlabs.com/terms-and-conditions"
+                            `${hostUrl}/terms`
                           )
                         }
                       >

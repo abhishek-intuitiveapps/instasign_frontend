@@ -12,6 +12,8 @@ import {
   emailRegex,
 } from "../constant/const";
 import { useTranslation } from "react-i18next";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ForgotPassword() {
   const { t } = useTranslation();
@@ -39,7 +41,7 @@ function ForgotPassword() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!emailRegex.test(state.email)) {
-      alert("Please enter a valid email address.");
+      toast.error("Please enter a valid email address.");
     } else {
       localStorage.setItem("appLogo", appInfo.applogo);
       localStorage.setItem("userSettings", JSON.stringify(appInfo.settings));
@@ -47,9 +49,11 @@ function ForgotPassword() {
         const username = state.email;
         try {
           await Parse.User.requestPasswordReset(username);
+          toast.success("Password reset email sent successfully!");
           setSentStatus("success");
         } catch (err) {
           console.log("err ", err.code);
+          toast.error("Failed to send password reset email.");
           setSentStatus("failed");
         } finally {
           setTimeout(() => setSentStatus(""), 1000);
@@ -129,6 +133,7 @@ function ForgotPassword() {
           </form>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 }

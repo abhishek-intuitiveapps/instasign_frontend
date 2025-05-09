@@ -147,7 +147,7 @@ function SignYourSelf() {
   // const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
   // const paymentMode = useSelector((state) => state.payment.mode);
 
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   const [saveSignCheckbox, setSaveSignCheckbox] = useState({
     isVisible: false,

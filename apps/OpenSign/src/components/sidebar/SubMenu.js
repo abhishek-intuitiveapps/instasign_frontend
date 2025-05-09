@@ -10,13 +10,14 @@ const Submenu = ({ item, closeSidebar, toggleSubmenu, submenuOpen }) => {
   
   // const [paymentMode, setPaymentMode] = useState(null);
   const paymentMode = useSelector((state) => state.payment.mode);
+  const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
   
 
 
   // useEffect(() => {
   //   const fetchUserData = async () => {
   //     try {
-  //       const response = await axios.get("https://api.dev.instasign.ai/base/api/v1/get/user/detail/", {
+  //       const response = await axios.get("https://api.tasign.ai/base/api/v1/get/user/detail/", {
   //         headers: {
   //           Authorization: `Bearer ${localStorage.getItem('django')}`,
   //         },
@@ -66,9 +67,10 @@ const Submenu = ({ item, closeSidebar, toggleSubmenu, submenuOpen }) => {
         <ul id={`submenu-${title}`} role="menu" aria-label={`${title} submenu`}>
           {children
             .filter(childItem => 
-              (paymentMode === true && childItem.title !== 'Wallet') || 
+              ((paymentMode === true && childItem.title !== 'Wallet') || 
               (paymentMode === false && childItem.title !== 'Billing') || 
-              (paymentMode !== true && paymentMode !== false)
+              (paymentMode !== true && paymentMode !== false)) &&
+              !(childItem.title === 'Users' && djangoUser?.is_main_admin === false)
             )
             .map((childItem) => (
               <li key={childItem.title} role="none" className="my-0.5">

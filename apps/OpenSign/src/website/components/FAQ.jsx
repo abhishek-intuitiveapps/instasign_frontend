@@ -1,63 +1,7 @@
 import React,{ useEffect, useRef, useState } from "react";
 import Title from "../../components/Title";
+import AccordionItem from "./AccordionItem";
 
-const AccordionItem = ({ title, content, isOpen, onClick }) => {
-  const contentRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const itemRef = useRef(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (itemRef.current) {
-      observer.observe(itemRef.current);
-    }
-
-    return () => {
-      if (itemRef.current) {
-        observer.unobserve(itemRef.current);
-      }
-    };
-  }, []);
-
-  return (
-    <div 
-      ref={itemRef}
-      className={`border-b border-neutral/20 transition-all duration-1000 ease-in-out transform ${
-        isVisible 
-          ? 'opacity-100 translate-y-0' 
-          : 'opacity-0 translate-y-10'
-      } ${isOpen ? 'fade-in' : ''}`}
-    >
-      <Title title="FAQs" drive={false} />
-      <button
-        className="w-full px-6 py-4 hover:bg-blue-50 op-text-primary font-medium text-left flex justify-between items-center"
-        onClick={onClick}
-      >
-        {title}
-        <span className={`transform transition-transform ${isOpen ? 'rotate-180' : ''}`}>
-          ▼
-        </span>
-      </button>
-      <div 
-        className={`overflow-hidden transition-all duration-300 ease-in-out`}
-        style={{ maxHeight: isOpen ? contentRef.current?.scrollHeight + 'px' : '0' }}
-      >
-        <div ref={contentRef} className="px-6 pb-4 text-black">
-          {content}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const Faq = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -89,8 +33,8 @@ const Faq = () => {
   const faqData = [
     {
       id: 'item-1',
-      title: 'How does KYC verification work?',
-      content: 'Instasign automatically checks the KYC status of recipients when they sign. Verified signers get a watermark on the document, providing an additional layer of security and authenticity to your important documents.'
+      title: 'How does instasign work?',
+      content: 'Instasign automatically verifies the status of uploaded documents associated with the signer. Signers who have been successfully authenticated receive a watermark on the document, enhancing security and ensuring authenticity.'
     },
     {
       id: 'item-2',
@@ -116,6 +60,7 @@ const Faq = () => {
 
   return (
     <section id="faq" className="py-16 md:py-24 bg-blue-50" ref={ref}>
+      <Title title="FAQs" drive={false} />
       <div className="container mx-auto px-4">
         <div className={`text-center mb-12 transition-all duration-1000 ease-in-out transform ${
           isVisible 

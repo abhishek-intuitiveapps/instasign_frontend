@@ -52,8 +52,24 @@ function EmailComponent({
     }
     for (let i = 0; i < emailList.length; i++) {
       try {
-        const imgPng =
-          "https://qikinnovation.ams3.digitaloceanspaces.com/logo.png";
+        const imgPng = `<svg viewBox="0 0 280 70" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .insta {
+      font-family: Arial, sans-serif; 
+      font-weight: bold; 
+      font-size: 45px;
+      fill: #0084ff;
+    }
+    .sign {
+      font-family: Arial, sans-serif; 
+      font-weight: bold; 
+      font-size: 45px;
+      fill: #002864;
+    }
+  </style>
+  <text x="10" y="50" class="insta">Insta</text>
+  <text x="112" y="50" class="sign">sign</text>
+</svg>`;
 
         let url = `${localStorage.getItem("baseUrl")}functions/sendmailv3`;
         const headers = {
@@ -61,7 +77,7 @@ function EmailComponent({
           "X-Parse-Application-Id": localStorage.getItem("parseAppId"),
           sessionToken: localStorage.getItem("accesstoken")
         };
-        const openSignUrl = "https://www.opensignlabs.com/contact-us";
+        const openSignUrl = "https://instasign.ai/contact";
         const themeBGcolor = themeColor;
         let params = {
           extUserId: extUserId,
@@ -81,9 +97,9 @@ function EmailComponent({
             themeBGcolor +
             ";'>    <p style='font-size:20px;font-weight:400;color:white;padding-left:20px',>  Document Copy</p></div><div><p style='padding:20px;font-family:system-ui;font-size:14px'>A copy of the document <strong>" +
             pdfName +
-            " </strong>is attached to this email. Kindly download the document from the attachment.</p></div> </div><div><p>This is an automated email from OpenSign™. For any queries regarding this email, please contact the sender " +
+            " </strong>is attached to this email. Kindly download the document from the attachment.</p></div> </div><div><p>This is an automated email from InstaSign™. For any queries regarding this email, please contact the sender " +
             sender.email +
-            " directly. If you think this email is inappropriate or spam, you may file a complaint with OpenSign™  <a href= " +
+            " directly. If you think this email is inappropriate or spam, you may file a complaint with InstaSign™  <a href= " +
             openSignUrl +
             " target=_blank>here</a> </p></div></div></body></html>"
         };

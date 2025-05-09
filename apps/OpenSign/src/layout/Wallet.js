@@ -6,6 +6,7 @@ import AddCreditsModal from "./AddCreditsModal";
 import { WalletCard } from "./WalletCard";
 import Loader from "../primitives/Loader";
 
+
 // Import necessary components and hooks
 const Wallet = () => {
   // NewCard component definition
@@ -19,7 +20,7 @@ const Wallet = () => {
   const [walletDetails, setWalletDetails] = useState(null); // State to store wallet details
   const [isLoading, setIsLoading] = useState(true); // New state for loading
   const [creditsData, setCreditsData] = useState([]); // Make creditsData a state variable
-  const djangoUrl = 'https://api.dev.instasign.ai';
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   const [rowsPerPage, setRowsPerPage] = useState(() => {
     const savedRowsPerPage = localStorage.getItem("rowsPerPage");

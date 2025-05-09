@@ -36,6 +36,8 @@ import { useTranslation } from "react-i18next";
 import DownloadPdfZip from "./DownloadPdfZip";
 import * as XLSX from "xlsx";
 import EditContactForm from "../components/EditContactForm";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ReportTable = (props) => {
   const { t } = useTranslation();
@@ -201,7 +203,7 @@ const ReportTable = (props) => {
       try {
         const tenantDetails = await getTenantDetails(user?.objectId);
         if (tenantDetails && tenantDetails === "user does not exist!") {
-          alert(t("user-not-exist"));
+          showToast(t("user-not-exist"), "error"); // Updated line
         } else if (tenantDetails) {
           const signatureType = tenantDetails?.SignatureType || [];
           const filterSignTypes = signatureType?.filter(
@@ -210,10 +212,10 @@ const ReportTable = (props) => {
           return filterSignTypes;
         }
       } catch (e) {
-        alert(t("user-not-exist"));
+        showToast(t("user-not-exist"), "error"); // Updated line
       }
     } else {
-      alert(t("user-not-exist"));
+      showToast(t("user-not-exist"), "error"); // Updated line
     }
   };
 
@@ -337,42 +339,26 @@ const ReportTable = (props) => {
 
                 if (res.data && res.data.objectId) {
                   setActLoader({});
-                  setIsAlert(true);
-                  setTimeout(() => setIsAlert(false), 1500);
+                  showToast(t("template-loaded-successfully"), "success"); // Updated line
                   navigate(`/${act.redirectUrl}/${res.data.objectId}`, {
                     state: { title: "Use Template" }
                   });
                 }
               } catch (err) {
                 console.log("Err", err);
-                setIsAlert(true);
-                setAlertMsg({
-                  type: "danger",
-                  message: t("something-went-wrong-mssg")
-                });
-                setTimeout(() => setIsAlert(false), 1500);
+                showToast(t("something-went-wrong-mssg"), "error"); // Updated line
                 setActLoader({});
               }
             } else {
               setActLoader({});
             }
           } else {
-            setIsAlert(true);
-            setAlertMsg({
-              type: "danger",
-              message: t("something-went-wrong-mssg")
-            });
-            setTimeout(() => setIsAlert(false), 1500);
+            showToast(t("something-went-wrong-mssg"), "error"); // Updated line
             setActLoader({});
           }
         } catch (err) {
           console.log("err", err);
-          setIsAlert(true);
-          setAlertMsg({
-            type: "danger",
-            message: t("something-went-wrong-mssg")
-          });
-          setTimeout(() => setIsAlert(false), 1500);
+          showToast(t("something-went-wrong-mssg"), "error"); // Updated line
           setActLoader({});
         }
       }
@@ -447,11 +433,15 @@ const ReportTable = (props) => {
     props.setList((prevData) => [data, ...prevData]);
   };
 
+  const showToast = (message, type = "success") => {
+    toast[type](message);
+  };
+
   const handleDelete = async (item) => {
     setIsDeleteModal({});
     setActLoader({ [`${item.objectId}`]: true });
     const clsObj = {
-      Contactbook: "contracts_Contactbook",
+      Contacts: "contracts_Contactbook",
       Templates: "contracts_Template"
     };
     try {
@@ -459,7 +449,7 @@ const ReportTable = (props) => {
       const cls = clsObj[props.ReportName] || "contracts_Document";
       const url = serverUrl + `/classes/${cls}/`;
       const body =
-        props.ReportName === "Contactbook"
+        props.ReportName === "Contacts"
           ? { IsDeleted: true }
           : { IsArchive: true };
       const res = await axios.put(url + item.objectId, body, {
@@ -471,12 +461,7 @@ const ReportTable = (props) => {
       });
       if (res.data && res.data.updatedAt) {
         setActLoader({});
-        setIsAlert(true);
-        setAlertMsg({
-          type: "success",
-          message: t("record-delete-alert")
-        });
-        setTimeout(() => setIsAlert(false), 1500);
+        showToast(t("record-delete-alert"), "error"); // Updated line
         const upldatedList = props.List.filter(
           (x) => x.objectId !== item.objectId
         );
@@ -484,12 +469,7 @@ const ReportTable = (props) => {
       }
     } catch (err) {
       console.log("err", err);
-      setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
-      setTimeout(() => setIsAlert(false), 1500);
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
       setActLoader({});
     }
   };
@@ -562,12 +542,7 @@ const ReportTable = (props) => {
         const res = result.data;
         if (res) {
           setActLoader({});
-          setIsAlert(true);
-          setAlertMsg({
-            type: "success",
-            message: t("record-revoke-alert")
-          });
-          setTimeout(() => setIsAlert(false), 1500);
+          showToast(t("record-revoke-alert"), "success"); // Updated line
           const upldatedList = props.List.filter(
             (x) => x.objectId !== item.objectId
           );
@@ -578,12 +553,7 @@ const ReportTable = (props) => {
       .catch((err) => {
         console.log("err", err);
         setReason("");
-        setIsAlert(true);
-        setAlertMsg({
-          type: "danger",
-          message: t("something-went-wrong-mssg")
-        });
-        setTimeout(() => setIsAlert(false), 1500);
+        showToast(t("something-went-wrong-mssg"), "error"); // Updated line
         setActLoader({});
       });
   };
@@ -660,7 +630,7 @@ const ReportTable = (props) => {
         setActLoader({});
       } catch (err) {
         console.log("err in getsignedurl", err);
-        alert(t("something-went-wrong-mssg"));
+        showToast(t("something-went-wrong-mssg"), "error"); // Updated line
         setActLoader({});
       }
     }
@@ -771,10 +741,634 @@ const ReportTable = (props) => {
     const subject =
       doc?.RequestSubject ||
       `{{sender_name}} has requested you to sign "{{document_title}}"`;
-    const body =
-      doc?.RequestBody ||
-      `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team OpenSign™</p><br></body> </html>`;
-    const res = replaceMailVaribles(subject, body, variables);
+    // const body =
+    //   doc?.RequestBody ||
+      // `<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body><p>Hi {{receiver_name}},</p><br><p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p><p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p><br><p>{{signing_url}}</p><br><p>If you have any questions or need further clarification regarding the document or the signing process,  please contact the sender.</p><br><p>Thanks</p><p> Team InstaSign™</p><br></body> </html>`;
+    
+    
+//     const body = doc?.RequestBody ||  `
+    
+//     <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+//     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+//     <title>Document Signing Request</title>
+//     <style>
+//         * {
+//             box-sizing: border-box;
+//         }
+//         body {
+//             margin: 0;
+//             padding: 0;
+//             background-color: #f5f5f5;
+//             -webkit-text-size-adjust: none;
+//             text-size-adjust: none;
+//             font-family: Arial, Helvetica Neue, Helvetica, sans-serif;
+//         }
+//         a {
+//             color: #0159C3;
+//             text-decoration: none;
+//         }
+//         a:hover {
+//             text-decoration: underline;
+//         }
+//         p {
+//             line-height: 1.5;
+//             margin: 0 0 10px;
+//         }
+//         .nl-container {
+//             width: 100%;
+//             background-color: #f5f5f5;
+//         }
+//         .row-content {
+//             width: 680px;
+//             margin: 0 auto;
+//             background-color: #ffffff;
+//             color: #000000;
+//             border-radius: 8px;
+//             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+//         }
+//         .column {
+//             font-weight: 400;
+//             text-align: left;
+//             vertical-align: top;
+//             border: 0;
+//         }
+//         .image_block img {
+//             display: block;
+//             height: auto;
+//             border: 0;
+//             width: 100%;
+//         }
+//         .text_block {
+//             word-break: break-word;
+//         }
+//         .button_block a {
+//             display: inline-block;
+//             padding: 12px 24px;
+//             background-color: #0159C3;
+//             color: #ffffff;
+//             border-radius: 5px;
+//             text-decoration: none;
+//             font-size: 16px;
+//             font-weight: 500;
+//         }
+//         .button_block a:hover {
+//             background-color: #0147a0;
+//         }
+//         .social_block .social-table {
+//             display: inline-block;
+//         }
+//         .social_block img {
+//             display: block;
+//             height: 32px;
+//             width: 32px;
+//         }
+//         .header {
+//             background-color: #002864;
+//             color: #ffffff;
+//             padding: 15px;
+//             text-align: center;
+//             border-top-left-radius: 8px;
+//             border-top-right-radius: 8px;
+//         }
+//         @media (max-width: 700px) {
+//             .row-content {
+//                 width: 100% !important;
+//                 border-radius: 0;
+//             }
+//             .stack .column {
+//                 width: 100%;
+//                 display: block;
+//             }
+//             .image_block div.fullWidth {
+//                 max-width: 100% !important;
+//             }
+//             .text_block td.pad {
+//                 padding: 15px !important;
+//             }
+//             .button_block a {
+//                 width: 100%;
+//                 text-align: center;
+//             }
+//         }
+//     </style>
+// </head>
+// <body>
+//     <table border="0" cellpadding="0" cellspacing="0" class="nl-container" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//         <tbody>
+//             <tr>
+//                 <td>
+//                     <!-- Header -->
+//                     <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                         <tbody>
+//                             <tr>
+//                                 <td>
+//                                     <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="680">
+//                                         <tbody>
+//                                             <tr>
+//                                                 <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0;" width="100%">
+//                                                     <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                                                         <tr>
+//                                                             <td class="pad" style="padding: 20px 0; width: 100%;">
+//                                                                 <div align="center" class="alignment" style="line-height:10px">
+//                                                                     <div style="max-width: 136px;">
+//                                                                         <img src="https://api.dev.instasign.ai/media/new_instasign_logo.png" style="width: 100%;" width="136" alt="InstaSign Logo" />
+//                                                                     </div>
+//                                                                 </div>
+//                                                             </td>
+//                                                         </tr>
+//                                                     </table>
+//                                                     <table border="0" cellpadding="0" cellspacing="0" class="text_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color:#002864;" width="100%">
+                                              
+//                                                             <td class="pad">
+//                                                                 <div class="header">
+//                                                                     <p style="margin: 0; font-size: 20px; font-weight: 500;">Document Signing Request</p>
+//                                                                 </div>
+//                                                             </td>
+//                                                         </tr>
+//                                                     </table>
+//                                                 </td>
+//                                             </tr>
+//                                         </tbody>
+//                                     </table>
+//                                 </td>
+//                             </tr>
+//                         </tbody>
+//                     </table>
+//                     <!-- Main Content -->
+//                     <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; " width="100%">
+//                         <tbody>
+//                             <tr>
+//                                 <td>
+//                                     <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color:#002864;" width="680">
+//                                         <tbody>
+//                                             <tr>
+//                                                 <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 20px;" width="100%">
+//                                                     <table border="0" cellpadding="0" cellspacing="0" class="text_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                                                         <tr>
+//                                                             <td class="pad" style="padding: 20px;">
+//                                                                 <div style="font-size: 16px; color: #ffffff; line-height: 1.5;">
+//                                                                     <p>Hi {{receiver_name}},</p>
+//                                                                     <p>We hope this email finds you well. {{sender_name}} has requested you to review and sign <b>"{{document_title}}"</b>.</p>
+//                                                                     <p>Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.</p>
+//                                                                 </div>
+//                                                             </td>
+//                                                         </tr>
+//                                                     </table>
+//                                                     <table border="0" cellpadding="0" cellspacing="0" class="button_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                                                         <tr>
+//                                                             <td class="pad" style="padding: 10px; text-align: center;">
+//                                                                 <a href="{{signing_url}}" target="_blank">Sign Document Now</a>
+//                                                             </td>
+//                                                         </tr>
+//                                                     </table>
+                                                    
+//                                                 </td>
+//                                             </tr>
+//                                         </tbody>
+//                                     </table>
+//                                 </td>
+//                             </tr>
+//                         </tbody>
+//                     </table>
+//                     <!-- Footer -->
+//                     <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                         <tbody>
+//                             <tr>
+//                                 <td>
+//                                     <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864;" width="680">
+//                                         <tbody>
+//                                             <tr>
+//                                                 <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px 0;" width="100%">
+//                                                     <table border="0" cellpadding="0" cellspacing="0" class="image_block block-1" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                                                         <tr>
+//                                                             <td class="pad" style="padding: 20px;">
+//                                                                 <div align="center" class="alignment" style="line-height:10px">
+//                                                                     <div style="max-width: 530px;">
+//                                                                         <img alt="Wave decoration image" src="https://api.dev.gurujibayarea.com/media/images/waves.png" style="width: 100%;" width="530" />
+//                                                                     </div>
+//                                                                 </div>
+//                                                             </td>
+//                                                         </tr>
+//                                                     </table>
+//                                                     <table border="0" cellpadding="0" cellspacing="0" class="text_block block-2" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                                                         <tr>
+//                                                             <td class="pad" style="padding: 10px;">
+//                                                                 <div style="font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
+//                                                                     <p style="margin: 0;">Thanks,</p>
+//                                                                     <p style="margin: 0; font-weight: 500;">Team InstaSign™</p>
+//                                                                     <p style="margin: 10px 0;">This is an automated email from InstaSign. For any queries, please contact the sender at <a href="mailto:{{sender_email}}">{{sender_email}}</a>.</p>
+//                                                                     <p style="margin: 0;">If you think this email is inappropriate or spam, you may file a complaint with InstaSign <a href="{{opurl}}" target="_blank">here</a>.</p>
+//                                                                 </div>
+//                                                             </td>
+//                                                         </tr>
+//                                                     </table>
+//                                                     <table border="0" cellpadding="0" cellspacing="0" class="social_block block-3" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                                                         <tr>
+//                                                             <td class="pad" style="padding: 10px;">
+//                                                                 <div align="center" class="alignment">
+//                                                                     <table border="0" cellpadding="0" cellspacing="0" class="social-table" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="108px">
+//                                                                         <tr>
+//                                                                             <td style="padding:0 2px;"><a href="https://www.facebook.com" target="_blank"><img alt="Facebook" src="https://api.dev.gurujibayarea.com/media/images/facebook2x.png" /></a></td>
+//                                                                             <td style="padding:0 2px;"><a href="https://www.twitter.com" target="_blank"><img alt="Twitter" src="https://api.dev.gurujibayarea.com/media/images/twitter2x.png" /></a></td>
+//                                                                             <td style="padding:0 2px;"><a href="https://www.linkedin.com/" target="_blank"><img alt="LinkedIn" src="https://api.dev.gurujibayarea.com/media/images/linkedin2x.png" /></a></td>
+//                                                                         </tr>
+//                                                                     </table>
+//                                                                 </div>
+//                                                             </td>
+//                                                         </tr>
+//                                                     </table>
+//                                                     <table border="0" cellpadding="0" cellspacing="0" class="text_block block-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                                                         <tr>
+//                                                             <td class="pad" style="padding: 10px;">
+//                                                                 <div style="font-size: 12px; color: #ffffff; line-height: 1.2; text-align: center;">
+//                                                                     <p style="margin: 0;">Product Developed by <a href="https://www.intuitiveapps.com" target="_blank" style="color: #a6dc9e;">Intuitive Apps Inc.</a></p>
+//                                                                     <p style="margin: 0;">India | USA | Canada</p>
+//                                                                     <p style="margin: 0;">Our <a href="#" style="color: #a6dc9e;">Privacy Policy</a> and <a href="#" style="color: #a6dc9e;">Terms of Use</a>.</p>
+//                                                                 </div>
+//                                                             </td>
+//                                                         </tr>
+//                                                     </table>
+//                                                 </td>
+//                                             </tr>
+//                                         </tbody>
+//                                     </table>
+//                                 </td>
+//                             </tr>
+//                         </tbody>
+//                     </table>
+//                     <!-- Spacer -->
+//                     <table align="center" border="0" cellpadding="0" cellspacing="0" class="row row-4" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+//                         <tbody>
+//                             <tr>
+//                                 <td>
+//                                     <table align="center" border="0" cellpadding="0" cellspacing="0" class="row-content stack" role="presentation" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="680">
+//                                         <tbody>
+//                                             <tr>
+//                                                 <td class="column column-1" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 20px 0;" width="100%">
+//                                                 </td>
+//                                             </tr>
+//                                         </tbody>
+//                                     </table>
+//                                 </td>
+//                             </tr>
+//                         </tbody>
+//                     </table>
+//                 </td>
+//             </tr>
+//         </tbody>
+//     </table>
+// </body>
+// </html>
+//     `
+
+    const body = doc?.RequestBody || `
+      <!DOCTYPE html>
+<html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
+
+<head>
+	<title></title>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch><o:AllowPNG/></o:OfficeDocumentSettings></xml><![endif]-->
+</head>
+
+<body style="background-color: #cbdee9; margin: 0; padding: 0; -webkit-text-size-adjust: none; text-size-adjust: none;">
+	<table border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #cbdee9;" width="100%">
+		<tbody>
+			<tr>
+				<td>
+					<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+						<tbody>
+							<tr>
+								<td>
+									<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #ffffff; border-radius: 0; color: #000000; width: 680px; margin: 0 auto;" width="680">
+										<tbody>
+											<tr>
+												<td style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+													<table border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+														<tr>
+															<td style="padding-bottom:10px;padding-top:10px;width:100%;padding-right:0px;padding-left:0px;">
+																<div style="line-height:10px; text-align: center;">
+																	<div style="max-width: 272px; display: inline-block;">
+                                                                        <img src="https://api.dev.instasign.ai/media/new_instasign_logo.png" style="margin-left: 1.5rem; display: block; height: auto; border: 0; width: 100%;" width="272"/>
+                                                                    </div>
+																</div>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-size: auto;" width="100%">
+						<tbody>
+							<tr>
+								<td>
+									<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-size: auto; background-color: #ffffff; border-radius: 0; color: #000000; width: 680px; margin: 0 auto;" width="680">
+										<tbody>
+											<tr>
+												<td style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; vertical-align: middle; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+													<table border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+														<tr>
+															<td style="width:100%;padding-right:0px;padding-left:0px;">
+																<div style="line-height:10px; text-align: center;">
+																	<div style="max-width: 680px;">
+																		<img src="https://img.freepik.com/free-vector/consent-concept-illustration_114360-9164.jpg?t=st=1746702705~exp=1746706305~hmac=de1a07689b82d0bbf58447a10dbeb0be64f5ba6227eb80d0799577f3cdf8adf3&w=740" style="display: block; height: auto; border: 0; width: 100%;" width="680" />
+                                                                    </div>
+																</div>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+						<tbody>
+							<tr>
+								<td>
+									<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864; color: #000000; width: 680px; margin: 0 auto;" width="680">
+										<tbody>
+											<tr>
+												<td style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+													<table border="0" cellpadding="10" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+														<tr>
+															<td>
+																<div style="font-family: sans-serif">
+																	<div style="font-size: 12px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14.399999999999999px; color: #ffffff; line-height: 1.2;">
+																		<p style="margin: 0; font-size: 12px; mso-line-height-alt: 14.399999999999999px;"> </p>
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+						<tbody>
+							<tr>
+								<td>
+									<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864; color: #000000; width: 680px; margin: 0 auto;" width="680">
+										<tbody>
+											<tr>
+												<td style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-left: 10px; padding-right: 10px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+													<table border="0" cellpadding="10" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+														<tr>
+															<td>
+																<div style="font-family: sans-serif">
+																	<div style="font-size: 14px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 16.8px; color: #ffffff; line-height: 1.2;">
+																		<p style="margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 16.8px;">
+																			<span style="font-size:30px;">Document Signing Request</span>
+                                                                        </p>
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</table>
+													<table border="0" cellpadding="20" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+														<tr>
+															<td>
+																<div style="font-family: sans-serif">
+																	<div style="font-size: 14px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 21px; color: #ffffff; line-height: 1.5;">
+																		<p style="margin: 0; font-size: 14px; text-align: justify; mso-line-height-alt: 21px;">
+																			Hi {{reciever_name}},
+																		</p>
+                                                                        <p style="margin: 0; mso-line-height-alt: 21px;"> </p>
+                                                                        <p style="margin: 0; font-size: 14px; text-align: justify; mso-line-height-alt: 21px;">
+																			We hope this email finds you well. {{sender_name}} has requested you to review and sign "{{document_title}}".
+																		</p>
+                                                                        <p style="margin: 0; mso-line-height-alt: 21px;"> </p>
+																		<p style="margin: 0; mso-line-height-alt: 21px;">
+                                                                            Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.
+																		</p>
+                                                                        <p style="margin: 0; mso-line-height-alt: 21px;"> </p>
+
+                                                                        <table border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+                                                                            <tr>
+                                                                                <td style="padding: 10px; text-align: center;">
+                                                                                    <a href="{{signing_url}}" style="background-color: #4CAF50; color: #ffffff; padding: 12px 25px; text-decoration: none; border-radius: 4px; font-weight: bold; display: inline-block; font-size: 16px; border: 1px solid #3e8e41; box-shadow: 0 2px 5px rgba(0,0,0,0.2);" target="_blank">Sign Document Now</a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        </table>
+
+                                                                        <p style="margin: 0; mso-line-height-alt: 21px;"> </p>
+																		<p style="margin: 0; mso-line-height-alt: 21px;">
+																			This is an automated email from InstaSign™. For any queries regarding this email, please contact the sender {{sender.Email}} directly. If you think this email is inappropriate or spam, you may file a complaint with InstaSign™ <a href="https://instasign.ai" style="color: #ffffff;" target="_blank">here</a>.
+                                                                        </p>
+                                                                    </div>
+																</div>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+						<tbody>
+							<tr>
+								<td>
+									<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864; color: #000000; width: 680px; margin: 0 auto;" width="680">
+										<tbody>
+											<tr>
+												<td style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+													<table border="0" cellpadding="20" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+														<tr>
+															<td>
+																<div style="line-height:10px; text-align: center;">
+																	<div style="max-width: 530px; display: inline-block;">
+                                                                        <img alt="Wave decoration image" src="https://api.dev.gurujibayarea.com/media/images/waves.png" style="display: block; height: auto; border: 0; width: 100%;" title="Wave decoration image" width="530" />
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+						<tbody>
+							<tr>
+								<td>
+									<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864; color: #000000; width: 680px; margin: 0 auto;" width="680">
+										<tbody>
+											<tr>
+												<td style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+													<table border="0" cellpadding="10" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+														<tr>
+															<td>
+																<div style="font-family: sans-serif">
+																	<div style="font-size: 14px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 16.8px; color: #ffffff; line-height: 1.2;">
+																		<p style="margin: 0; font-size: 14px; text-align: center; mso-line-height-alt: 16.8px;">
+																			<span style="font-size:26px;">Thank you</span>
+                                                                        </p>
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</table>
+													<table border="0" cellpadding="20" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+														<tr>
+															<td>
+																<div style="line-height:10px; text-align: center;">
+																	<div style="max-width: 530px; display: inline-block;">
+                                                                        <img alt="Wave decoration image" src="https://api.dev.gurujibayarea.com/media/images/waves.png" style="display: block; height: auto; border: 0; width: 100%;" title="Wave decoration image" width="530" />
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</table>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+						<tbody>
+							<tr>
+								<td>
+									<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; background-color: #002864; color: #000000; background-repeat: no-repeat; width: 680px; margin: 0 auto;" width="680">
+										<tbody>
+											<tr>
+												<td style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 0px; padding-top: 15px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+													<table border="0" cellpadding="10" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+														<tr>
+															<td style="text-align: center;">
+																<div style="text-align: center;">
+																	<table border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; display: inline-block;" width="108px">
+																		<tr>
+																			<td style="padding:0 2px 0 2px;">
+                                                                                <a href="https://www.facebook.com" target="_blank">
+                                                                                    <img alt="Facebook" height="32" src="https://api.dev.gurujibayarea.com/media/images/facebook2x.png" style="display: block; height: auto; border: 0;" title="facebook" width="32" />
+                                                                                </a>
+                                                                            </td>
+																			<td style="padding:0 2px 0 2px;">
+                                                                                <a href="https://www.twitter.com" target="_blank">
+                                                                                    <img alt="Twitter" height="32" src="https://api.dev.gurujibayarea.com/media/images/twitter2x.png" style="display: block; height: auto; border: 0;" title="twitter" width="32" />
+                                                                                </a>
+                                                                            </td>
+																			<td style="padding:0 2px 0 2px;">
+                                                                                <a href="https://www.linkedin.com/" target="_blank">
+                                                                                    <img alt="LinkedIn" height="32" src="https://api.dev.gurujibayarea.com/media/images/linkedin2x.png" style="display: block; height: auto; border: 0;" title="LinkedIn" width="32" />
+                                                                                </a>
+                                                                            </td>
+																		</tr>
+																	</table>
+																</div>
+															</td>
+														</tr>
+													</table>
+													<table border="0" cellpadding="10" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; word-break: break-word;" width="100%">
+														<tr>
+															<td>
+																<div style="font-family: sans-serif">
+																	<div style="font-size: 12px; font-family: Arial, Helvetica Neue, Helvetica, sans-serif; mso-line-height-alt: 14.399999999999999px; color: #ffffff; line-height: 1.2;">
+																		<p style="margin: 0; text-align: center; mso-line-height-alt: 14.399999999999999px;">
+																			Product Developed by <a href="https://www.intuitiveapps.com" rel="noopener" style="text-decoration: underline; color: #a6dc9e;" target="_blank" title="IT Consulting & Software Development Enterprise">Intuitive Apps Inc.</a>
+                                                                        </p>
+																		<p style="margin: 0; text-align: center; mso-line-height-alt: 14.399999999999999px;">
+																			India | USA | Canada 
+                                                                        </p>
+																		<p style="margin: 0; text-align: center; mso-line-height-alt: 14.399999999999999px;">
+																			Our Privacy Policy and Terms of Use. 
+                                                                        </p>
+																	</div>
+																</div>
+															</td>
+														</tr>
+													</table>
+													<table border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+														<tr>
+															<td style="color:#cccccc;font-family:inherit;font-size:12px;text-align:center;">
+																<table border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+																	<tr>
+																		<td style="text-align:center;font-size:0px;">
+																			<div style="text-align:center;">
+																				<!--[if mso]><table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style=""><tr style="text-align:center;"><![endif]-->
+                                                                                <!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]-->
+                                                                                <a href="mailto:support@instasign.ai" style="padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;" target="_self">
+                                                                                    support@instasign.ai
+																				</a>
+                                                                                <!--[if mso]></td><td><![endif]-->
+                                                                                <span style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span>
+                                                                                <!--[if mso]></td><![endif]-->
+                                                                                <!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]-->
+                                                                                <a href="tel:+917011313488" style="padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;" target="_self">
+                                                                                    +91 9311648357
+                                                                                </a>
+                                                                                <!--[if mso]></td><![endif]-->
+                                                                                <!--[if mso]></tr></table><![endif]-->
+																			</div>
+																		</td>
+																	</tr>
+																</table>
+															</td>
+														</tr>
+													</table>
+													<div style="height:30px;line-height:30px;font-size:1px;"> </div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt;" width="100%">
+						<tbody>
+							<tr>
+								<td>
+									<table align="center" border="0" cellpadding="0" cellspacing="0" style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #000000; width: 680px; margin: 0 auto;" width="680">
+										<tbody>
+											<tr>
+												<td style="mso-table-lspace: 0pt; mso-table-rspace: 0pt; font-weight: 400; text-align: left; padding-bottom: 5px; padding-top: 5px; vertical-align: top; border-top: 0px; border-right: 0px; border-bottom: 0px; border-left: 0px;" width="100%">
+													<div style="height:20px;line-height:20px;font-size:1px;"> </div>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+</html>
+    `
+
+      const res = replaceMailVaribles(subject, body, variables);
     setMail((prev) => ({ ...prev, subject: res.subject, body: res.body }));
     setIsNextStep({ [user.Id]: true });
   };
@@ -801,23 +1395,14 @@ const ReportTable = (props) => {
     try {
       const res = await axios.post(url, params, { headers: headers });
       if (res?.data?.result?.status === "success") {
-        setIsAlert(true);
-        setAlertMsg({ type: "success", message: t("mail-sent-alert") });
+        showToast(t("mail-sent-alert"), "success"); // Updated line
         setIsResendMail({});
       } else {
-        setIsAlert(true);
-        setAlertMsg({
-          type: "danger",
-          message: t("something-went-wrong-mssg")
-        });
+        showToast(t("something-went-wrong-mssg"), "error"); // Updated line
       }
     } catch (err) {
       console.log("err in sendmail", err);
-      setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
     } finally {
       setTimeout(() => setIsAlert(false), 1500);
       setIsNextStep({});
@@ -855,24 +1440,12 @@ const ReportTable = (props) => {
     setIsAlert(true);
     if (status === "success") {
       if (count > 1) {
-        setAlertMsg({
-          type: "success",
-          message: count + " " + t("document-sent-alert")
-        });
-        setTimeout(() => setIsAlert(false), 1500);
+        showToast(count + " " + t("document-sent-alert"), "success"); // Updated line
       } else {
-        setAlertMsg({
-          type: "success",
-          message: count + " " + t("document-sent-alert")
-        });
-        setTimeout(() => setIsAlert(false), 1500);
+        showToast(count + " " + t("document-sent-alert"), "success"); // Updated line
       }
     } else {
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
-      setTimeout(() => setIsAlert(false), 1500);
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
     }
   };
 
@@ -912,7 +1485,7 @@ const ReportTable = (props) => {
       console.log("err in fetch template in bulk modal", err);
       setIsBulkSend({});
       setIsAlert(true);
-      setAlertMsg({ type: "danger", message: t("something-went-wrong-mssg") });
+      showToast(t("something-went-wrong-mssg"), "error");
       setTimeout(() => setIsAlert(false), 1500);
     }
   };
@@ -938,17 +1511,11 @@ const ReportTable = (props) => {
       const res = await templateCls.save();
       if (res) {
         setIsAlert(true);
-        setAlertMsg({
-          type: "success",
-          message: t("template-share-alert")
-        });
+        showToast(t("template-share-alert"),"success");
       }
     } catch (err) {
       setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
+      showToast(t("something-went-wrong-mssg"),"error");
     } finally {
       setActLoader({});
       setTimeout(() => setIsAlert(false), 1500);
@@ -978,13 +1545,7 @@ const ReportTable = (props) => {
             }
           });
           if (res.data && res.data.updatedAt) {
-            setIsAlert(true);
-            setAlertMsg({
-              type: "success",
-              message: t("expiry-date-updated", {
-                newexpirydate: new Date(expiryDate)?.toLocaleDateString()
-              })
-            });
+            showToast(t("expiry-date-updated", { newexpirydate: new Date(expiryDate)?.toLocaleDateString() }), "success"); // Updated line
             if (props.ReportName === "Expired Documents") {
               const upldatedList = props.List.filter(
                 (x) => x.objectId !== item.objectId
@@ -994,11 +1555,7 @@ const ReportTable = (props) => {
           }
         } catch (err) {
           console.log("err", err);
-          setIsAlert(true);
-          setAlertMsg({
-            type: "danger",
-            message: t("something-went-wrong-mssg")
-          });
+          showToast(t("something-went-wrong-mssg"), "error"); // Updated line
         } finally {
           setActLoader({});
           setExpiryDate();
@@ -1006,13 +1563,11 @@ const ReportTable = (props) => {
           setIsModal({});
         }
       } else {
-        setIsAlert(true);
-        setAlertMsg({ type: "danger", message: t("expiry-date-error") });
+        showToast(t("expiry-date-error"), "error"); // Updated line
         setTimeout(() => setIsAlert(false), 2000);
       }
     } else {
-      setIsAlert(true);
-      setAlertMsg({ type: "danger", message: t("expiry-date-error") });
+      showToast(t("expiry-date-error"), "error"); // Updated line
       setTimeout(() => setIsAlert(false), 2000);
     }
   };
@@ -1051,56 +1606,12 @@ const ReportTable = (props) => {
     const displaySigners = isShowAllSigners[item.objectId]
       ? signers
       : signers.slice(0, 3);
-    return (
-      <>
-        {displaySigners?.map((x, i) => (
-          <div
-            key={i}
-            className="text-sm font-medium flex flex-row gap-2 items-center"
-          >
-            <button
-              onClick={() => setIsModal({ [`${item.objectId}_${i}`]: true })}
-              className={`${
-                x.Activity === "SIGNED"
-                  ? "op-border-primary op-text-primary"
-                  : x.Activity === "VIEWED"
-                    ? "border-green-400 text-green-400"
-                    : "border-black text-black"
-              } focus:outline-none border-2 w-[60px] h-[30px] text-[11px] rounded-full`}
-            >
-              {x?.Activity?.toUpperCase() || "-"}
-            </button>
-            <div className="py-2 font-bold text-[12px]">{x?.Email || "-"}</div>
-            {isModal[`${item.objectId}_${i}`] && (
-              <ModalUi
-                isOpen
-                title={t("document-logs")}
-                handleClose={() => setIsModal({})}
-              >
-                <div className="pl-3 first:mt-2 border-t-[1px] border-gray-600 text-[12px] py-2">
-                  <p className="font-bold"> {x?.Email}</p>
-                  <p>Viewed on: {x?.ViewedOn}</p>
-                  <p>Signed on: {x?.SignedOn}</p>
-                </div>
-              </ModalUi>
-            )}
-          </div>
-        ))}
-        {/* Show More / Hide button */}
-        {signers?.length > 3 && (
-          <button
-            onClick={() =>
-              setIsShowAllSigners({
-                [item.objectId]: !isShowAllSigners[item.objectId]
-              })
-            }
-            className="ml-2 text-xs font-medium text-blue-500 underline focus:outline-none"
-          >
-            {isShowAllSigners[item.objectId] ? "Hide" : "Show More"}
-          </button>
-        )}
-      </>
-    );
+    
+    return {
+      signers: displaySigners,
+      totalSigners: signers.length,
+      itemId: item.objectId
+    };
   };
 
   // `handleImportBtn` is trigger when user click on upload icon from contactbook
@@ -1156,12 +1667,12 @@ const ReportTable = (props) => {
           setInvalidRecords(invalidItems);
           setImportedData(validRecords);
         } else {
-          alert(t("100-records-only"));
+          showToast(t("100-records-only"), "warning"); // Updated line
           event.target.value = "";
           setImportedData([]);
         }
       } else {
-        alert(t("invalid-data"));
+        showToast(t("invalid-data"), "warning"); // Updated line
         event.target.value = "";
       }
     };
@@ -1207,11 +1718,11 @@ const ReportTable = (props) => {
             setInvalidRecords(invalidItems);
             setImportedData(validRecords);
           } else {
-            alert(t("invalid-data"));
+            showToast(t("invalid-data"), "warning"); // Updated line
             event.target.value = "";
           }
         } else {
-          alert(t("100-records-only"));
+          showToast(t("100-records-only"), "warning"); // Updated line
           event.target.value = "";
           setImportedData([]);
         }
@@ -1289,22 +1800,17 @@ const ReportTable = (props) => {
       const contacts = JSON.stringify(filterdata);
       const res = await Parse.Cloud.run("createbatchcontact", { contacts });
       if (res) {
-        setIsAlert(true);
-        setAlertMsg({
-          type: "info",
-          message: t("contact-imported", {
-            imported: res?.success || 0,
-            failed: res?.failed || 0
-          })
-        });
+        showToast(t("contact-imported", {
+          imported: res?.success || 0,
+          failed: res?.failed || 0
+        }), "info"); // Updated line
         if (res?.success > 0) {
           setTimeout(() => window.location.reload(), 2000);
         }
       }
     } catch (err) {
       console.log("err while creating batch contact", err);
-      setIsAlert(true);
-      setAlertMsg({ type: "danger", message: t("something-went-wrong-mssg") });
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
     } finally {
       setActLoader({});
       setIsModal({});
@@ -1325,18 +1831,10 @@ const ReportTable = (props) => {
       if (duplicateRes) {
         const newTemplate = JSON.parse(JSON.stringify(duplicateRes));
         props.setList((prevData) => [newTemplate, ...prevData]);
-        setIsAlert(true);
-        setAlertMsg({
-          type: "success",
-          message: t("duplicate-template-created")
-        });
+        showToast(t("duplicate-template-created"), "success"); // Success toast
       }
     } catch (err) {
-      setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
+      showToast(t("something-went-wrong-mssg"), "error"); // Error toast
       console.log("Err while create duplicate template", err);
     } finally {
       setActLoader({});
@@ -1361,19 +1859,11 @@ const ReportTable = (props) => {
         x.objectId === item.objectId ? { ...x, Name: renameDoc } : x
       );
       props.setList(updateList);
-      setIsAlert(true);
-      setAlertMsg({
-        type: "success",
-        message: "Document updated"
-      });
+      showToast(t("document-updated"), "success"); // Updated line
       setActLoader({});
       setTimeout(() => setIsAlert(false), 2000);
     } catch (err) {
-      setIsAlert(true);
-      setAlertMsg({
-        type: "danger",
-        message: t("something-went-wrong-mssg")
-      });
+      showToast(t("something-went-wrong-mssg"), "error"); // Updated line
       setActLoader({});
       setTimeout(() => setIsAlert(false), 2000);
     }
@@ -1395,12 +1885,24 @@ const ReportTable = (props) => {
       x.objectId === contact.objectId ? { ...x, ...updateContact } : x
     );
     props.setList(updateList);
+    showToast(t("contact-updated-successfully"), "success"); // Success toast
   };
   const handleCloseModal = () => {
     setIsModal({});
   };
   return (
     <div className="relative">
+      <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       {Object.keys(actLoader)?.length > 0 && (
         <div className="absolute w-full h-full flex justify-center items-center bg-black bg-opacity-30 z-30">
           <Loader />
@@ -1420,10 +1922,10 @@ const ReportTable = (props) => {
           </>
         )}
         <div className="flex flex-row items-center justify-between my-2 mx-3 text-[20px] md:text-[23px]">
-          <div className="font-light">
-            {t(`report-name.${props.ReportName}`)}
+          <div className="flex items-center gap-2 font-light">
+            <span>{t(`report-name.${props.ReportName}`)}</span>
             {props.report_help && (
-              <span className="text-xs md:text-[13px] font-normal ml-[4px]"> {/* Increased margin from ml-[2px] to ml-[4px] */}
+              <span className="flex items-center justify-center text-xs md:text-[13px] font-normal">
                 <Tooltip message={t(`report-help.${props.ReportName}`)} />
               </span>
             )}
@@ -1554,6 +2056,9 @@ const ReportTable = (props) => {
                 {props.heading?.map((item, index) => (
                   <React.Fragment key={index}>
                     <th className="p-2">{t(`report-heading.${item}`)}</th>
+                    {item === "Signers" && ["In-progress documents", "Need your sign"].includes(props.ReportName) && (
+                      <th className="p-2">{t("Status")}</th>
+                    )}
                   </React.Fragment>
                 ))}
                 {props.actions?.length > 0 && (
@@ -1567,12 +2072,12 @@ const ReportTable = (props) => {
               {props.List?.length > 0 && (
                 <>
                   {currentList.map((item, index) =>
-                    props.ReportName === "Contactbook" ? (
+                    props.ReportName === "Contacts" ? (
                       <tr className="border-y-[1px]" key={index}>
                         {props.heading.includes("Sr.No") && (
-                          <th className="p-2">{startIndex + index + 1}</th>
+                          <th className="p-2 text-center">{startIndex + index + 1}</th>
                         )}
-                        <td className="px-4 py-2 font-semibold">
+                        <td className="px-4 py-2 font-semibold text-center">
                           {item?.Name}{" "}
                         </td>
                         <td className="p-2 text-center">
@@ -1581,8 +2086,8 @@ const ReportTable = (props) => {
                         <td className="p-2 text-center">
                           {item?.Phone || "-"}
                         </td>
-                        <td className="px-3 py-2">
-                          <div className={`text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-start items-center`}> {/* Apply red background if trash icon */}
+                        <td className="px-3 py-2 text-center">
+                          <div className={`text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-center items-center`}> {/* Changed justify-start to justify-center */}
                             {props.actions?.length > 0 &&
                               props.actions.map((act, index) => (
                                 <span
@@ -1636,14 +2141,14 @@ const ReportTable = (props) => {
                         key={index}
                       >
                         {props.heading.includes("Sr.No") && (
-                          <th className="px-2 py-2">
+                          <th className="px-2 py-2 text-center">
                             {startIndex + index + 1}
                           </th>
                         )}
-                        <td className="p-2 min-w-56 max-w-56">
-                          <div className="font-semibold">{item?.Name}</div>
+                        <td className="p-2 min-w-56 max-w-56 text-left">
+                          <div className="font-semibold text-left">{item?.Name}</div>
                           {item?.ExpiryDate?.iso && (
-                            <div className="text-gray-500">
+                            <div className="text-gray-500 text-left">
                               Expires {formatDate(item?.ExpiryDate?.iso)}
                             </div>
                           )}
@@ -1657,7 +2162,7 @@ const ReportTable = (props) => {
                         )}
                         {props.heading.includes("Note") && (
                           <td className="p-2 text-center">
-                            <p className="truncate w-[100px]">
+                            <p className="truncate w-[100px] text-center mx-auto">
                               {item?.Note || "-"}
                             </p>
                           </td>
@@ -1686,11 +2191,66 @@ const ReportTable = (props) => {
                         ["In-progress documents", "Need your sign"].includes(
                           props.ReportName
                         ) ? (
-                          <td className="px-1 py-2">
-                            {!item?.IsSignyourself && item?.Placeholders && (
-                              <>{formatStatusRow(item)}</>
-                            )}
-                          </td>
+                          <>
+                            <td className="px-1 py-2 text-left">
+                              {!item?.IsSignyourself && item?.Placeholders && (
+                                <div className="flex flex-col gap-2 items-start"> {/* Changed items-center to items-start */}
+                                  {formatStatusRow(item).signers.map((x, i) => (
+                                    <div key={i} className="py-2 font-bold text-[12px] text-left">
+                                      {x?.Email || "-"}
+                                    </div>
+                                  ))}
+                                  {formatStatusRow(item).totalSigners > 3 && (
+                                    <button
+                                      onClick={() =>
+                                        setIsShowAllSigners({
+                                          [item.objectId]: !isShowAllSigners[item.objectId]
+                                        })
+                                      }
+                                      className="ml-2 text-xs font-medium text-blue-500 underline focus:outline-none"
+                                    >
+                                      {isShowAllSigners[item.objectId] ? "Hide" : "Show More"}
+                                    </button>
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                            <td className="px-1 py-2 text-left">
+                              {!item?.IsSignyourself && item?.Placeholders && (
+                                <div className="flex flex-col gap-2 items-center"> {/* Changed items-start to items-center */}
+                                  {formatStatusRow(item).signers.map((x, i) => (
+                                    <div key={i} className="flex items-center justify-center">
+                                      <button
+                                        onClick={() => setIsModal({ [`${item.objectId}_${i}`]: true })}
+                                        className={`${
+                                          x.Activity === "SIGNED"
+                                            ? "op-border-primary op-text-primary"
+                                            : x.Activity === "VIEWED"
+                                              ? "border-green-400 text-green-400"
+                                              : "border-black text-black"
+                                        } focus:outline-none border-2 w-[60px] h-[30px] text-[11px] rounded-full`}
+                                      >
+                                        {x?.Activity?.toUpperCase() || "-"}
+                                      </button>
+                                      {isModal[`${item.objectId}_${i}`] && (
+                                        <ModalUi
+                                          isOpen
+                                          title={t("document-logs")}
+                                          handleClose={() => setIsModal({})}
+                                        >
+                                          <div className="pl-3 first:mt-2 border-t-[1px] border-gray-600 text-[12px] py-2">
+                                            <p className="font-bold"> {x?.Email}</p>
+                                            <p>Viewed on: {x?.ViewedOn}</p>
+                                            <p>Signed on: {x?.SignedOn}</p>
+                                          </div>
+                                        </ModalUi>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                          </>
                         ) : (
                           <td className="p-2 text-center">
                             {!item?.IsSignyourself && item?.Placeholders ? (
@@ -1705,8 +2265,8 @@ const ReportTable = (props) => {
                             )}
                           </td>
                         )}
-                        <td className="px-2 py-2">
-                          <div className="text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-start items-center">
+                        <td className="px-2 py-2 text-center">
+                          <div className="text-base-content min-w-max flex flex-row gap-x-2 gap-y-1 justify-center items-center"> {/* Changed justify-start to justify-center */}
                             {props.actions?.length > 0 &&
                               props.actions.map((act, index) =>
                                 props.ReportName === "Templates" ? (

@@ -10,6 +10,10 @@ import {
   emailRegex,
 } from "../constant/const";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function generatePassword(length) {
   const characters =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -34,14 +38,18 @@ const AddUser = (props) => {
   });
   const [isFormLoader, setIsFormLoader] = useState(false);
   const [teamList, setTeamList] = useState([]);
-  const role = ["OrgAdmin", "Editor", "User"];
+  // const role = ["OrgAdmin", "Editor", "User"];
+  const role = ["User"];
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
+  const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
+  const djangoToken = localStorage.getItem('django');
+
   useEffect(() => {
     getTeamList();
     // eslint-disable-next-line
   }, []);
 
   const getTeamList = async () => {
-    setFormdata((prev) => ({ ...prev, password: generatePassword(12) }));
     const teamRes = await Parse.Cloud.run("getteams", { active: true });
     if (teamRes.length > 0) {
       const _teamRes = JSON.parse(JSON.stringify(teamRes));
@@ -70,7 +78,8 @@ const AddUser = (props) => {
     e.preventDefault();
     e.stopPropagation();
     if (!emailRegex.test(formdata.email)) {
-      alert("Please enter a valid email address.");
+      // toast.error("Please enter a valid email address.");
+      props.setIsAlert({type: "danger", msg: "Please enter a valid email address."});
     } else {
       const localUser = JSON.parse(localStorage.getItem("Extand_Class"))?.[0];
       setIsFormLoader(true);
@@ -81,6 +90,39 @@ const AddUser = (props) => {
         setTimeout(() => props.setIsAlert({ type: "success", msg: "" }), 1000);
       } else {
         try {
+          // Split the name into first and last name for the Django API
+          const nameParts = formdata.name.split(" ");
+          const firstName = nameParts[0] || "";
+          const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+          // Check if last name is empty
+          if (!lastName) {
+            // toast.error("Please enter full name");
+            props.setIsAlert({ type: "danger", msg: "Please enter full name."});
+            setIsFormLoader(false);
+            return; // Exit the function if last name is not present
+          }
+          
+          // Call Django register API
+          
+          const response = await axios.post(`${djangoUrl}/base/api/v1/register/`, {
+            first_name: firstName,
+            last_name: lastName,
+            email: formdata.email,
+            phone_number: formdata.phone || "",
+            password: formdata.password,
+            country: djangoUser.country, // You might want to add this to your form
+            company_name: localUser?.Company || "",
+            user_type: 'user'
+          }, {
+            headers: {
+              Authorization: `Bearer ${djangoToken}`,
+              'Content-Type': 'application/json',
+            }
+          });
+
+          console.log("Registration Process :", response.data);
+
           const extUser = new Parse.Object("contracts_Users");
           extUser.set("Name", formdata.name);
           if (formdata.phone) {
@@ -132,6 +174,10 @@ const AddUser = (props) => {
 
             const user = await _user.save();
             if (user) {
+              // Success toast for user creation
+              // toast.success(t("user-created-successfully"));
+              props.setIsAlert({ type: "success", msg: t("user-created-successfully") });
+
               const currentUser = Parse.User.current();
               extUser.set(
                 "CreatedBy",
@@ -228,10 +274,8 @@ const AddUser = (props) => {
         } catch (err) {
           console.log("err", err);
           setIsFormLoader(false);
-          props.setIsAlert({
-            type: "danger",
-            msg: t("something-went-wrong-mssg")
-          });
+          // toast.error(t("something-went-wrong-mssg"));
+          props.setIsAlert({ type: "danger", msg: t("something-went-wrong-mssg") });
         } finally {
           setTimeout(
             () => props.setIsAlert({ type: "success", msg: "" }),
@@ -253,6 +297,12 @@ const AddUser = (props) => {
     let { name, value } = event.target;
     if (name === "email") {
       value = value?.toLowerCase()?.replace(/\s/g, "");
+    } else if (name === "phone") {
+      // Validate that the phone value is a positive integer
+      if (!/^\d*$/.test(value) || parseInt(value) <= 0) {
+        alert("Please enter a valid positive integer for phone.");
+        return; // Exit the function if the value is invalid
+      }
     }
     setFormdata((prev) => ({ ...prev, [name]: value }));
   };
@@ -264,6 +314,17 @@ const AddUser = (props) => {
   };
   return (
     <div className="shadow-md rounded-box my-[1px] p-3 bg-base-100 relative">
+      {/* <ToastContainer 
+        position="bottom-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      /> */}
       <Title title={t("add-user")} />
       {isFormLoader && (
         <div className="absolute w-full h-full inset-0 flex justify-center items-center bg-base-content/30 z-50">
@@ -285,6 +346,7 @@ const AddUser = (props) => {
                           name="name"
                           value={formdata.name}
                           onChange={(e) => handleChange(e)}
+                          placeholder="Name should be matched as govt document"
                           onInvalid={(e) =>
                             e.target.setCustomValidity(t("input-required"))
                           }
@@ -315,19 +377,25 @@ const AddUser = (props) => {
                         />
                       </div>
                       <div className="mb-3">
-                        <label className="block text-xs text-gray-700 font-semibold">
+                        <label
+                          htmlFor="password"
+                          className="block text-xs text-gray-700 font-semibold"
+                        >
                           {t("password")}
+                          <span className="text-[red] text-[13px]"> *</span>
                         </label>
-                        <div className="flex justify-between items-center op-input op-input-bordered op-input-sm text-base-content w-full h-full text-[13px]">
-                          <div className="break-all">{formdata?.password}</div>
-                          <i
-                            onClick={() => copytoclipboard(formdata?.password)}
-                            className="fa-light fa-copy rounded-full hover:bg-base-300 p-[8px] cursor-pointer "
-                          ></i>
-                        </div>
-                        <div className="text-[12px] ml-2 mb-0 text-[red] select-none">
-                          {t("password-generateed")}
-                        </div>
+                        <input
+                          type="password"
+                          name="password"
+                          value={formdata.password}
+                          onChange={(e) => handleChange(e)}
+                          required
+                          onInvalid={(e) =>
+                            e.target.setCustomValidity(t("input-required"))
+                          }
+                          onInput={(e) => e.target.setCustomValidity("")}
+                          className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
+                        />
                       </div>
                       <div className="mb-3">
                         <label
@@ -335,14 +403,15 @@ const AddUser = (props) => {
                           className="block text-xs text-gray-700 font-semibold"
                         >
                           {t("phone")}
-                          {/* <span className="text-[red] text-[13px]"> *</span> */}
+                          <span className="text-[red] text-[13px]"> *</span>
                         </label>
                         <input
                           type="text"
                           name="phone"
-                          placeholder={t("phone-optional")}
                           value={formdata.phone}
                           onChange={(e) => handleChange(e)}
+                          required
+                          maxLength={10}
                           className="op-input op-input-bordered op-input-sm focus:outline-none hover:border-base-content w-full text-xs"
                         />
                       </div>

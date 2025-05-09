@@ -1,5 +1,5 @@
 # Use an official Node runtime as the base image
-FROM node:20
+FROM node:18
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
@@ -9,7 +9,7 @@ WORKDIR /usr/src/app
 COPY ./package*.json .
 
 # Install application dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # If you have native dependencies, you'll need extra tools. Uncomment the following line if needed.
 # RUN apk add --no-cache make gcc g++ python3

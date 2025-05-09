@@ -1783,7 +1783,7 @@ export const multiSignEmbed = async (widgets, pdfDoc, signyourself, scale) => {
   } else {
     return {
       error:
-        "This pdf is not compatible with opensign please contact <support@opensignlabs.com>"
+        "This pdf is not compatible with InstaSign please contact <support@instasign.ai>"
     };
   }
 };
@@ -2172,7 +2172,7 @@ export const fetchUrl = async (url, pdfName) => {
       throw new Error("Network response was not ok");
     }
     const blob = await response.blob();
-    saveAs(blob, `${sanitizeFileName(pdfName)}_signed_by_OpenSign™.pdf`);
+    saveAs(blob, `${sanitizeFileName(pdfName)}_signed_by_InstaSign™.pdf`);
   } catch (error) {
     alert("something went wrong, please try again later.");
     console.error("Error downloading the file:", error);
@@ -2356,7 +2356,7 @@ export const handleDownloadCertificate = async (
             setIsDownloading("");
             return certificateUrl;
           } else {
-            saveAs(certificateUrl, `Certificate_signed_by_OpenSign™.pdf`);
+            saveAs(certificateUrl, `Certificate_signed_by_InstaSign™.pdf`);
             setIsDownloading("");
           }
         } else {
@@ -2381,7 +2381,7 @@ export const handleDownloadCertificate = async (
                 // Convert the response into a Blob
                 const certificateBlob = await fetchCertificate.blob();
                 setIsDownloading("");
-                saveAs(certificateBlob, `Certificate_signed_by_OpenSign™.pdf`);
+                saveAs(certificateBlob, `Certificate_signed_by_InstaSign™.pdf`);
               }
             } catch (err) {
               console.log("err in download in certificate", err);

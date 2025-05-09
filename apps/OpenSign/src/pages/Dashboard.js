@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import { saveTourSteps } from "../redux/reducers/TourStepsReducer";
 import dashboardJson from "../json/dashboardJson";
 import Loader from "../primitives/Loader";
+// import ModalUi from "../primitives/ModalUi";
+// import AccountActivationModal from "../primitives/AccountActivationModal";
 import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
@@ -15,6 +17,8 @@ const Dashboard = () => {
   const { id } = useParams();
   const [dashboard, setdashboard] = useState({});
   const [loading, setloading] = useState(true);
+
+  // account activation modal
 
   useEffect(() => {
     if (localStorage.getItem("accesstoken")) {
@@ -55,6 +59,8 @@ const Dashboard = () => {
     }
   };
 
+  // account activation modal
+
   return (
     <React.Fragment>
       <Title title="Dashboard" />
@@ -65,6 +71,10 @@ const Dashboard = () => {
       ) : (
         <GetDashboard dashboard={dashboard} />
       )}
+
+      {/* account activation modal */}
+      {/* <AccountActivationModal/> */}
+     
     </React.Fragment>
   );
 };

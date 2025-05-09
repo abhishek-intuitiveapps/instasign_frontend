@@ -2,6 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import React from "react";
 import styled, { keyframes } from "styled-components";
 import Title from "../../components/Title";
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -214,29 +218,60 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    company: "",
+    phone: "",
     message: "",
   });
   const [isVisible, setIsVisible] = useState(false);
   const [messageVisible, setMessageVisible] = useState(false);
   const ref = useRef(null);
   const messageRef = useRef(null);
+  const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Validate phone number to ensure it contains only digits and has a max length of 10
+    if (name === "phone") {
+      const regex = /^[0-9]*$/; // Only allow digits
+      if (value.length <= 10 && regex.test(value)) {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form data submitted:", formData);
-    alert("Message sent successfully! We'll get back to you soon.");
-    setFormData({
-      name: "",
-      email: "",
-      company: "",
-      message: "",
-    });
+    
+    const payload = {
+      name: formData.name,
+      message: formData.message,
+      email: formData.email,
+      phone_number: formData.phone, // Use phone_number as per the API requirement
+    };
+
+    try {
+      const response = await axios.post(`${djangoUrl}/base/api/v1/contact/us/`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      console.log("Response from API:", response.data);
+      toast.success("Message sent successfully! We'll get back to you soon.");
+      
+      // Reset form data
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+      });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast.error("There was an error sending your message. Please try again later.");
+    }
   };
 
   useEffect(() => {
@@ -284,124 +319,127 @@ const Contact = () => {
   }, []);
 
   return (
-    <ContactSection id="contact" className={isVisible ? 'fade-in' : ''} ref={ref}>
-      <Title title="Contact Us" drive={false} />
-      <Container>
-        <Header>
-          <h2>Contact Us</h2>
-          <p>Have questions or ready to get started? Reach out to our team for support.</p>
-        </Header>
+    <>
+      <ToastContainer />
+      <ContactSection id="contact" className={isVisible ? 'fade-in' : ''} ref={ref}>
+        <Title title="Contact Us" drive={false} />
+        <Container>
+          <Header>
+            <h2>Contact Us</h2>
+            <p>Have questions or ready to get started? Reach out to our team for support.</p>
+          </Header>
 
-        <ContactGrid>
-          <ContactInfo>
-            <InfoCard>
-              <InfoContent>
-                <h3>India</h3>
-                <InfoItem>
-                  <Icon><MapPinIcon /></Icon>
-                  <p>B-85 Dashrath Puri, Palam Road, New Delhi-110045</p>
-                </InfoItem>
-                <InfoItem>
-                  <Icon><PhoneIcon /></Icon>
-                  <p>+91 9311648357</p>
-                </InfoItem>
-                <InfoItem>
-                  <Icon><MailIcon /></Icon>
-                  <p>cs@instasign.com</p>
-                </InfoItem>
-              </InfoContent>
-            </InfoCard>
+          <ContactGrid>
+            <ContactInfo>
+              <InfoCard>
+                <InfoContent>
+                  <h3>India</h3>
+                  <InfoItem>
+                    <Icon><MapPinIcon /></Icon>
+                    <p>B-85 Dashrath Puri, Palam Road,<br /> New Delhi 110045</p>
+                  </InfoItem>
+                  <InfoItem>
+                    <Icon><PhoneIcon /></Icon>
+                    <p>+91 9311648357</p>
+                  </InfoItem>
+                  <InfoItem>
+                    <Icon><MailIcon /></Icon>
+                    <p>cs@instasign.ai</p>
+                  </InfoItem>
+                </InfoContent>
+              </InfoCard>
 
-            <InfoCard>
-              <InfoContent>
-                <h3>USA</h3>
-                <InfoItem>
-                  <Icon><MapPinIcon /></Icon>
-                  <p>2802 E. Lincoln St, Suite # 1D, Bloomington, IL 61704</p>
-                </InfoItem>
-                <InfoItem>
-                  <Icon><PhoneIcon /></Icon>
-                  <p>+1 408-341-9417</p>
-                </InfoItem>
-                <InfoItem>
-                  <Icon><MailIcon /></Icon>
-                  <p>cs@instasign.com</p>
-                </InfoItem>
-              </InfoContent>
-            </InfoCard>
+              <InfoCard>
+                <InfoContent>
+                  <h3>USA</h3>
+                  <InfoItem>
+                    <Icon><MapPinIcon /></Icon>
+                    <p>2802 E. Lincoln St, Suite # 1D, Bloomington, IL 61704</p>
+                  </InfoItem>
+                  <InfoItem>
+                    <Icon><PhoneIcon /></Icon>
+                    <p>+1 408.341.9417</p>
+                  </InfoItem>
+                  <InfoItem>
+                    <Icon><MailIcon /></Icon>
+                    <p>cs@instasign.ai</p>
+                  </InfoItem>
+                </InfoContent>
+              </InfoCard>
 
-            <InfoCard>
-              <InfoContent>
-                <h3>Canada</h3>
-                <InfoItem>
-                  <Icon><MapPinIcon /></Icon>
-                  <p>206 Coventry Crt NE, Calgary, Alberta T3K5E8</p>
-                </InfoItem>
-                <InfoItem>
-                  <Icon><PhoneIcon /></Icon>
-                  <p>+1 408-341-9417</p>
-                </InfoItem>
-                <InfoItem>
-                  <Icon><MailIcon /></Icon>
-                  <p>cs@instasign.com</p>
-                </InfoItem>
-              </InfoContent>
-            </InfoCard>
-          </ContactInfo>
+              <InfoCard>
+                <InfoContent>
+                  <h3>Canada</h3>
+                  <InfoItem>
+                    <Icon><MapPinIcon /></Icon>
+                    <p>206 Coventry Crt NE,<br /> Calgary, Alberta T3K5E8</p>
+                  </InfoItem>
+                  <InfoItem>
+                    <Icon><PhoneIcon /></Icon>
+                    <p>+1 408.341.9417</p>
+                  </InfoItem>
+                  <InfoItem>
+                    <Icon><MailIcon /></Icon>
+                    <p>cs@instasign.ai</p>
+                  </InfoItem>
+                </InfoContent>
+              </InfoCard>
+            </ContactInfo>
 
-          <ContactForm ref={messageRef}>
-            <h3 className={messageVisible ? 'fade-in' : ''}>Send Us a Message</h3>
-            <form onSubmit={handleSubmit}>
-              <FormGrid>
+            <ContactForm ref={messageRef}>
+              <h3 className={messageVisible ? 'fade-in' : ''}>Send Us a Message</h3>
+              <form onSubmit={handleSubmit}>
+                <FormGrid>
+                  <FormGroup>
+                    <label htmlFor="name">Name</label>
+                    <input
+                      id="name"
+                      name="name"
+                      type="text"
+                      placeholder="Your name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <label htmlFor="email">Email</label>
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      placeholder="Your email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </FormGroup>
+                </FormGrid>
+
                 <FormGroup>
-                  <label htmlFor="name">Name</label>
+                  <label htmlFor="phone">Phone</label>
                   <input
-                    id="name"
-                    name="name"
+                    id="phone"
+                    name="phone"
                     type="text"
-                    placeholder="Your name"
-                    value={formData.name}
+                    placeholder="Your phone number"
+                    value={formData.phone}
                     onChange={handleChange}
-                    required
+                    maxLength={10}
                   />
                 </FormGroup>
+
                 <FormGroup>
-                  <label htmlFor="email">Email</label>
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Your email"
-                    value={formData.email}
+                  <label htmlFor="message">Message</label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    placeholder="How can we help you?"
+                    value={formData.message}
                     onChange={handleChange}
                     required
                   />
                 </FormGroup>
-              </FormGrid>
-
-              <FormGroup>
-                <label htmlFor="company">Company</label>
-                <input
-                  id="company"
-                  name="company"
-                  type="text"
-                  placeholder="Your company"
-                  value={formData.company}
-                  onChange={handleChange}
-                />
-              </FormGroup>
-
-              <FormGroup>
-                <label htmlFor="message">Message</label>
-                <textarea
-                  id="message"
-                  name="message"
-                  placeholder="How can we help you?"
-                  value={formData.message}
-                  onChange={handleChange}
-                  required
-                />
-              </FormGroup>
 
               <SubmitButton type="submit">Send Message</SubmitButton>
             </form>
@@ -409,6 +447,7 @@ const Contact = () => {
         </ContactGrid>
       </Container>
     </ContactSection>
+  </>
   );
 };
 
