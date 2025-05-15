@@ -1374,8 +1374,7 @@ function PlaceHolderSign() {
             //   openSignUrl +
             //   " target=_blank>here</a>.</p></div></div></body></html>"
 
-            `
-                          <!DOCTYPE html>
+            ` <!DOCTYPE html>
 
 <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
 
@@ -1658,7 +1657,7 @@ function PlaceHolderSign() {
                                                                                     <tr>
                                                                                         <td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Sender</td>
                                                                                         <td></td>
-                                                                                        <td style='color:#ffffff;font-weight:bold;'>${senderEmail}</td>
+                                                                                        <td style='color:#ffffff;font-weight:bold;'><span style="color:#ffffff !important;text-decoration:none;">${senderEmail}</span></td>
                                                                                     </tr>
                                                                                     <tr>
                                                                                         <td style='font-weight:bold;font-family:sans-serif;font-size:15px'>Organization</td>
@@ -1698,7 +1697,7 @@ function PlaceHolderSign() {
 																			 </p>
 																		<p
 																			style="margin: 0; mso-line-height-alt: 21px;">
-																			This is an automated email from InstaSign™. For any queries regarding this email, please contact the sender ${senderEmail} directly. If you think this email is inappropriate or spam, you may file a complaint with InstaSign™ <a href="https://instasign.ai" style="color: #ffffff;" target="_blank">here</a>".</p>
+																			This is an automated email from InstaSign™. For any queries regarding this email, please contact the sender <span style="color:#ffffff !important;text-decoration:none;">${senderEmail}</span> directly. If you think this email is inappropriate or spam, you may file a complaint with InstaSign™ <a href="https://instasign.ai" style="color: #ffffff;" target="_blank">here</a>".</p>
 																	
                                                                         </div>
 																</div>
@@ -1920,10 +1919,28 @@ function PlaceHolderSign() {
 																				</a><!--[if mso]></td><td><![endif]--><span
 																					class="sep"
 																					style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span><!--[if mso]></td><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
-																					href="tel:+917011313488"
+																					href="tel:+919311648357"
 																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
 																					target="_self">+91
 																					9311648357</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
+																			</div>
+																		</td>
+																	</tr>
+                                  <tr>
+																		<td class="alignment"
+																			style="text-align:center;font-size:0px;">
+																			<div class="menu-links">
+																				<!--[if mso]><table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style=""><tr style="text-align:center;"><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
+																					href="mailto:support@instasign.ai"
+																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
+																					target="_self">USA
+																				</a><!--[if mso]></td><td><![endif]--><span
+																					class="sep"
+																					style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span><!--[if mso]></td><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
+																					href="tel:+14083419417"
+																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
+																					target="_self">+1
+																					4083419417</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
 																			</div>
 																		</td>
 																	</tr>
@@ -1973,7 +1990,8 @@ function PlaceHolderSign() {
 
 </html>
                           
-                          `
+                          
+            `
         };
 
         sendMail = await axios.post(url, params, { headers: headers });

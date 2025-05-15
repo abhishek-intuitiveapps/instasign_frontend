@@ -233,8 +233,8 @@ const Header = ({ showSidebar, setIsMenu, isPendingVerification }) => {
             </ul>
           </div>
         </div> */}
-{/* 
-        {!isPendingVerification && ( */}
+
+         {/* {!isPendingVerification && ( */}
           <div className="flex-none gap-2 flex items-center" id="profile-menu">
             <div className="op-dropdown op-dropdown-end relative">
               <div
@@ -304,7 +304,7 @@ const Header = ({ showSidebar, setIsMenu, isPendingVerification }) => {
               </ul>
             </div>
           </div>
-        {/* )} */}
+        {/* )}  */}
 
         <div className="flex-none">
             <button

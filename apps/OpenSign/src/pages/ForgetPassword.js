@@ -4,7 +4,6 @@ import { Link, useNavigate } from "react-router";
 // import login_img from "../assets/images/login_img.svg";
 import login_img from "../assets/images/instasign.jpg"
 import Parse from "parse";
-import Alert from "../primitives/Alert";
 import { appInfo } from "../constant/appinfo";
 import { useDispatch } from "react-redux";
 import { fetchAppInfo } from "../redux/reducers/infoReducer";
@@ -14,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from "axios";
 
 function ForgotPassword() {
   const { t } = useTranslation();
@@ -22,6 +22,7 @@ function ForgotPassword() {
   const [state, setState] = useState({ email: "", password: "", hideNav: "" });
   const [sentStatus, setSentStatus] = useState("");
   const [image, setImage] = useState();
+  const djangoURL = process.env.REACT_APP_DJANGO_URL
 
   const handleChange = (event) => {
     let { name, value } = event.target;
@@ -48,9 +49,17 @@ function ForgotPassword() {
       if (state.email) {
         const username = state.email;
         try {
-          await Parse.User.requestPasswordReset(username);
-          toast.success("Password reset email sent successfully!");
-          setSentStatus("success");
+          const result = await axios.post(`${djangoURL}/base/api/v1/forget/password/`, {
+            email: state.email,
+            reset_url_path: `${window.location.origin}/resetpassword/`
+          });
+          if (result.data.data && result.data.data.encoded_secret_code) {
+            toast.success(t("reset-password-alert-1"));
+            setSentStatus("success");
+          } else {
+            toast.error("No encoded secret code received.");
+            setSentStatus("failed");
+          }
         } catch (err) {
           console.log("err ", err.code);
           toast.error("Failed to send password reset email.");
@@ -64,7 +73,7 @@ function ForgotPassword() {
 
   useEffect(() => {
     dispatch(fetchAppInfo());
-    saveLogo();
+    // saveLogo();
     resize();
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
@@ -86,12 +95,6 @@ function ForgotPassword() {
       <div className="flex-1 flex justify-center items-center bg-white">
         <div className="w-full max-w-md p-8">
           <Title title="Forgot password page" />
-          {sentStatus === "success" && (
-            <Alert type="success">{t("reset-password-alert-1")}</Alert>
-          )}
-          {sentStatus === "failed" && (
-            <Alert type={"danger"}>{t("reset-password-alert-2")}</Alert>
-          )}
           <form onSubmit={handleSubmit}>
             <h2 className="text-2xl font-bold text-left mb-6">{t("Forgot Password")}</h2>
             {/* <div className="w-full my-4 op-card bg-base-100 shadow-md outline outline-1 outline-slate-300/50"> */}

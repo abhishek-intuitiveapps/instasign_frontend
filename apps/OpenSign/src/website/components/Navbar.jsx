@@ -40,6 +40,9 @@ const Navbar = () => {
           <a href="/faq" style={{ textDecoration: 'none', color: '#002864' }} className="font-medium transition-colors cursor-pointer" onMouseOver={(e) => e.currentTarget.style.color = '#2563EB'} onMouseOut={(e) => e.currentTarget.style.color = '#002864'}>
             FAQ
           </a>
+          <a href="/sign-pdf" style={{ textDecoration: 'none', color: '#002864' }} className="font-medium transition-colors cursor-pointer" onMouseOver={(e) => e.currentTarget.style.color = '#2563EB'} onMouseOut={(e) => e.currentTarget.style.color = '#002864'}>
+            Sign PDF
+          </a>
         </div>
 
         <div className="hidden md:flex space-x-4">
@@ -89,6 +92,9 @@ const Navbar = () => {
             </a>
             <a href="/faq" style={{ textDecoration: 'none', color: '#002864' }} className="py-2 text-primary no-underline" onClick={toggleMenu}>
               FAQ
+            </a>
+            <a href="/sign-pdf" style={{ textDecoration: 'none', color: '#002864' }} className="py-2 text-primary no-underline" onClick={toggleMenu}>
+              Sign PDF
             </a>
             <div className="flex flex-col space-y-2 pt-2 pb-4">
               <button
