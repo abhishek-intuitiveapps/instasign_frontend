@@ -126,10 +126,10 @@ function ForgotPassword() {
               </button>
               <div className="text-gray-600 mt-4">
                 <p className="mb-2">
-                  {t("Don't have an account?")} <Link to="/signup" className="text-blue-600 hover:underline">{t("Sign Up")}</Link>
+                  {t("Don't have an account?")} <Link to="/signup" className="text-blue-600 cursor-pointer hover:underline">{t("Sign Up")}</Link>
                 </p>
                 <p>
-                  {t("Already have an account?")} <Link to="/login" className="text-blue-600 hover:underline">{t("Sign in")}</Link>
+                  {t("Already have an account?")} <Link to="/login" className="text-blue-600 cursor-pointer hover:underline">{t("Sign in")}</Link>
                 </p>
               </div>
             </div>

@@ -629,14 +629,14 @@ function Login() {
                     </div>
                     <span className="ml-2">Keep me logged in</span>
                   </label>
-                  <NavLink to="/forgetpassword" className="text-blue-500 hover:underline">
+                  <NavLink to="/forgetpassword" className="text-blue-500 cursor-pointer hover:underline">
                     {t("Forgot Password")}
                   </NavLink>
                 </div>
                 <div className="grid grid-cols-1 gap-1 text-center">
                   <button
                     type="submit"
-                    className="w-full bg-blue-600 text-white font-bold py-3 rounded-md hover:bg-blue-700 transition duration-200"
+                    className="w-full bg-blue-600 cursor-pointer text-white font-bold py-3 rounded-md hover:bg-blue-700 transition duration-200"
                   >
                     {t("Sign In")}
                   </button>
@@ -644,7 +644,7 @@ function Login() {
               </form>
               <div className="text-center mt-2">
                 <span className="text-sm">
-                  {t("Don't have an account?")} <NavLink to="/signup" className="text-blue-500 hover:underline">{t("Sign up")}</NavLink>
+                  {t("Don't have an account?")} <NavLink to="/signup" className="text-blue-500 cursor-pointer hover:underline">{t("Sign up")}</NavLink>
                 </span>
               </div>
               {state.alertMsg && (
