@@ -794,10 +794,28 @@ export const mailTemplate = param => {
 																				</a><!--[if mso]></td><td><![endif]--><span
 																					class="sep"
 																					style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span><!--[if mso]></td><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
-																					href="tel:+917011313488"
+																					href="tel:+919311648357"
 																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
 																					target="_self">+91
 																					9311648357</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
+																			</div>
+																		</td>
+																	</tr>
+																	<tr>
+																		<td class="alignment"
+																			style="text-align:center;font-size:0px;">
+																			<div class="menu-links">
+																				<!--[if mso]><table role="presentation" border="0" cellpadding="0" cellspacing="0" align="center" style=""><tr style="text-align:center;"><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
+																					href="mailto:support@instasign.ai"
+																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
+																					target="_self">USA
+																				</a><!--[if mso]></td><td><![endif]--><span
+																					class="sep"
+																					style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span><!--[if mso]></td><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
+																					href="tel:+14083419417"
+																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
+																					target="_self">+1
+																					4083419417</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
 																			</div>
 																		</td>
 																	</tr>

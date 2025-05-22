@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import digitalSignature from "../assets/digital_signature.svg";
+import {useNavigate} from "react-router";
 
 const Hero1 = () => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -75,7 +77,7 @@ const Hero1 = () => {
               >
                 Request a Demo
               </button>
-              <button className="px-6 py-2 border-2 border-[#002864] text-[#002864] rounded-lg hover:bg-[#002864] hover:text-white text-base">
+              <button onClick={() => navigate('/sign-pdf')} className="px-6 py-2 border-2 border-[#002864] text-[#002864] rounded-lg hover:bg-[#002864] hover:text-white text-base">
                 E-Sign
               </button>
             </div>

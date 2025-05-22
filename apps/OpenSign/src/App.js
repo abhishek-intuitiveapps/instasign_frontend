@@ -33,8 +33,10 @@ import Contact from "./website/components/Contact";
 import ServiceAndDelivery from "./website/Pages/ServiceAndDelivery";
 import Terms from "./website/Pages/Terms";
 import Faq from "./website/components/FAQ";
+import SignPdf from "./website/Pages/SignPdf";
 const DebugPdf = lazy(() => import("./pages/DebugPdf"));
 const ForgetPassword = lazy(() => import("./pages/ForgetPassword"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const GuestLogin = lazy(() => import("./pages/GuestLogin"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
@@ -94,6 +96,7 @@ function App() {
               <Route path="refund" element={<Refund/>} />
               <Route path="contact" element={<Contact/>} />
               <Route path="faq" element={<Faq/>} />
+              <Route path="sign-pdf" element={<SignPdf/>} />
             </Route>
             <Route element={<ValidateRoute />}>
               <Route exact path="/login" element={<Login />} />
@@ -139,6 +142,9 @@ function App() {
             <Route
               path="/forgetpassword"
               element={<LazyPage Page={ForgetPassword} />}
+            />
+            <Route path="/resetpassword" 
+            element={<LazyPage Page={ResetPassword}/>} 
             />
             <Route element={<HomeLayout />}>
               <Route
