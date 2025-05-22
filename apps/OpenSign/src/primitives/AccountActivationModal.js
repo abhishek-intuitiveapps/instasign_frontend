@@ -21,7 +21,6 @@ const AccountActivationModal = () => {
     const otpInputRefs = useRef([]);
     const djangoToken = localStorage.getItem('django');
     const djangoUrl = process.env.REACT_APP_DJANGO_URL;
-    const apiBaseUrl = 'https://api.dev.instasign.ai';
     
     // Get Django user to check status
     const djangoUser = JSON.parse(localStorage.getItem('djangoUser'));
@@ -69,7 +68,7 @@ const AccountActivationModal = () => {
         setOtpLoading(true);
         setOtpError('');
         try {
-            const response = await axios.get(`${apiBaseUrl}/base/api/v1/otp/verification/`, {
+            const response = await axios.get(`${djangoUrl}/base/api/v1/otp/verification/`, {
                 headers: {
                     'Authorization': `Bearer ${djangoToken}`
                 }
@@ -108,7 +107,7 @@ const AccountActivationModal = () => {
             const otp = manualOtp || otpValues.join('');
             console.log("Submitting OTP:", otp); // Debug log
             
-            const response = await axios.post(`${apiBaseUrl}/base/api/v1/otp/verification/`, 
+            const response = await axios.post(`${djangoUrl}/base/api/v1/otp/verification/`, 
                 { otp },
                 {
                     headers: {
@@ -226,7 +225,7 @@ const AccountActivationModal = () => {
             const base64Data = await base64Promise;
             
             // Send the base64 data to the API using axios
-            const response = await axios.post(`${apiBaseUrl}/base/api/v1/upload/certificate/`, {
+            const response = await axios.post(`${djangoUrl}/base/api/v1/upload/certificate/`, {
                 certificate: base64Data
             }, {
                 headers: {
@@ -239,7 +238,7 @@ const AccountActivationModal = () => {
                 setUploadStatus('Certificate uploaded successfully');
                 // Refresh user data to get updated status
                 try {
-                    const userResponse = await axios.get(`${apiBaseUrl}/base/api/v1/get/user/detail/`, {
+                    const userResponse = await axios.get(`${djangoUrl}/base/api/v1/get/user/detail/`, {
                         headers: {
                             Authorization: `Bearer ${djangoToken}`
                         }
