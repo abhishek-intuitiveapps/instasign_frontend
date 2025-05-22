@@ -5,7 +5,7 @@ import { PDFDocument } from 'pdf-lib';
 import { DateTime } from 'luxon';
 dotenv.config();
 
-export const cloudServerUrl = 'https://instasign.ai/app';
+export const cloudServerUrl = 'https://dev.instasign.ai/app';
 export const appName = 'InstaSign™';
 
 export const color = [
