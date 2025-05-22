@@ -78,7 +78,8 @@ const Hero1 = () => {
                 Request a Demo
               </button>
               <button onClick={() => navigate('/sign-pdf')} className="px-6 py-2 border-2 border-[#002864] text-[#002864] rounded-lg hover:bg-[#002864] hover:text-white text-base">
-                E-Sign
+              Sign Instantly - Free
+ 
               </button>
             </div>
             <div className="flex flex-col sm:flex-row gap-4 pt-6">

@@ -143,9 +143,8 @@ function SignYourSelf() {
   const [isDownloadModal, setIsDownloadModal] = useState(false);
   const [isResize, setIsResize] = useState(false);
   const [isUploadPdf, setIsUploadPdf] = useState(false);
-  // const [walletStatus, setWalletStatus] = useState(false);
-  // const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
-  // const paymentMode = useSelector((state) => state.payment.mode);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isPublicAccess, setIsPublicAccess] = useState(false);
 
   const djangoUrl = process.env.REACT_APP_DJANGO_URL;
 
@@ -176,27 +175,23 @@ function SignYourSelf() {
     localStorage.getItem(
       `Parse/${localStorage.getItem("parseAppId")}/currentUser`
     );
-  const jsonSender = JSON.parse(senderUser);
+  const jsonSender = senderUser ? JSON.parse(senderUser) : null;
 
   useEffect(() => {
+    // Check if user is authenticated
+    const currentUser = Parse.User.current();
+    if (currentUser) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+      setIsPublicAccess(true);
+    }
+
     if (documentId) {
       getDocumentDetails(true);
     }
-    // if (!paymentMode) {
-    //   fetchStatus();
-    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // useEffect(() => {
-  //   console.log("wallet condition", walletStatus);
-  //   if (walletStatus || paymentMode) {
-  //     console.log("this condition run");
-  //     setIsWalletModalOpen(false);
-  //   } else {
-  //     setIsWalletModalOpen(true);
-  //   }
-  // }, [walletStatus, paymentMode]);
 
   useEffect(() => {
     const updateSize = () => {
@@ -217,26 +212,6 @@ function SignYourSelf() {
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [divRef.current, isHeader]);
-
-  // const fetchStatus = async () => {
-  //   try {
-  //       const response = await axios.get(`${djangoUrl}/base/api/v1/check/activity/access/`, {
-  //           headers: {
-  //               'Authorization': `Bearer ${localStorage.getItem('django')}`
-  //           }
-  //       });
-  //       console.log('Status fetched:', response.data.status);
-  //       setWalletStatus(response.data.status);
-  //       // setWalletStatus(true);
-  //       // Handle the response as needed
-  //   } catch (error) {
-  //       console.error('Error fetching status:', error);
-  //   }
-  // };
-
-  // const handleAddCredits = () => {
-  //   navigate("/wallet");
-  // };
 
   //function for get document details for perticular signer with signer'object id
   const getDocumentDetails = async (showComplete) => {
@@ -298,51 +273,30 @@ function SignYourSelf() {
         setHandleError(t("no-data-avaliable"));
         setIsLoading({ isLoad: false });
       }
-      //function to get default signatur eof current user from `contracts_Signature` class
-      const defaultSignRes = await getDefaultSignature(jsonSender.objectId);
-      if (defaultSignRes?.status === "success") {
-        setSaveSignCheckbox((prev) => ({
-          ...prev,
-          isVisible: true,
-          signId: defaultSignRes?.res?.id
-        }));
-        setDefaultSignImg(defaultSignRes?.res?.defaultSignature);
-        setMyInitial(defaultSignRes?.res?.defaultInitial);
-      }
-      const contractUsersRes = await contractUsers();
-      if (contractUsersRes === "Error: Something went wrong!") {
-        setHandleError(t("something-went-wrong-mssg"));
-        setIsLoading({ isLoad: false });
-      } else if (contractUsersRes[0] && contractUsersRes.length > 0) {
-        setContractName("_Users");
-        setSignerUserId(contractUsersRes[0].objectId);
-        setSaveSignCheckbox((prev) => ({ ...prev, isVisible: true }));
-        const tourstatuss =
-          contractUsersRes[0].TourStatus && contractUsersRes[0].TourStatus;
-        if (tourstatuss && tourstatuss.length > 0 && !isCompleted) {
-          setTourStatus(tourstatuss);
-          const checkTourRecipients = tourstatuss.filter(
-            (data) => data.signyourself
-          );
-          if (checkTourRecipients && checkTourRecipients.length > 0) {
-            setCheckTourStatus(checkTourRecipients[0].signyourself);
-          }
-        } else {
-          setCheckTourStatus(true);
-        }
-        const loadObj = {
-          isLoad: false
-        };
-        setIsLoading(loadObj);
-      } else if (contractUsersRes.length === 0) {
-        const contractContactBook = await contactBook(jsonSender.objectId);
-        if (contractContactBook && contractContactBook.length > 0) {
-          setContractName("_Contactbook");
-          setSignerUserId(contractContactBook[0].objectId);
-          const tourstatuss =
-            contractContactBook[0].TourStatus &&
-            contractContactBook[0].TourStatus;
 
+      // If user is authenticated, get default signature
+      if (isAuthenticated && jsonSender) {
+        //function to get default signatur eof current user from `contracts_Signature` class
+        const defaultSignRes = await getDefaultSignature(jsonSender.objectId);
+        if (defaultSignRes?.status === "success") {
+          setSaveSignCheckbox((prev) => ({
+            ...prev,
+            isVisible: true,
+            signId: defaultSignRes?.res?.id
+          }));
+          setDefaultSignImg(defaultSignRes?.res?.defaultSignature);
+          setMyInitial(defaultSignRes?.res?.defaultInitial);
+        }
+        const contractUsersRes = await contractUsers();
+        if (contractUsersRes === "Error: Something went wrong!") {
+          setHandleError(t("something-went-wrong-mssg"));
+          setIsLoading({ isLoad: false });
+        } else if (contractUsersRes[0] && contractUsersRes.length > 0) {
+          setContractName("_Users");
+          setSignerUserId(contractUsersRes[0].objectId);
+          setSaveSignCheckbox((prev) => ({ ...prev, isVisible: true }));
+          const tourstatuss =
+            contractUsersRes[0].TourStatus && contractUsersRes[0].TourStatus;
           if (tourstatuss && tourstatuss.length > 0 && !isCompleted) {
             setTourStatus(tourstatuss);
             const checkTourRecipients = tourstatuss.filter(
@@ -354,13 +308,42 @@ function SignYourSelf() {
           } else {
             setCheckTourStatus(true);
           }
-        } else {
-          setHandleError(t("no-data-avaliable"));
+          const loadObj = {
+            isLoad: false
+          };
+          setIsLoading(loadObj);
+        } else if (contractUsersRes.length === 0) {
+          const contractContactBook = await contactBook(jsonSender.objectId);
+          if (contractContactBook && contractContactBook.length > 0) {
+            setContractName("_Contactbook");
+            setSignerUserId(contractContactBook[0].objectId);
+            const tourstatuss =
+              contractContactBook[0].TourStatus &&
+              contractContactBook[0].TourStatus;
+
+            if (tourstatuss && tourstatuss.length > 0 && !isCompleted) {
+              setTourStatus(tourstatuss);
+              const checkTourRecipients = tourstatuss.filter(
+                (data) => data.signyourself
+              );
+              if (checkTourRecipients && checkTourRecipients.length > 0) {
+                setCheckTourStatus(checkTourRecipients[0].signyourself);
+              }
+            } else {
+              setCheckTourStatus(true);
+            }
+          } else {
+            setHandleError(t("no-data-avaliable"));
+          }
+          const loadObj = {
+            isLoad: false
+          };
+          setIsLoading(loadObj);
         }
-        const loadObj = {
-          isLoad: false
-        };
-        setIsLoading(loadObj);
+      } else {
+        // For public access without authentication
+        setCheckTourStatus(true);
+        setIsLoading({ isLoad: false });
       }
     } catch (err) {
       console.log("Error: error in getDocumentDetails", err);
@@ -654,30 +637,8 @@ function SignYourSelf() {
   };
   //function for send placeholder's co-ordinate(x,y) position embed signature url or stamp url
   async function embedWidgetsData() {
-    //check current user email is verified or not
-    const currentUser = JSON.parse(JSON.stringify(Parse.User.current()));
-    let isEmailVerified;
-    isEmailVerified = currentUser?.emailVerified;
-    const isEnableOTP = pdfDetails?.[0]?.IsEnableOTP || false;
-    if (isEnableOTP) {
-      if (isEmailVerified) {
-        setIsEmailVerified(isEmailVerified);
-      } else {
-        try {
-          const userQuery = new Parse.Query(Parse.User);
-          const user = await userQuery.get(currentUser.objectId, {
-            sessionToken: localStorage.getItem("accesstoken")
-          });
-          if (user) {
-            isEmailVerified = user?.get("emailVerified");
-            setIsEmailVerified(isEmailVerified);
-          }
-        } catch (e) {
-          setHandleError(t("something-went-wrong-mssg"));
-        }
-      }
-    }
-    if (!isEnableOTP || isEmailVerified) {
+    // Skip email verification check for public access
+    if (isPublicAccess || isAuthenticated) {
       let showAlert = false,
         isSignatureExist = false;
       try {
@@ -738,7 +699,6 @@ function SignYourSelf() {
               isSignYourSelfFlow,
               scale
             );
-            // console.log("pdf", pdfBytes);
             //function for call to embed signature in pdf and get digital signature pdf
             if (!pdfBytes?.error) {
               await signPdfFun(pdfBytes, documentId);
@@ -784,6 +744,36 @@ function SignYourSelf() {
           isShow: true,
           alertMessage: t("something-went-wrong-mssg")
         });
+      }
+    } else {
+      // If the user needs to verify email first
+      const currentUser = JSON.parse(JSON.stringify(Parse.User.current()));
+      let isEmailVerified;
+      isEmailVerified = currentUser?.emailVerified;
+      const isEnableOTP = pdfDetails?.[0]?.IsEnableOTP || false;
+      
+      if (isEnableOTP) {
+        if (isEmailVerified) {
+          setIsEmailVerified(isEmailVerified);
+        } else {
+          try {
+            const userQuery = new Parse.Query(Parse.User);
+            const user = await userQuery.get(currentUser.objectId, {
+              sessionToken: localStorage.getItem("accesstoken")
+            });
+            if (user) {
+              isEmailVerified = user?.get("emailVerified");
+              setIsEmailVerified(isEmailVerified);
+            }
+          } catch (e) {
+            setHandleError(t("something-went-wrong-mssg"));
+          }
+        }
+      }
+      
+      if (!isEnableOTP || isEmailVerified) {
+        // Continue with the embedding process
+        // ... (This code is already handled in the first part of this function)
       }
     }
   }

@@ -41,7 +41,7 @@ const Navbar = () => {
             FAQ
           </a>
           <a href="/sign-pdf" style={{ textDecoration: 'none', color: '#002864' }} className="font-medium transition-colors cursor-pointer" onMouseOver={(e) => e.currentTarget.style.color = '#2563EB'} onMouseOut={(e) => e.currentTarget.style.color = '#002864'}>
-            Sign PDF
+            E-Sign
           </a>
         </div>
 
