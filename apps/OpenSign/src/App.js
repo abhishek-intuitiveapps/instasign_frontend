@@ -20,7 +20,6 @@ import UserList from "./pages/UserList";
 import { serverUrl_fn } from "./constant/appinfo";
 import DocSuccessPage from "./pages/DocSuccessPage";
 import Transaction from "./pages/Transaction";
-import SignUp from "./pages/Signup";
 import Wallet from "./pages/Wallet";
 import MonthlyBills from "./pages/MonthlyBills";
 import { useSelector, useDispatch } from "react-redux";
@@ -33,8 +32,11 @@ import Contact from "./website/components/Contact";
 import ServiceAndDelivery from "./website/Pages/ServiceAndDelivery";
 import Terms from "./website/Pages/Terms";
 import Faq from "./website/components/FAQ";
+import SignPdf from "./website/Pages/SignPdf";
 const DebugPdf = lazy(() => import("./pages/DebugPdf"));
 const ForgetPassword = lazy(() => import("./pages/ForgetPassword"));
+const SignUp = lazy(() => import("./pages/Signup"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const GuestLogin = lazy(() => import("./pages/GuestLogin"));
 const ChangePassword = lazy(() => import("./pages/ChangePassword"));
 const UserProfile = lazy(() => import("./pages/UserProfile"));
@@ -94,7 +96,13 @@ function App() {
               <Route path="refund" element={<Refund/>} />
               <Route path="contact" element={<Contact/>} />
               <Route path="faq" element={<Faq/>} />
+              <Route path="sign-pdf" element={<SignPdf/>} />
             </Route>
+            
+            {/* Public SignYourSelf route */}
+            <Route path="/public-sign/:docId" element={<SignYourSelf />} />
+           
+            
             <Route element={<ValidateRoute />}>
               <Route exact path="/login" element={<Login />} />
                   <Route
@@ -123,6 +131,7 @@ function App() {
                 element={<PdfRequestFiles />}
               />
             </Route>
+
             <Route
               path="/loadmf/signmicroapp/login/:id/:userMail/:contactBookId/:serverUrl"
               element={<LazyPage Page={GuestLogin} />}
@@ -140,11 +149,17 @@ function App() {
               path="/forgetpassword"
               element={<LazyPage Page={ForgetPassword} />}
             />
+            <Route path="/resetpassword" 
+            element={<LazyPage Page={ResetPassword}/>} 
+            />
             <Route element={<HomeLayout />}>
               <Route
                 path="/changepassword"
                 element={<LazyPage Page={ChangePassword} />}
               />
+
+              <Route path="/signaturePdf/:docId" element={<SignYourSelf />} />
+               
               <Route path="/form/:id" element={<Form />} />
               {!paymentMode && (
                 <Route path="/wallet" element={<Wallet />} />
@@ -173,8 +188,6 @@ function App() {
                 path="/template/:templateId"
                 element={<TemplatePlaceholder />}
               />
-              {/* signyouself route with no rowlevel data using docId from url */}
-              <Route path="/signaturePdf/:docId" element={<SignYourSelf />} />
               {/* draft document route to handle and navigate route page accordiing to document status */}
               <Route path="/draftDocument" element={<DraftDocument />} />
               {/* recipient placeholder set route with no rowlevel data using docId from url*/}

@@ -28,7 +28,7 @@ if (useLocal !== 'true') {
     const s3Options = {
       bucket: process.env.DO_SPACE,
       baseUrl: process.env.DO_BASEURL,
-      fileAcl: 'none',
+      fileAcl: 'public-read',
       region: process.env.DO_REGION,
       directAccess: true,
       preserveFileName: true,
@@ -47,11 +47,13 @@ if (useLocal !== 'true') {
     console.log('Please provide AWS credintials in env file! Defaulting to local storage.');
     fsAdapter = new FSFilesAdapter({
       filesSubDirectory: 'files', // optional, defaults to ./files
+      publicURL: process.env.SERVER_URL || cloudServerUrl,
     });
   }
 } else {
   fsAdapter = new FSFilesAdapter({
     filesSubDirectory: 'files', // optional, defaults to ./files
+    publicURL: process.env.SERVER_URL || cloudServerUrl,
   });
 }
 
@@ -110,6 +112,9 @@ export const config = {
   appName: appName,
   allowClientClassCreation: false,
   allowExpiredAuthDataToken: false,
+  fileUpload: {
+    enableForAnonymousUsers: true, // <--- Enable anonymous file uploads
+  },
   encodeParseObjectInCloudFunction: true,
   ...(isMailAdapter === true
     ? {
@@ -203,6 +208,7 @@ app.use('/public', express.static(path.join(__dirname, '/public')));
 if (!process.env.TESTING) {
   const mountPath = process.env.PARSE_MOUNT || '/app';
   try {
+    console.log('Parse Server config:', config.fileUpload);
     const server = new ParseServer(config);
     await server.start();
     app.use(mountPath, server.app);

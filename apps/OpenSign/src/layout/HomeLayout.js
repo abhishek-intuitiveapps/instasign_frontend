@@ -273,15 +273,20 @@ const HomeLayout = () => {
   };
 
   async function checkTourStatus() {
-    const cloudRes = await Parse.Cloud.run("getUserDetails");
-    if (cloudRes) {
-      const extUser = JSON.parse(JSON.stringify(cloudRes));
-      localStorage.setItem("Extand_Class", JSON.stringify([extUser]));
-      const tourStatus = extUser?.TourStatus || [];
-      setTourStatusArr(tourStatus);
-      const loginTour = tourStatus.find((obj) => obj.loginTour)?.loginTour;
-      setIsTour(!loginTour);
-    } else {
+    try {
+      const cloudRes = await Parse.Cloud.run("getUserDetails");
+      if (cloudRes) {
+        const extUser = JSON.parse(JSON.stringify(cloudRes));
+        localStorage.setItem("Extand_Class", JSON.stringify([extUser]));
+        const tourStatus = extUser?.TourStatus || [];
+        setTourStatusArr(tourStatus);
+        const loginTour = tourStatus.find((obj) => obj.loginTour)?.loginTour;
+        setIsTour(!loginTour);
+      } else {
+        setIsTour(true);
+      }
+    } catch (error) {
+      console.error("Error in checkTourStatus:", error);
       setIsTour(true);
     }
   }
@@ -309,7 +314,7 @@ const HomeLayout = () => {
           <Header 
             showSidebar={showSidebar} 
             setIsMenu={setIsOpen} 
-            // isPendingVerification={djangoUser?.status === "pending_verification"}
+            isPendingVerification={djangoUser?.status === "pending_verification"}
           />
         )}
       </div>
@@ -321,7 +326,7 @@ const HomeLayout = () => {
             </div>
           ) : (
             <>
-              {/* {djangoUser?.status === "pending_verification" && <AccountActivationModal />} */}
+              {(djangoUser?.status === "pending_verification" || djangoUser?.status === "pending_cin") && djangoUser?.user_type === "admin" && <AccountActivationModal />}
               <div className="flex md:flex-row flex-col z-50 flex-grow overflow-hidden">
                 <Sidebar isOpen={isOpen} closeSidebar={closeSidebar} />
                 <div

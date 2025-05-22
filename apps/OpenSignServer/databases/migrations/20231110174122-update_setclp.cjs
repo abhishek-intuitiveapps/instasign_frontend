@@ -78,6 +78,7 @@ exports.up = async Parse => {
     .addArray('Recipients')
     .addArray('Clauses')
     .addArray('AgreementDelta');
+
   await doc.save(null, { useMasterKey: true });
 
   const signature = new Parse.Schema('contracts_Signature');
