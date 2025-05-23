@@ -22,6 +22,7 @@ const SignPdfUpload = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const maxFileSize = 20;
+  const djangoToken = localStorage.getItem("django");
   
   useEffect(() => {
     const setupAnonymousUser = async () => {
@@ -376,7 +377,12 @@ const SignPdfUpload = () => {
       
       // Navigate to the SignYourSelf component with the document ID
       setIsSubmitting(false);
-      navigate(`/public-sign/${res.id}`);
+      
+      if (djangoToken) {
+        navigate(`/signaturePdf/${res.id}`);
+      } else {
+        navigate(`/public-sign/${res.id}`);
+      }
       
     } catch (error) {
       console.error("Error saving document:", error);
