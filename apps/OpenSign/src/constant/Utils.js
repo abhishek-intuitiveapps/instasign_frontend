@@ -382,7 +382,7 @@ export const getWidgetType = (item, widgetName) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          marginBottom: '0.15rem',
+          marginBottom: '0.05rem',
         }}
       >
         <i

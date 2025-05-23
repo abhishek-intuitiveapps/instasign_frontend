@@ -133,8 +133,8 @@ function RenderAllPdfPage(props) {
               <Page
                 key={`page_${index + 1}`}
                 pageNumber={index + 1}
-                width={pageWidth - 60}
-                scale={1}
+                width={pageWidth - 140}
+                scale={0.65}
                 renderAnnotationLayer={false}
                 renderTextLayer={false}
               />

@@ -219,6 +219,7 @@ function WidgetComponent(props) {
                   signRef={signRef}
                   marginLeft={5}
                   addPositionOfSignature={props.addPositionOfSignature}
+                  isPlaceHolderSign={props.isPlaceHolderSign}
                 />
               </div>
             </div>
@@ -235,12 +236,13 @@ function WidgetComponent(props) {
             <span>{t("fields")}</span>
           </div>
 
-          <div className="p-[15px] flex flex-col pt-4" data-tut="addWidgets">
+          <div className="p-[15px] flex flex-col pt-2" data-tut="addWidgets">
             <WidgetList
               updateWidgets={updateWidgets}
               handleDivClick={props.handleDivClick}
               handleMouseLeave={props.handleMouseLeave}
               signRef={signRef}
+              isPlaceHolderSign={props.isPlaceHolderSign}
             />
           </div>
         </div>
