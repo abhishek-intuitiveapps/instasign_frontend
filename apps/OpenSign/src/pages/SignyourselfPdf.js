@@ -1005,7 +1005,7 @@ function SignYourSelf() {
       selector: '[data-tut="addWidgets"]',
       content: () => (
         <TourContentWithBtn
-          message={t("tour-mssg.signyour-self-2")}
+          message={t("tour-mssg.signyour-self-1")}
           isChecked={handleDontShow}
         />
       ),
@@ -1269,7 +1269,7 @@ function SignYourSelf() {
               />
             )}
             {/* this component used for UI interaction and show their functionality */}
-            {pdfLoad && !checkTourStatus && (
+            {pdfLoad && checkTourStatus && (
               <Tour
                 onRequestClose={closeTour}
                 steps={tourConfig}
