@@ -372,28 +372,23 @@ export const addWidgetSelfsignOptions = (type, getWidgetValue) => {
 export const getWidgetType = (item, widgetName) => {
   return (
     <div
-      className="flex flex-col items-center justify-center w-20 py-1 cursor-pointer select-none"
+      className="flex flex-col items-center justify-center w-20 py-1 cursor-pointer select-none group hover:text-[#002864]"
       style={{ minWidth: '5rem', maxWidth: '5rem' }}
     >
       <div
-        className="w-8 h-8"
+        className="w-8 h-8 flex items-center justify-center mb-[0.05rem]"
         style={{
           borderRadius: '0.75rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: '0.05rem',
         }}
       >
         <i
-          className={`${item.icon}`}
-          style={{ color: '#002864', fontSize: '1.1rem' }}
+          className={`${item.icon} text-black group-hover:text-[#002864] transition-colors duration-200`}
+          style={{ fontSize: '1.1rem' }}
         ></i>
       </div>
       <span
-        className="text-xs font-medium text-center truncate w-full"
+        className="text-xs font-medium text-center truncate w-full text-black group-hover:text-[#002864] transition-colors duration-200"
         style={{
-          color: '#002864',
           display: 'block',
           whiteSpace: 'nowrap',
           overflow: 'hidden',
