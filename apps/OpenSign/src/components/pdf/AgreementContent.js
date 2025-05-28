@@ -22,7 +22,7 @@ function AgreementContent(props) {
         title={t("term-cond-title")}
         handleClose={() => props.setIsShowAgreeTerms(false)}
       >
-        <div className="h-[100%] p-[20px]">
+        <div className="h-[calc(100vh-200px)] p-[20px] overflow-y-auto">
           <h2 className={h2Style}>{t("term-cond-h")}</h2>
           <span className="mt-2">{t("term-cond-p1")}</span>
           <div className="h-[1px] bg-[#9f9f9f] w-full my-[15px]"></div>
