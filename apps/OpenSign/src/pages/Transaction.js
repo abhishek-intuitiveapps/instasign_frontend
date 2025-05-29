@@ -2,7 +2,8 @@ import React, { useState,useEffect } from "react";
 import axios from "axios";
 import PaginationComponent from "./PaginationComponent"; // Adjust the import path as necessary
 import AddCreditsModal from "./AddCreditsModal";
-import Loader from "../primitives/Loader";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import Title from "../components/Title";
 
 
@@ -92,16 +93,6 @@ const BillingPage = () => {
   //   { id: 3, date: "2025-01-03", amount: 150, transactionId: "TXN003", status: "failed" },
   //   { id: 4, date: "2025-01-04", amount: 300, transactionId: "TXN004", status: "approved" },
   //   { id: 5, date: "2025-01-05", amount: 250, transactionId: "TXN005", status: "approved" },
-  //   { id: 1, date: "2025-01-01", amount: 100, transactionId: "TXN001", status: "approved" },
-  //   { id: 2, date: "2025-01-02", amount: 200, transactionId: "TXN002", status: "pending" },
-  //   { id: 3, date: "2025-01-03", amount: 150, transactionId: "TXN003", status: "failed" },
-  //   { id: 4, date: "2025-01-04", amount: 300, transactionId: "TXN004", status: "approved" },
-  //   { id: 5, date: "2025-01-05", amount: 250, transactionId: "TXN005", status: "approved" },
-  //   { id: 1, date: "2025-01-01", amount: 100, transactionId: "TXN001", status: "approved" },
-  //   { id: 2, date: "2025-01-02", amount: 200, transactionId: "TXN002", status: "pending" },
-  //   { id: 3, date: "2025-01-03", amount: 150, transactionId: "TXN003", status: "failed" },
-  //   { id: 4, date: "2025-01-04", amount: 300, transactionId: "TXN004", status: "approved" },
-  //   { id: 5, date: "2025-01-05", amount: 250, transactionId: "TXN005", status: "approved" },
   // ];
 
   // Set dummy data to transactionsData
@@ -151,14 +142,16 @@ const BillingPage = () => {
             </thead>
             <tbody>
               {
-              isLoading ? ( // Show loader while loading
-                <tr>
-                  <td colSpan="5" className="p-3 text-center" style={{ height: '400px' }}>
-                    <div className="flex justify-center items-center" style={{ height: '100%' }}>
-                      <Loader />
-                    </div>
-                  </td>
-                </tr>
+              isLoading ? ( // Show skeleton loading while loading
+                Array(rowsPerPage).fill(0).map((_, index) => (
+                  <tr key={index} className="text-center border border-gray-300">
+                    <td className="p-3 border"><Skeleton /></td>
+                    <td className="p-3 border"><Skeleton /></td>
+                    <td className="p-3 border"><Skeleton /></td>
+                    <td className="p-3 border"><Skeleton /></td>
+                    <td className="p-3 border"><Skeleton width={80} /></td>
+                  </tr>
+                ))
               ) : paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">

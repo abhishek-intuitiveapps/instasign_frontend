@@ -3,7 +3,9 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import PaginationComponent from "./PaginationComponent"; // Adjust the import path as necessary
 import AddCreditsModal from "./AddCreditsModal";
-import Loader from "../primitives/Loader";
+// import Loader from "../primitives/Loader";
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 import Title from "../components/Title";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -439,13 +441,15 @@ const MonthlyBills = () => {
             <tbody>
               {
               isLoading ? ( // Show loader while loading
-                <tr>
-                  <td colSpan="6" className="p-3 text-center" style={{ height: '400px' }}>
-                    <div className="flex justify-center items-center" style={{ height: '100%' }}>
-                      <Loader />
-                    </div>
-                  </td>
-                </tr>
+                Array(rowsPerPage).fill(0).map((_, index) => (
+                  <tr key={index} className="text-center border border-gray-300">
+                    <td className="p-3 border"><Skeleton /></td>
+                    <td className="p-3 border"><Skeleton /></td>
+                    <td className="p-3 border"><Skeleton /></td>
+                    <td className="p-3 border"><Skeleton /></td>
+                    <td className="p-3 border"><Skeleton width={80} /></td>
+                  </tr>
+                ))
               ) : paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">

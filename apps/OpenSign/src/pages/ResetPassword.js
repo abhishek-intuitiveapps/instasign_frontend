@@ -29,6 +29,7 @@ function ResetPassword() {
   const [image, setImage] = useState();
   const [linkExpired, setLinkExpired] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userEmail, setUserEmail] = useState("");
   const djangoURL = process.env.REACT_APP_DJANGO_URL;
 //   const apiURL = "https://api.dev.instasign.ai";
 
@@ -57,6 +58,8 @@ function ResetPassword() {
       if (!result.data.status) {
         setLinkExpired(true);
         toast.error(result.data.message || "This reset link has expired. Please request a new one.");
+      } else {
+        setUserEmail(result.data.data.email);
       }
     } catch (err) {
       console.error("Error checking link expiry:", err);
@@ -81,25 +84,32 @@ function ResetPassword() {
     }
     
     try {
-      const result = await axios.post(`${djangoURL}/base/api/v1/reset/password/`, {
+      // Try Parse Server API
+      const parseResult = await Parse.Cloud.run('updatepassword', {
+        email: userEmail,
+        new_password: state.password
+      });
+      
+      // Try Django API
+      const djangoResult = await axios.post(`${djangoURL}/base/api/v1/reset/password/`, {
         auth: auth,
         id: id,
         new_password: state.password
       });
       
-      if (result.data.success) {
+      if (parseResult.success || djangoResult.data.success) {
         setResetStatus("success");
         toast.success("Password reset successfully!");
         setTimeout(() => {
           navigate("/login");
         }, 2000);
       } else {
-        toast.error(result.data.message || "Failed to reset password.");
+        toast.error("Failed to reset password.");
         setResetStatus("failed");
       }
     } catch (err) {
       console.log("err ", err);
-      toast.error("Failed to reset password. Token may be invalid or expired.");
+      toast.error("Failed to reset password. Please try again.");
       setResetStatus("failed");
     } finally {
       setTimeout(() => setResetStatus(""), 1000);

@@ -22,6 +22,7 @@ const SignPdfUpload = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const maxFileSize = 20;
+  const djangoToken = localStorage.getItem("django");
   
   useEffect(() => {
     const setupAnonymousUser = async () => {
@@ -32,9 +33,9 @@ const SignPdfUpload = () => {
 
         // Generate random email and name for admin user
         const randomId = Math.random().toString(36).substring(2, 8);
-        const adminEmail = `admin_${randomId}@instasign.com`;
-        const adminName = `Admin User ${randomId}`;
-        const adminPassword = "Admin@123"; // Default password for demo admin
+        const adminEmail = `Guest_${randomId}@instasign.com`;
+        const adminName = `Guest User ${randomId}`;
+        const adminPassword = "Guest@123"; // Default password for demo admin
 
         let user = null;
         let isNewUser = false;
@@ -376,7 +377,12 @@ const SignPdfUpload = () => {
       
       // Navigate to the SignYourSelf component with the document ID
       setIsSubmitting(false);
-      navigate(`/public-sign/${res.id}`);
+      
+      if (djangoToken) {
+        navigate(`/signaturePdf/${res.id}`);
+      } else {
+        navigate(`/public-sign/${res.id}`);
+      }
       
     } catch (error) {
       console.error("Error saving document:", error);

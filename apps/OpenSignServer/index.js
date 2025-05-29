@@ -112,9 +112,6 @@ export const config = {
   appName: appName,
   allowClientClassCreation: false,
   allowExpiredAuthDataToken: false,
-  fileUpload: {
-    enableForAnonymousUsers: true, // <--- Enable anonymous file uploads
-  },
   encodeParseObjectInCloudFunction: true,
   ...(isMailAdapter === true
     ? {

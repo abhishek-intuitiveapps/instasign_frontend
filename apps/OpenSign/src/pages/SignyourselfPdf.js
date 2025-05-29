@@ -1005,7 +1005,7 @@ function SignYourSelf() {
       selector: '[data-tut="addWidgets"]',
       content: () => (
         <TourContentWithBtn
-          message={t("tour-mssg.signyour-self-2")}
+          message={t("tour-mssg.signyour-self-1")}
           isChecked={handleDontShow}
         />
       ),
@@ -1269,7 +1269,7 @@ function SignYourSelf() {
               />
             )}
             {/* this component used for UI interaction and show their functionality */}
-            {pdfLoad && !checkTourStatus && (
+            {pdfLoad && checkTourStatus && (
               <Tour
                 onRequestClose={closeTour}
                 steps={tourConfig}
@@ -1489,7 +1489,7 @@ function SignYourSelf() {
                 </div>
               </div>
             </div>
-            <div className="w-full md:w-[23%] bg-base-100 overflow-y-auto hide-scrollbar">
+            <div className="bg-base-100 overflow-y-auto hide-scrollbar">
               <div className={`max-h-screen`}>
                 {!isCompleted ? (
                   <div>
@@ -1501,6 +1501,7 @@ function SignYourSelf() {
                       isSignYourself={true}
                       addPositionOfSignature={addPositionOfSignature}
                       isMailSend={false}
+                      isPlaceHolderSign={false}
                       // setSelectWidgetId={setSelectWidgetId}
                     />
                   </div>
