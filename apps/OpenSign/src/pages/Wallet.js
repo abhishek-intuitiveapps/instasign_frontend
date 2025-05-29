@@ -7,7 +7,8 @@ import { WalletCard } from "./WalletCard";
 import Loader from "../primitives/Loader";
 import { ToastContainer, toast } from 'react-toastify'; // Import ToastContainer and toast
 import 'react-toastify/dist/ReactToastify.css'; // Import CSS for toasts
-
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 // Import necessary components and hooks
 const Wallet = () => {
@@ -230,14 +231,20 @@ const Wallet = () => {
               </tr>
             </thead>
             <tbody>
-              {isLoading ? ( // Show loader while loading
-                <tr>
-                  <td colSpan="8" className="p-3 text-center" style={{ height: '400px' }}>
-                    <div className="flex justify-center items-center" style={{ height: '100%' }}>
-                      <Loader />
-                    </div>
-                  </td>
-                </tr>
+              {isLoading ? (
+                Array(rowsPerPage).fill(0).map((_, index) => (
+                  <tr key={index} className="text-center border border-gray-300">
+                    <td className="p-3 border"><Skeleton height={20} /></td>
+                    <td className="p-3 border"><Skeleton height={20} width={40} /></td>
+                    <td className="p-3 border"><Skeleton height={20} width={100} /></td>
+                    <td className="p-3 border"><Skeleton height={20} width={80} /></td>
+                    <td className="p-3 border"><Skeleton height={20} width={120} /></td>
+                    <td className="p-3 border"><Skeleton height={20} width={80} /></td>
+                    <td className="p-3 border"><Skeleton height={20} width={100} /></td>
+                    <td className="p-3 border"><Skeleton height={20} width={100} /></td>
+                    <td className="p-3 border"><Skeleton height={20} width={80} /></td>
+                  </tr>
+                ))
               ) : paginatedData.length > 0 ? (
                 paginatedData.map((item, index) => (
                   <tr key={item.id} className="text-center border border-gray-300">
@@ -276,7 +283,7 @@ const Wallet = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center p-3 border text-gray-500">No data available</td>
+                  <td colSpan="9" className="text-center p-3 border text-gray-500">No data available</td>
                 </tr>
               )}
             </tbody>

@@ -38,6 +38,7 @@
     "react-helmet": "^6.1.0",
     "react-i18next": "^15.4.1",
     "react-konva": "^18.2.10",
+    "react-loading-skeleton": "^3.5.0",
     "react-pdf": "^9.2.1",
     "react-quill-new": "^3.4.6",
     "react-redux": "^9.2.0",

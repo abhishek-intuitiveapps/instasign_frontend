@@ -1489,7 +1489,7 @@ function SignYourSelf() {
                 </div>
               </div>
             </div>
-            <div className="w-full md:w-[23%] bg-base-100 overflow-y-auto hide-scrollbar">
+            <div className="bg-base-100 overflow-y-auto hide-scrollbar">
               <div className={`max-h-screen`}>
                 {!isCompleted ? (
                   <div>
@@ -1501,6 +1501,7 @@ function SignYourSelf() {
                       isSignYourself={true}
                       addPositionOfSignature={addPositionOfSignature}
                       isMailSend={false}
+                      isPlaceHolderSign={false}
                       // setSelectWidgetId={setSelectWidgetId}
                     />
                   </div>
