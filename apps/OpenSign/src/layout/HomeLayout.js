@@ -15,7 +15,7 @@ import { showHeader } from "../redux/reducers/showHeader";
 import { useTranslation } from "react-i18next";
 import { setPaymentMode } from "../redux/reducers/PaymentReducer";
 import AccountActivationModal from "../primitives/AccountActivationModal";
-
+import { saveLanguageInLocal } from "../constant/Utils";
 const HomeLayout = () => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -303,7 +303,22 @@ const HomeLayout = () => {
     } catch (err) {
       console.log("err ", err);
     } finally {
-      localStorage.removeItem("accesstoken");
+      let appdata = localStorage.getItem("userSettings");
+      let applogo = localStorage.getItem("appLogo");
+      let defaultmenuid = localStorage.getItem("defaultmenuid");
+      let PageLanding = localStorage.getItem("PageLanding");
+      let baseUrl = localStorage.getItem("baseUrl");
+      let appid = localStorage.getItem("parseAppId");
+
+      localStorage.clear();
+      saveLanguageInLocal(i18n);
+      localStorage.setItem("appLogo", applogo);
+      localStorage.setItem("defaultmenuid", defaultmenuid);
+      localStorage.setItem("PageLanding", PageLanding);
+      localStorage.setItem("userSettings", appdata);
+      localStorage.setItem("baseUrl", baseUrl);
+      localStorage.setItem("parseAppId", appid);
+
       navigate("/login", { replace: true, state: { from: location } });
     }
   };

@@ -2680,6 +2680,10 @@ function PdfRequestFiles(
                   showFirstWidget={showFirstWidget}
                   setIsKycModalOpen={setIsKycModalOpen}
                   kycRequired={pdfDetails?.[0]?.KycRequired}
+                  sender={pdfDetails?.[0]?.ExtUserPtr}
+                  signer={unsignedSigners.find(
+                    signer => signer.objectId === signerObjectId || signer.Id === uniqueId
+                  )}
                 />
               )}
 

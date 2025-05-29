@@ -7,7 +7,15 @@ function WidgetList(props) {
   const isMobile = window.innerWidth < 767;
 
   return (
-    <div className={`flex flex-row items-center gap-2 ${!isMobile ? "flex-wrap" : ""}`}>
+    <div
+      className={`${
+        isMobile
+          ? "flex flex-row items-center gap-2"
+          : `grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 ${
+              props.isPlaceHolderSign ? "lg:grid-cols-4" : "lg:grid-cols-1"
+            } gap-3`
+      } w-full`}
+    >
       {props.updateWidgets.map((item, ind) => {
         return (
           <div key={ind} className="p-0 mx-1">

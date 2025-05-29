@@ -33,9 +33,9 @@ const SignPdfUpload = () => {
 
         // Generate random email and name for admin user
         const randomId = Math.random().toString(36).substring(2, 8);
-        const adminEmail = `admin_${randomId}@instasign.com`;
-        const adminName = `Admin User ${randomId}`;
-        const adminPassword = "Admin@123"; // Default password for demo admin
+        const adminEmail = `Guest_${randomId}@instasign.com`;
+        const adminName = `Guest User ${randomId}`;
+        const adminPassword = "Guest@123"; // Default password for demo admin
 
         let user = null;
         let isNewUser = false;

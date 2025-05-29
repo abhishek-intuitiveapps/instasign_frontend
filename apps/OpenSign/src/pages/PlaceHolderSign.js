@@ -3225,6 +3225,7 @@ function PlaceHolderSign() {
                         uniqueId={uniqueId}
                         setSignerPos={setSignerPos}
                         setSelectWidgetId={setSelectWidgetId}
+                        isPlaceHolderSign={true}
                       />
                     </div>
                   ) : (
@@ -3260,6 +3261,7 @@ function PlaceHolderSign() {
                             isSignYourself={false}
                             addPositionOfSignature={addPositionOfSignature}
                             initial={true}
+                            isPlaceHolderSign={true}
                           />
                         </div>
                       </div>
