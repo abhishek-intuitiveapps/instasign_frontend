@@ -5,13 +5,13 @@ services:
     volumes:
       - opensign-files:/usr/src/app/files
     ports:
-      - "8080:8080"
+      - "8005:8005"
     depends_on:
       - mongo
     env_file: .env.prod
     environment:
       - NODE_ENV=production
-      - PORT=8080
+      - PORT=8005
     networks:
       - app-network
   mongo:
@@ -30,9 +30,9 @@ services:
       - server
     env_file: .env.prod
     ports:
-      - "3090:3090"
+      - "3005:3005"
     environment:
-      - PORT=3090
+      - PORT=3005
     networks:
       - app-network
   nginx:
