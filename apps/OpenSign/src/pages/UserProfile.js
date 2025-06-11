@@ -552,7 +552,7 @@ function UserProfile() {
                 <li className="flex justify-between items-center border-b-[1px] border-gray-300 py-2 break-all">
                   <span className="font-semibold">{t("Email Verified")}:</span>{" "}
                   <span className="flex items-center justify-center">
-                    {isEmailVerified ? (
+                    {(djangoUser?.status === "pending_cin" || djangoUser?.status === "active") ? (
                       <span className="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded text-center">
                         Verified
                       </span>

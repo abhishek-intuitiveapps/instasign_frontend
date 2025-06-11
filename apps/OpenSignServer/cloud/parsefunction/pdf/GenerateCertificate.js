@@ -225,40 +225,10 @@ export default async function GenerateCertificate(docDetails) {
     color: textValueColor,
   });
 
-  page.drawText('Document Name :', {
-    x: 30,
-    y: 657,
-    size: text,
-    font: timesRomanFont,
-    color: textKeyColor,
-  });
-
-  page.drawText(docDetails?.Name, {
-    x: 140,
-    y: 657,
-    size: docDetails?.Name?.length >= 78 ? 12 : text,
-    font: timesRomanFont,
-    color: textValueColor,
-  });
-
-  page.drawText('Organization :', {
-    x: 30,
-    y: 627,
-    size: text,
-    font: timesRomanFont,
-    color: textKeyColor,
-  });
-
-  page.drawText(company, {
-    x: 140,
-    y: 627,
-    size: text,
-    font: timesRomanFont,
-    color: textValueColor,
-  });
   page.drawText('Created On :', {
     x: 30,
-    y: 597,
+    // y: 597,
+    y: 657,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
@@ -266,14 +236,17 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText(`${typeof createdAt === 'string' && createdAt ? formatDateTime(new Date(createdAt), "MMM dd, yyyy | hh:mm a", timezone, true) : generatedUTCTime}`, {
     x: 140,
-    y: 597,
+    // y: 597,
+    y: 657,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
+
   page.drawText('Completed On :', {
     x: 30,
-    y: 567,
+    // y: 567,
+    y: 627,
     size: text,
     font: timesRomanFont,
     color: textKeyColor,
@@ -281,11 +254,50 @@ export default async function GenerateCertificate(docDetails) {
 
   page.drawText(`${typeof completedAt === 'object' ? completedUTCtime : typeof docDetails?.completedAt === 'string' ? formatDateTime(new Date(docDetails.completedAt), "MMM dd, yyyy | hh:mm a", timezone, true) : generatedUTCTime}`, {
     x: 140,
+    // y: 567,
+    y: 627,
+    size: text,
+    font: timesRomanFont,
+    color: textValueColor,
+  });
+
+  page.drawText('Document Name :', {
+    x: 30,
+    // y: 657,
+    y: 597,
+    size: text,
+    font: timesRomanFont,
+    color: textKeyColor,
+  });
+
+  page.drawText(docDetails?.Name, {
+    x: 140,
+    // y: 657,
+    y: 597,
+    size: docDetails?.Name?.length >= 78 ? 12 : text,
+    font: timesRomanFont,
+    color: textValueColor,
+  });
+
+  page.drawText('Organization :', {
+    x: 30,
+    // y: 627,
+    y: 567,
+    size: text,
+    font: timesRomanFont,
+    color: textKeyColor,
+  });
+
+  page.drawText(company, {
+    x: 140,
+    // y: 627,
     y: 567,
     size: text,
     font: timesRomanFont,
     color: textValueColor,
   });
+  
+  
   page.drawText('Signers :', {
     x: 30,
     y: 537,
