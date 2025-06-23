@@ -977,7 +977,7 @@ function PdfRequestFiles(
                           recipient: user.Email,
                           subject: replaceVar?.subject
                             ? replaceVar?.subject
-                            : `${pdfDetails?.[0].ExtUserPtr.Name} has requested you to sign "${pdfDetails?.[0].Name}"`,
+                            : `Your Appraisal Letter Is Ready – Please Review & Sign`,
                           from:
                             senderEmail,
                             html: replaceVar?.body
