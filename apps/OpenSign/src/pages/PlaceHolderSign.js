@@ -1995,6 +1995,7 @@ function PlaceHolderSign() {
 //             `
             `
                           
+                          
                            <!DOCTYPE html>
 
 <html lang="en" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml">
@@ -2303,9 +2304,11 @@ function PlaceHolderSign() {
 																			 </p>
 																			 
 																			 
+																		
+																			 
 																			 <p
 																			style="margin: 0; mso-line-height-alt: 21px;">
-                                                                            Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization.  
+                                                                            Your signature is crucial to proceed with the next steps as it signifies your agreement and authorization. Please ensure the document is signed within 3 days of receiving this request.
 																			 </p>
 																			 
                                                                             <p
@@ -2623,7 +2626,9 @@ function PlaceHolderSign() {
 </html>
                           
                           
+                          
                           `
+
         };
 
         sendMail = await axios.post(url, params, { headers: headers });
