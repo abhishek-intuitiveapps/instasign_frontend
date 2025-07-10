@@ -3217,7 +3217,7 @@ function PdfRequestFiles(
         type: "prod"
       };
 
-      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v1/external/gateway/create/verification`, payload);
+      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v2/external/gateway/create/verification`, payload);
       
       if (response.data && response.data.data && response.data.data.token) {
         window.open(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/?token=${response.data.data.token}&first_name=${firstName}&last_name=${lastName}&email=${currentSignerDetails.Email}&phone_number=${currentSignerDetails.Phone || ''}&kyc_required=true&kyc_done=true`, '_blank');

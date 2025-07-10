@@ -100,7 +100,7 @@ function UserProfile() {
         type: "prod"
       };
 
-      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v1/external/gateway/create/verification`, payload);
+      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v2/external/gateway/create/verification`, payload);
       
       if (response.data && response.data.data && response.data.data.token) {
         window.open(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/?token=${response.data.data.token}`, '_blank');
