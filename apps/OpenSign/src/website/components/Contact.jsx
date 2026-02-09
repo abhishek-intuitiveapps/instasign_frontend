@@ -340,7 +340,7 @@ const Contact = () => {
                   </InfoItem>
                   <InfoItem>
                     <Icon><PhoneIcon /></Icon>
-                    <p>+91 9311648357</p>
+                    <p>+91 8130696679</p>
                   </InfoItem>
                   <InfoItem>
                     <Icon><MailIcon /></Icon>

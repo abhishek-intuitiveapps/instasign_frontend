@@ -130,7 +130,7 @@ const Footer = () => {
         
         <div className="border-t border-white/20 mt-12 pt-6 text-center">
           <p className="text-white/80">
-            © 2025 Instasign. All Rights Reserved.
+            © {new Date().getFullYear()} Instasign. All Rights Reserved.
           </p>
         </div>
       </div>

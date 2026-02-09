@@ -1920,10 +1920,10 @@ function PlaceHolderSign() {
 // 																				</a><!--[if mso]></td><td><![endif]--><span
 // 																					class="sep"
 // 																					style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span><!--[if mso]></td><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
-// 																					href="tel:+919311648357"
+// 																					href="tel:+918130696679"
 // 																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
 // 																					target="_self">+91
-// 																					9311648357</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
+// 																					8130696679</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
 // 																			</div>
 // 																		</td>
 // 																	</tr>
@@ -2554,10 +2554,10 @@ function PlaceHolderSign() {
 																				</a><!--[if mso]></td><td><![endif]--><span
 																					class="sep"
 																					style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span><!--[if mso]></td><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
-																					href="tel:+919311648357"
+																					href="tel:+918130696679"
 																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
 																					target="_self">+91
-																					9311648357</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
+																					8130696679</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
 																			</div>
 																		</td>
 																	</tr>

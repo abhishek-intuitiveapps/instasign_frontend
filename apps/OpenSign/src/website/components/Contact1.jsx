@@ -154,7 +154,7 @@ const Contact = () => {
                   <span className="bg-[#002864]/10 p-2 rounded-full mr-3">
                     <PhoneIcon className="text-[#002864]" />
                   </span>
-                  <p className="text-[#29354a]">+91 9311648357</p>
+                  <p className="text-[#29354a]">+91 8130696679</p>
                 </div>
                 <div className="flex items-center mt-3">
                   <span className="bg-[#002864]/10 p-2 rounded-full mr-3">
