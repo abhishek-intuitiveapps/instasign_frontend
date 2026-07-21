@@ -1,3 +1,12 @@
+export const apiTokenMenu = {
+  icon: "fa-light fa-key",
+  title: "API Token",
+  target: "_self",
+  pageType: "",
+  description: "",
+  objectId: "generatetoken"
+};
+
 export const subSetting = [
   {
     icon: "fa-light fa-sliders",
@@ -208,14 +217,7 @@ const sidebarList = [
         description: "",
         objectId: "managesign"
       },
-      {
-        icon: "fa-light fa-key",
-        title: "API Token",
-        target: "_self",
-        pageType: "",
-        description: "",
-        objectId: "generatetoken"
-      },
+      apiTokenMenu,
       {
         icon: "fa-light fa-globe",
         title: "Webhook",

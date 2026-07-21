@@ -51,6 +51,8 @@ import getUserListByOrg from './parsefunction/getUserListByOrg.js';
 import editContact from './parsefunction/editContact.js';
 import forwardDoc from './parsefunction/ForwardDoc.js';
 import updatePassword from './parsefunction/updatePassword.js';
+import generateapitoken from './parsefunction/generateapitoken.js';
+import getapitoken from './parsefunction/getapitoken.js';
 
 // This afterSave function triggers after an object is added or updated in the specified class, allowing for post-processing logic.
 Parse.Cloud.afterSave('contracts_Document', DocumentAftersave);
@@ -112,3 +114,5 @@ Parse.Cloud.define('getuserlistbyorg', getUserListByOrg);
 Parse.Cloud.define('editcontact', editContact);
 Parse.Cloud.define('forwarddoc', forwardDoc);
 Parse.Cloud.define('updatepassword', updatePassword);
+Parse.Cloud.define('generateapitoken', generateapitoken);
+Parse.Cloud.define('getapitoken', getapitoken);
