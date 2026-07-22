@@ -146,7 +146,7 @@ const Policy = () => {
         <ul className="list-inside">
           <li>For privacy-related questions or concerns, we are committed to addressing your inquiries and maintaining a secure and transparent privacy experience at Instasign. You can contact us in the following modes:</li>
           <li><strong>Through Email:</strong> <a href="mailto:support@Instasign.in">support@Instasign.in</a></li>
-          <li><strong>Through Phone:</strong> +91.9311648358</li>
+          <li><strong>Through Phone:</strong> +91.8130696679</li>
         </ul>
       ),
     },

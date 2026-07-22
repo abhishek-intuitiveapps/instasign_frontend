@@ -8,8 +8,8 @@ import dotenv from 'dotenv';
 import GenerateCertificate from './pdf/GenerateCertificate.js';
 import { getSecureUrl } from '../../Utils.js';
 dotenv.config();
-const eSignName = 'OpenSign';
-const eSigncontact = 'hello@opensignlabs.com';
+const eSignName = 'InstaSign';
+const eSigncontact = 'support@instasign.ai';
 
 // `uploadFile` is used to create url in from pdfFile
 async function uploadFile(pdfName, filepath) {

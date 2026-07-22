@@ -36,7 +36,7 @@ export default async function forwardDoc(request) {
         let mailRes;
         for (let i = 0; i < recipients.length; i++) {
           const logo = `<img src='https://qikinnovation.ams3.digitaloceanspaces.com/logo.png' height='50' style='padding:20px'/>`;
-          const opurl = ` <a href='www.opensignlabs.com' target=_blank>here</a>`;
+          const opurl = ` <a href='https://instasign.ai' target=_blank>here</a>`;
           const themeColor = '#47a3ad';
 
           let params = {

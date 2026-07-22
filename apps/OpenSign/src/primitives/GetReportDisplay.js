@@ -1322,7 +1322,7 @@ const ReportTable = (props) => {
                                                                                 <!--[if mso]></td><![endif]-->
                                                                                 <!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]-->
                                                                                 <a href="tel:+917011313488" style="padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;" target="_self">
-                                                                                    +91 9311648357
+                                                                                    +91 8130696679
                                                                                 </a>
                                                                                 <!--[if mso]></td><![endif]-->
                                                                                 <!--[if mso]></tr></table><![endif]-->

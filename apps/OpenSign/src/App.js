@@ -45,6 +45,7 @@ const ManageSign = lazy(() => import("./pages/Managesign"));
 const AddAdmin = lazy(() => import("./pages/AddAdmin"));
 const UpdateExistUserAdmin = lazy(() => import("./pages/UpdateExistUserAdmin"));
 const Preferences = lazy(() => import("./pages/Preferences"));
+const GenerateToken = lazy(() => import("./pages/GenerateToken"));
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
 const AppLoader = () => {
   return (
@@ -183,6 +184,10 @@ function App() {
               <Route
                 path="/managesign"
                 element={<LazyPage Page={ManageSign} />}
+              />
+              <Route
+                path="/generatetoken"
+                element={<LazyPage Page={GenerateToken} />}
               />
               <Route
                 path="/template/:templateId"

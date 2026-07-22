@@ -1542,10 +1542,10 @@ function PdfRequestFiles(
 																				</a><!--[if mso]></td><td><![endif]--><span
 																					class="sep"
 																					style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span><!--[if mso]></td><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
-																					href="tel:+919311648357"
+																					href="tel:+918130696679"
 																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
 																					target="_self">+91
-																					9311648357</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
+																					8130696679</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
 																			</div>
 																		</td>
 																	</tr>
@@ -2192,10 +2192,10 @@ function PdfRequestFiles(
 // 																				</a><!--[if mso]></td><td><![endif]--><span
 // 																					class="sep"
 // 																					style="font-size:12px;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;color:#cccccc;">|</span><!--[if mso]></td><![endif]--><!--[if mso]><td style="padding-top:5px;padding-right:5px;padding-bottom:5px;padding-left:5px"><![endif]--><a
-// 																					href="tel:+919311648357"
+// 																					href="tel:+918130696679"
 // 																					style="mso-hide:false;padding-top:5px;padding-bottom:5px;padding-left:5px;padding-right:5px;display:inline-block;color:#a6dc9e;font-family:Arial, Helvetica Neue, Helvetica, sans-serif;font-size:12px;text-decoration:none;letter-spacing:normal;"
 // 																					target="_self">+91
-// 																					9311648357</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
+// 																					8130696679</a><!--[if mso]></td><![endif]--><!--[if mso]></tr></table><![endif]-->
 // 																			</div>
 // 																		</td>
 // 																	</tr>
@@ -3217,7 +3217,7 @@ function PdfRequestFiles(
         type: "prod"
       };
 
-      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v1/external/gateway/create/verification`, payload);
+      const response = await axios.post(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/api/v2/external/gateway/create/verification`, payload);
       
       if (response.data && response.data.data && response.data.data.token) {
         window.open(`${process.env.REACT_APP_KYCEE_SANDBOX_URL}/?token=${response.data.data.token}&first_name=${firstName}&last_name=${lastName}&email=${currentSignerDetails.Email}&phone_number=${currentSignerDetails.Phone || ''}&kyc_required=true&kyc_done=true`, '_blank');

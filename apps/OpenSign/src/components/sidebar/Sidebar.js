@@ -3,7 +3,7 @@ import Menu from "./Menu";
 import Submenu from "./SubMenu";
 import SocialMedia from "./SocialMedia";
 import dp from "../../assets/images/dp.png";
-import sidebarList, { subSetting } from "../../json/menuJson";
+import sidebarList, { subSetting, apiTokenMenu } from "../../json/menuJson";
 import { useNavigate } from "react-router";
 
 const Sidebar = ({ isOpen, closeSidebar }) => {
@@ -38,10 +38,9 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
         ) {
           const newSidebarList = sidebarList.map((item) => {
             if (item.title === "Settings") {
-              // Make a shallow copy of the item
               const newItem = { ...item };
-                const arr = newItem.children.slice(0, 1);
-                newItem.children = [...arr, ...subSetting];
+              const mySignature = newItem.children.slice(0, 1);
+              newItem.children = [...mySignature, apiTokenMenu, ...subSetting];
               return newItem;
             }
             return item;
@@ -50,10 +49,9 @@ const Sidebar = ({ isOpen, closeSidebar }) => {
         } else {
             const newSidebarList = sidebarList.map((item) => {
               if (item.title === "Settings") {
-                // Make a shallow copy of the item
                 const newItem = { ...item };
-                const arr = newItem.children.slice(0, 1);
-                newItem.children = arr;
+                const mySignature = newItem.children.slice(0, 1);
+                newItem.children = [...mySignature, apiTokenMenu];
                 return newItem;
               }
               return item;
