@@ -1,7 +1,26 @@
 {$HOST_URL} {
-    reverse_proxy client:3000
-    handle_path /api/* {
-        reverse_proxy server:8080
-            rewrite * {uri}
-    }
+	# Custom integration API (keep /api/v1 path as-is on OpenSignServer)
+	handle /api/v1* {
+		reverse_proxy server:8080
+	}
+
+	# Parse Server: public /api/app/... → container /app/...
+	handle_path /api/* {
+		reverse_proxy server:8080
+	}
+
+	# Direct Parse mount (if frontend uses /app without /api prefix)
+	handle /app* {
+		reverse_proxy server:8080
+	}
+
+	# File uploads custom route
+	handle /file_upload {
+		reverse_proxy server:8080
+	}
+
+	# Frontend (React)
+	handle {
+		reverse_proxy client:3000
+	}
 }
