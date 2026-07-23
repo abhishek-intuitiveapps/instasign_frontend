@@ -15,9 +15,9 @@ const GenerateToken = () => {
 
   const apiBase = (() => {
     try {
-      const serverUrl = localStorage.getItem("baseUrl") || "";
-      // baseUrl is typically .../app/ — API v1 is mounted on server root
-      return serverUrl.replace(/\/app\/?$/, "");
+      const serverUrl = (localStorage.getItem("baseUrl") || "").replace(/\/$/, "");
+      // baseUrl is typically .../app — integration API lives at .../app/v1
+      return serverUrl.endsWith("/app") ? `${serverUrl}/v1` : `${serverUrl}/app/v1`;
     } catch {
       return "";
     }
@@ -151,7 +151,7 @@ const GenerateToken = () => {
                 signature fields, then send from InstaSign.
               </p>
               <pre className="bg-base-200 rounded-box p-3 text-xs overflow-x-auto whitespace-pre-wrap">
-{`POST ${apiBase || "{SERVER}"}/api/v1/request-signature
+{`POST ${apiBase || "https://dev.instasign.ai/app/v1"}/request-signature
 Header: x-api-token: <your-token>
 
 Single receiver (form-data):
@@ -161,7 +161,10 @@ Multiple receivers (form-data):
 file, receivers (JSON array), document_name, kyc_required, send_in_order
 
 receivers example:
-[{"email":"a@example.com","name":"Alice"},{"email":"b@example.com","name":"Bob"}]`}
+[{"email":"a@example.com","name":"Alice"},{"email":"b@example.com","name":"Bob"}]
+
+Health check:
+GET ${apiBase || "https://dev.instasign.ai/app/v1"}/health`}
               </pre>
             </div>
           </div>
