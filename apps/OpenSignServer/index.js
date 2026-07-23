@@ -12,7 +12,7 @@ import { ApiPayloadConverter } from 'parse-server-api-mail-adapter';
 import S3Adapter from '@parse/s3-files-adapter';
 import FSFilesAdapter from '@parse/fs-files-adapter';
 import AWS from 'aws-sdk';
-import { app as customRoute } from './cloud/customRoute/customApp.js';
+import { app as customRoute, apiV1 } from './cloud/customRoute/customApp.js';
 import { exec } from 'child_process';
 import { createTransport } from 'nodemailer';
 import { appName, cloudServerUrl, smtpenable, smtpsecure, useLocal } from './Utils.js';
@@ -201,6 +201,10 @@ app.use(async function (req, res, next) {
 // Serve static assets from the /public folder
 app.use('/public', express.static(path.join(__dirname, '/public')));
 
+// Integration API under /app/v1 — must be mounted BEFORE Parse so /app/*
+// requests are not swallowed by Parse Server.
+app.use('/app/v1', apiV1);
+
 // Serve the Parse API on the /parse URL prefix
 if (!process.env.TESTING) {
   const mountPath = process.env.PARSE_MOUNT || '/app';
@@ -214,7 +218,7 @@ if (!process.env.TESTING) {
     process.exit();
   }
 }
-// Mount your custom express app
+// Mount your custom express app (file_upload + legacy /api/v1)
 app.use('/', customRoute);
 
 // Parse Server plays nicely with the rest of your web routes
