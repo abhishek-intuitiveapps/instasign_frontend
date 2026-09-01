@@ -213,6 +213,25 @@ function SignYourSelf() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [divRef.current, isHeader]);
 
+  const hasUnsavedWorkRef = useRef(false);
+
+  useEffect(() => {
+    hasUnsavedWorkRef.current =
+      !isCompleted && !!pdfArrayBuffer && !handleError;
+  }, [isCompleted, pdfArrayBuffer, handleError]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (!hasUnsavedWorkRef.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+      return "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
   //function for get document details for perticular signer with signer'object id
   const getDocumentDetails = async (showComplete) => {
     try {

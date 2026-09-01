@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import uploadFile from './uploadFile.js';
 import { validateApiToken } from './apiAuth.js';
 import requestSignature from './requestSignature.js';
+import resendSignature from './resendSignature.js';
 
 dotenv.config();
 
@@ -29,9 +30,11 @@ apiV1.get('/health', (req, res) => {
 });
 
 apiV1.post('/request-signature', validateApiToken, requestSignature);
+apiV1.post('/resend-signature', validateApiToken, resendSignature);
 
 // Keep legacy /api/v1 paths for local direct server access (port 8080)
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', service: 'instasign-api-v1' });
 });
 app.post('/api/v1/request-signature', validateApiToken, requestSignature);
+app.post('/api/v1/resend-signature', validateApiToken, resendSignature);

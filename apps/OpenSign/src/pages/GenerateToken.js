@@ -163,6 +163,12 @@ file, receivers (JSON array), document_name, kyc_required, send_in_order
 receivers example:
 [{"email":"a@example.com","name":"Alice"},{"email":"b@example.com","name":"Bob"}]
 
+Resend signing email (JSON):
+POST ${apiBase || "https://dev.instasign.ai/app/v1"}/resend-signature
+Header: x-api-token: <your-token>
+Body: { "document_id": "<id>", "email": "signer@example.com" }
+(email is optional — omit to resend to all pending signers)
+
 Health check:
 GET ${apiBase || "https://dev.instasign.ai/app/v1"}/health`}
               </pre>
