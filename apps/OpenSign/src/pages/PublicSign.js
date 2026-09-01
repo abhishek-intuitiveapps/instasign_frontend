@@ -129,6 +129,29 @@ function PublicSign() {
     }
   }, [uploadedFile]);
 
+  const hasUnsavedWorkRef = useRef(false);
+
+  useEffect(() => {
+    hasUnsavedWorkRef.current =
+      !isCompleted &&
+      (isFileUploaded ||
+        !!uploadedFile ||
+        !!pdfArrayBuffer ||
+        xyPosition.length > 0);
+  }, [isCompleted, isFileUploaded, uploadedFile, pdfArrayBuffer, xyPosition]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event) => {
+      if (!hasUnsavedWorkRef.current) return;
+      event.preventDefault();
+      event.returnValue = "";
+      return "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
   // Handle file upload
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
