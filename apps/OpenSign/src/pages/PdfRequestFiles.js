@@ -436,11 +436,9 @@ function PdfRequestFiles(
               data?.UserPtr?.objectId === currUserId &&
               data.Activity === "Signed"
           ) || false;
+        setSendInOrder(documentData?.[0]?.SendinOrder || false);
         if (checkAlreadySign) {
           setAlreadySign(true);
-        } else {
-          const obj = documentData?.[0];
-          setSendInOrder(obj?.SendinOrder || false);
         }
 
         let signers = [];
@@ -879,29 +877,73 @@ function PdfRequestFiles(
                     true,
                     isSuccessRoute
                   );
-                  const index = pdfDetails?.[0]?.Signers.findIndex(
-                    (x) => x.objectId === signerObjectId
+                  // Prefer refreshed doc after sign; fall back to in-memory details
+                  const doc = updateDoc?.[0] || pdfDetails?.[0];
+                  const isSendInOrder = doc?.SendinOrder === true;
+                  // Signing order follows Placeholders (exclude prefill), not Signers array index
+                  const orderedPlaceholders = (doc?.Placeholders || []).filter(
+                    (x) => x.Role !== "prefill"
                   );
-                  const newIndex = index + 1;
-                  const usermail = {
-                    Email: pdfDetails?.[0]?.Placeholders[newIndex]?.email || ""
-                  };
-                  const user = usermail?.Email
-                    ? usermail
-                    : pdfDetails?.[0]?.Signers[newIndex];
-                  if (sendmail !== "false" && sendInOrder) {
-                    const requestBody = pdfDetails?.[0]?.RequestBody;
-                    const requestSubject = pdfDetails?.[0]?.RequestSubject;
+                  const auditTrail = doc?.AuditTrail || [];
+                  const isSignerSigned = (email, objectId) =>
+                    auditTrail.some(
+                      (entry) =>
+                        entry?.Activity === "Signed" &&
+                        ((email &&
+                          (entry?.UserPtr?.Email || "").toLowerCase() ===
+                            email.toLowerCase()) ||
+                          (objectId &&
+                            entry?.UserPtr?.objectId === objectId))
+                    );
+                  const currentPlaceholderIndex = orderedPlaceholders.findIndex(
+                    (p) => p.signerObjId === signerObjectId
+                  );
+                  // Next recipients after the signer who just finished
+                  const nextPlaceholders =
+                    currentPlaceholderIndex >= 0
+                      ? orderedPlaceholders.slice(currentPlaceholderIndex + 1)
+                      : orderedPlaceholders;
+                  const pendingSigners = nextPlaceholders
+                    .map((placeholder) => {
+                      const signer = placeholder?.signerObjId
+                        ? (doc?.Signers || []).find(
+                            (s) => s.objectId === placeholder.signerObjId
+                          )
+                        : null;
+                      const email = signer?.Email || placeholder?.email;
+                      const objectId =
+                        signer?.objectId || placeholder?.signerObjId;
+                      if (
+                        !email ||
+                        objectId === signerObjectId ||
+                        isSignerSigned(email, objectId)
+                      ) {
+                        return null;
+                      }
+                      return (
+                        signer || {
+                          Email: email,
+                          Name: placeholder?.Name || "",
+                          objectId
+                        }
+                      );
+                    })
+                    .filter(Boolean);
+                  // With send-in-order, notify only the next pending signer
+                  const user = isSendInOrder ? pendingSigners[0] : null;
+                  if (sendmail !== "false" && isSendInOrder) {
+                    const requestBody = doc?.RequestBody;
+                    const requestSubject = doc?.RequestSubject;
                     if (user) {
-                      const expireDate = pdfDetails?.[0].ExpiryDate.iso;
+                      const expireDate = doc.ExpiryDate.iso;
                       const newDate = new Date(expireDate);
                       const localExpireDate = newDate.toLocaleDateString(
                         "en-US",
                         { day: "numeric", month: "long", year: "numeric" }
                       );
-                      let senderEmail = pdfDetails?.[0].ExtUserPtr.Email;
-                      let senderPhone = pdfDetails?.[0]?.ExtUserPtr?.Phone;
-                      const senderName = `${pdfDetails?.[0].ExtUserPtr.Name}`;
+                      let senderEmail = doc.ExtUserPtr.Email;
+                      let senderPhone = doc?.ExtUserPtr?.Phone;
+                      const senderName = `${doc.ExtUserPtr.Name}`;
 
                       try {
                         const imgPng =
@@ -915,23 +957,22 @@ function PdfRequestFiles(
                         };
                         const objectId = user?.objectId;
                         const hostUrl = window.location.origin;
-                        //encode this url value `${pdfDetails?.[0].objectId}/${user.Email}/${objectId}` to base64 using `btoa` function
+                        const docId = doc?.objectId || pdfDetails?.[0]?.objectId;
+                        //encode this url value `${docId}/${user.Email}/${objectId}` to base64 using `btoa` function
                         let encodeBase64;
                         if (objectId) {
                           encodeBase64 = btoa(
-                            `${pdfDetails?.[0].objectId}/${user.Email}/${objectId}`
+                            `${docId}/${user.Email}/${objectId}`
                           );
                         } else {
-                          encodeBase64 = btoa(
-                            `${pdfDetails?.[0].objectId}/${user.Email}`
-                          );
+                          encodeBase64 = btoa(`${docId}/${user.Email}`);
                         }
                         let signPdf =
                               `${hostUrl}/login/${encodeBase64}`;
                         const openSignUrl =
                           `${hostUrl}/contact`;
-                        const orgName = pdfDetails[0]?.ExtUserPtr.Company
-                          ? pdfDetails[0].ExtUserPtr.Company
+                        const orgName = doc?.ExtUserPtr?.Company
+                          ? doc.ExtUserPtr.Company
                           : "";
                         const themeBGcolor = themeColor;
                         let replaceVar;
@@ -949,7 +990,7 @@ function PdfRequestFiles(
                             "</body> </html>";
 
                           const variables = {
-                            document_title: pdfDetails?.[0].Name,
+                            document_title: doc?.Name,
                             sender_name:
                               senderName,
                             sender_mail:
