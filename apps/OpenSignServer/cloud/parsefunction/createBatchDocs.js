@@ -32,15 +32,16 @@ async function sendMail(document) {
     month: 'long',
     year: 'numeric',
   });
-  let signerMail = document.Placeholders;
+  let signerMail = (document.Placeholders || []).filter(
+    (x) => x.Role !== 'prefill'
+  );
   const senderName =
     document.ExtUserPtr.Name;
   const senderEmail =
     document.ExtUserPtr.Email;
 
   if (document.SendinOrder) {
-    signerMail = signerMail.slice();
-    signerMail.splice(1);
+    signerMail = signerMail.slice(0, 1);
   }
   for (let i = 0; i < signerMail.length; i++) {
     try {
