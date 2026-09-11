@@ -7,6 +7,7 @@ import {
   saveFileUsage,
   getSecureUrl,
   appName,
+  mailTemplate,
 } from '../../../Utils.js';
 import GenerateCertificate from './GenerateCertificate.js';
 import { pdflibAddPlaceholder } from '@signpdf/placeholder-pdf-lib';
@@ -993,6 +994,180 @@ async function sendNotifyMail(doc, signUser, mailProvider) {
     }
   } catch (err) {
     console.log('err in sendnotifymail', err);
+  }
+}
+
+function publicOrigin() {
+  const base = process.env.PUBLIC_URL || 'http://localhost:3000';
+  try {
+    return new URL(base).origin;
+  } catch {
+    return base.replace(/\/$/, '');
+  }
+}
+
+function hasSignedByEmail(auditTrail, email) {
+  const normalized = (email || '').trim().toLowerCase();
+  if (!normalized) {
+    return false;
+  }
+  return (auditTrail || []).some(
+    entry =>
+      entry?.Activity === 'Signed' &&
+      (entry?.UserPtr?.Email || '').trim().toLowerCase() === normalized
+  );
+}
+
+function hasSignedById(auditTrail, objectId) {
+  if (!objectId) {
+    return false;
+  }
+  return (auditTrail || []).some(
+    entry =>
+      entry?.Activity === 'Signed' && entry?.UserPtr?.objectId === objectId
+  );
+}
+
+/**
+ * When SendinOrder is enabled, email the next pending signer after someone signs.
+ * Runs on the server so it is not blocked by client `sendmail=false` share links.
+ */
+async function sendNextSignerMail(doc, currentSignerId, auditTrail) {
+  try {
+    if (!doc?.SendinOrder) {
+      return;
+    }
+    const placeholders = (doc.Placeholders || []).filter(
+      item => item?.Role !== 'prefill'
+    );
+    if (!placeholders.length) {
+      return;
+    }
+
+    const currentIndex = placeholders.findIndex(
+      p => p.signerObjId === currentSignerId
+    );
+    const nextPlaceholders =
+      currentIndex >= 0 ? placeholders.slice(currentIndex + 1) : placeholders;
+
+    let nextSigner = null;
+    for (const placeholder of nextPlaceholders) {
+      const signer = placeholder?.signerObjId
+        ? (doc.Signers || []).find(s => s.objectId === placeholder.signerObjId)
+        : null;
+      const email = signer?.Email || placeholder?.email;
+      const objectId = signer?.objectId || placeholder?.signerObjId;
+      if (!email) {
+        continue;
+      }
+      if (
+        objectId === currentSignerId ||
+        hasSignedByEmail(auditTrail, email) ||
+        hasSignedById(auditTrail, objectId)
+      ) {
+        continue;
+      }
+      nextSigner = signer || {
+        Email: email,
+        Name: placeholder?.Name || '',
+        objectId,
+        Phone: placeholder?.phone || '',
+      };
+      break;
+    }
+
+    if (!nextSigner?.Email) {
+      console.log('sendNextSignerMail: no pending next signer');
+      return;
+    }
+
+    const sender = doc.ExtUserPtr || {};
+    const senderName = sender.Name || '';
+    const senderEmail = sender.Email || '';
+    const orgName = sender.Company || '';
+    const localExpireDate = doc?.ExpiryDate?.iso
+      ? new Date(doc.ExpiryDate.iso).toLocaleDateString('en-US', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })
+      : '';
+
+    const hostUrl = publicOrigin();
+    const encodeBase64 = Buffer.from(
+      nextSigner.objectId
+        ? `${doc.objectId}/${nextSigner.Email}/${nextSigner.objectId}`
+        : `${doc.objectId}/${nextSigner.Email}`,
+      'utf8'
+    ).toString('base64');
+    const signPdf = `${hostUrl}/login/${encodeBase64}`;
+
+    const requestBody =
+      doc?.RequestBody || sender?.TenantId?.RequestBody || '';
+    const requestSubject =
+      doc?.RequestSubject || sender?.TenantId?.RequestSubject || '';
+
+    let mailSubject;
+    let mailHtml;
+    if (requestBody && requestSubject) {
+      const replacedRequestBody = requestBody.replace(/"/g, "'");
+      const htmlReqBody =
+        "<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>" +
+        replacedRequestBody +
+        '</body></html>';
+      const variables = {
+        document_title: doc?.Name,
+        sender_name: senderName,
+        sender_mail: senderEmail,
+        sender_phone: sender?.Phone || '',
+        receiver_name: nextSigner?.Name || '',
+        receiver_email: nextSigner.Email,
+        receiver_phone: nextSigner?.Phone || '',
+        expiry_date: localExpireDate,
+        company_name: orgName,
+        signing_url: `<a href=${signPdf} target=_blank>Sign here</a>`,
+      };
+      const replaced = replaceMailVaribles(
+        requestSubject,
+        htmlReqBody,
+        variables
+      );
+      mailSubject = replaced.subject;
+      mailHtml = replaced.body;
+    } else {
+      const fallback = mailTemplate({
+        senderName,
+        senderMail: senderEmail,
+        title: doc.Name,
+        organization: orgName,
+        localExpireDate,
+        sigingUrl: signPdf,
+      });
+      mailSubject = fallback.subject;
+      mailHtml = fallback.body;
+    }
+
+    const params = {
+      extUserId: sender.objectId,
+      recipient: nextSigner.Email,
+      subject: mailSubject,
+      from: senderEmail,
+      replyto: senderEmail || '',
+      html: mailHtml,
+    };
+
+    console.log(
+      `sendNextSignerMail: sending to ${nextSigner.Email} for doc ${doc.objectId}`
+    );
+    await axios.post(`${serverUrl}/functions/sendmailv3`, params, {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Parse-Application-Id': APPID,
+        'X-Parse-Master-Key': masterKEY,
+      },
+    });
+  } catch (err) {
+    console.log('err in sendNextSignerMail', err);
   }
 }
 
@@ -2126,6 +2301,12 @@ async function PDF(req) {
           const doc = { ..._resDoc, AuditTrail: updatedDoc.AuditTrail, SignedUrl: data.imageUrl };
           sendMailsaveCertifcate(doc, pfx, isCustomMail, mailProvider, `signed_${name}`);
         } else {
+          // Notify the next signer when send-in-order is enabled (server-side).
+          await sendNextSignerMail(
+            _resDoc,
+            signUser.objectId,
+            updatedDoc?.AuditTrail || updateAuditTrail
+          );
           fs.unlinkSync(pfxname);
         }
         // `fs.unlinkSync` is used to remove exported signed pdf file from exports folder

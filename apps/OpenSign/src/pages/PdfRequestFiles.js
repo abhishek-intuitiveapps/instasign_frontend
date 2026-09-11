@@ -929,9 +929,11 @@ function PdfRequestFiles(
                       );
                     })
                     .filter(Boolean);
-                  // With send-in-order, notify only the next pending signer
+                  // With send-in-order, notify only the next pending signer.
+                  // Next-signer email is sent by the signPdf cloud function (PDF.js)
+                  // so it still works when the signer opened a share link with sendmail=false.
                   const user = isSendInOrder ? pendingSigners[0] : null;
-                  if (sendmail !== "false" && isSendInOrder) {
+                  if (false && sendmail !== "false" && isSendInOrder) {
                     const requestBody = doc?.RequestBody;
                     const requestSubject = doc?.RequestSubject;
                     if (user) {
