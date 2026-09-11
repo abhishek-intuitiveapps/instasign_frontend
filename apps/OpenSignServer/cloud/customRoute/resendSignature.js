@@ -144,6 +144,7 @@ function collectPendingSigners(document, targetEmail) {
 
 /**
  * Resend signing emails for a document that was already sent.
+ * If the draft exists but placeholders were never placed/sent, return prepare_url.
  */
 async function handleResendSignature(req, res) {
   try {
@@ -190,12 +191,17 @@ async function handleResendSignature(req, res) {
     }
 
     const document = JSON.parse(JSON.stringify(doc));
+    const prepareUrl = `${publicOrigin()}/placeHolderSign/${documentId}`;
 
+    // Draft exists but sender has not placed widgets and clicked Send yet.
+    // Return the same prepare URL so the client can reopen it instead of failing.
     if (!document.SignedUrl) {
-      return res.status(400).json({
-        status: 'error',
+      return res.status(200).json({
+        status: 'needs_prepare',
+        document_id: documentId,
+        prepare_url: prepareUrl,
         message:
-          'Document has not been sent yet. Open prepare_url, place signature fields, and send first.',
+          'Document already exists but signature fields have not been placed and sent yet. Open prepare_url to finish, then signing emails will go out.',
       });
     }
 
