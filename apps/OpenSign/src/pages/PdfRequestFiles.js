@@ -1020,7 +1020,7 @@ function PdfRequestFiles(
                           recipient: user.Email,
                           subject: replaceVar?.subject
                             ? replaceVar?.subject
-                            : `Your Appraisal Letter Is Ready – Please Review & Sign`,
+                            : `Your ${doc?.Name || "document"} is Ready – Please Review & Sign`,
                           from:
                             senderEmail,
                             html: replaceVar?.body

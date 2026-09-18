@@ -1344,7 +1344,7 @@ function PlaceHolderSign() {
           recipient: signerMail[i].Email,
           subject: replaceVar?.subject
             ? replaceVar?.subject
-            : `Your Appraisal Letter Is Ready – Please Review & Sign`,
+            : `Your ${documentName} is Ready – Please Review & Sign`,
           replyto:
             senderEmail ||
             "",
