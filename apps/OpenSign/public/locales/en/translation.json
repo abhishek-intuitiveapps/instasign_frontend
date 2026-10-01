@@ -156,6 +156,7 @@
   "report-heading": {
     "Sr.No": "Sr.No",
     "Title": "Title",
+    "Template ID": "Template ID",
     "Email": "Email",
     "Phone": "Phone",
     "File": "File",

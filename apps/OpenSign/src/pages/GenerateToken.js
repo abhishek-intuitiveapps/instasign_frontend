@@ -147,8 +147,9 @@ const GenerateToken = () => {
               </h2>
               <p className="text-sm opacity-80 mb-3">
                 From another project, upload a PDF and receiver email with your
-                API token. You will get a <code>prepare_url</code> to place
-                signature fields, then send from InstaSign.
+                API token. Pass <code>template_id</code> to reuse a saved field
+                layout (offer letter, exit letter, etc.). Without it you get a{" "}
+                <code>prepare_url</code> to place fields manually.
               </p>
               <pre className="bg-base-200 rounded-box p-3 text-xs overflow-x-auto whitespace-pre-wrap">
 {`POST ${apiBase || "https://dev.instasign.ai/app/v1"}/request-signature
@@ -156,12 +157,20 @@ Header: x-api-token: <your-token>
 
 Single receiver (form-data):
 file, email, name, phone, document_name, kyc_required, send_in_order
+optional: template_id, role, send
+
+With layout template (form-data):
+file, template_id, receivers (JSON), document_name
+send=true  → apply placeholders and email signers immediately
+send=false → apply placeholders; open prepare_url to review then send
 
 Multiple receivers (form-data):
 file, receivers (JSON array), document_name, kyc_required, send_in_order
+optional: template_id, send
 
-receivers example:
-[{"email":"a@example.com","name":"Alice"},{"email":"b@example.com","name":"Bob"}]
+receivers example (order maps to template roles, or use role names):
+[{"email":"candidate@example.com","name":"Alice","role":"Candidate"},
+ {"email":"hr@example.com","name":"HR Admin","role":"HR"}]
 
 Resend signing email (JSON):
 POST ${apiBase || "https://dev.instasign.ai/app/v1"}/resend-signature
