@@ -6,7 +6,7 @@ export default function reportJson(id) {
   const iphead = ["Title", "Note", "Folder", "File", "Signers"];
   const contactbook = ["Name", "Email", "Phone"];
   const dashboardReportHead = ["Title", "File", "Owner", "Signers"];
-  const templateReport = ["Title", "File", "Owner", "Signers"];
+  const templateReport = ["Title", "Template ID", "File", "Owner", "Signers"];
   switch (id) {
     // draft documents report
     case "ByHuevtCFY":

@@ -2152,6 +2152,27 @@ const ReportTable = (props) => {
                             </div>
                           )}
                         </td>
+                        {props.heading.includes("Template ID") && (
+                          <td className="p-2 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="font-mono text-[11px] select-all">
+                                {item.objectId}
+                              </span>
+                              <button
+                                type="button"
+                                title={t("copy-code")}
+                                className="op-btn op-btn-xs op-btn-ghost"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  copytoData(item.objectId);
+                                  showToast(t("copied"));
+                                }}
+                              >
+                                <i className="fa-light fa-copy"></i>
+                              </button>
+                            </div>
+                          </td>
+                        )}
                         {props?.heading?.includes("Reason") && (
                           <td className="p-2 text-center">
                             {item?.DeclineReason?.length > 25
